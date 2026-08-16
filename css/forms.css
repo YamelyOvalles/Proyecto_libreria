@@ -1,0 +1,294 @@
+/* Forms & Inputs */
+/* ============== */
+
+.form-input,
+.input-field {
+    width: 100%;
+    background-color: var(--surface-container-lowest);
+    border: 1px solid var(--surface-variant);
+    border-radius: var(--radius-default);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--on-surface);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    transition: all 0.2s ease;
+}
+
+.form-input::placeholder,
+.input-field::placeholder {
+    color: rgba(68, 72, 61, 0.4);
+}
+
+.form-input:focus,
+.input-field:focus {
+    outline: none;
+    border-color: var(--primary-container);
+    box-shadow: 0 0 0 2px rgba(190, 219, 149, 0.2);
+}
+
+.form-input:disabled,
+.input-field:disabled {
+    background-color: var(--surface-container);
+    color: var(--on-surface-variant);
+    cursor: not-allowed;
+}
+
+/* Form Labels */
+.form-label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    color: var(--on-surface-variant);
+    font-family: 'Inter', sans-serif;
+    font-size: var(--font-label-md);
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+/* Select Inputs */
+select.form-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-md) center;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5em;
+}
+
+/* Checkboxes */
+input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--surface-variant);
+    border-radius: var(--radius-default);
+    background-color: var(--surface-container-lowest);
+    cursor: pointer;
+    accent-color: var(--primary);
+    transition: all 0.2s ease;
+}
+
+input[type="checkbox"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(77, 102, 45, 0.2);
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+/* Buttons */
+.btn-primary {
+    width: 100%;
+    background-color: var(--primary-container);
+    color: var(--on-primary-container);
+    font-family: 'Inter', sans-serif;
+    font-size: var(--font-label-md);
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: none;
+    border-radius: var(--radius-default);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+    line-height: 1;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-fixed);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    background-color: var(--surface-container);
+    color: var(--on-surface-variant);
+    cursor: not-allowed;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    width: 100%;
+    background-color: var(--surface-container-lowest);
+    color: var(--on-surface);
+    border: 1px solid var(--surface-variant);
+    font-family: 'Inter', sans-serif;
+    font-size: var(--font-label-md);
+    font-weight: 600;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-default);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+    line-height: 1;
+}
+
+.btn-secondary:hover {
+    background-color: var(--surface-container-low);
+    border-color: var(--outline-variant);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Icon Button */
+.btn-icon {
+    background: none;
+    border: none;
+    color: var(--on-surface-variant);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-default);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:hover {
+    background-color: var(--surface-container-low);
+    color: var(--on-surface);
+}
+
+/* Form Groups */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group.horizontal {
+    flex-direction: row;
+    gap: var(--spacing-lg);
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.form-field.with-icon {
+    position: relative;
+}
+
+.form-field.with-icon .form-input,
+.form-field.with-icon .input-field {
+    padding-left: 2.5rem;
+}
+
+.form-field.with-icon .material-symbols-outlined {
+    position: absolute;
+    left: var(--spacing-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--outline);
+    pointer-events: none;
+    font-size: 20px;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--spacing-md);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--surface-variant);
+}
+
+@media (min-width: 768px) {
+    .form-actions {
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: auto;
+    }
+}
+
+/* Form Sections */
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.form-section > h2 {
+    font-size: var(--font-label-md);
+    color: var(--on-surface-variant);
+    border-bottom: 1px solid var(--surface-variant);
+    padding-bottom: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+/* Input with Prefix/Suffix */
+.input-prefix,
+.input-suffix {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--outline);
+    font-family: 'Inter', sans-serif;
+    font-size: var(--font-body-md);
+    pointer-events: none;
+}
+
+.input-prefix {
+    left: var(--spacing-md);
+}
+
+.input-suffix {
+    right: var(--spacing-md);
+}
+
+.form-field.has-prefix .form-input {
+    padding-left: 2rem;
+}
+
+.form-field.has-suffix .form-input {
+    padding-right: 2rem;
+}
+
+/* Inline Checkbox/Radio Group */
+.checkbox-group,
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.checkbox-item,
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+}
+
+.checkbox-item input,
+.radio-item input {
+    cursor: pointer;
+}
+
+.checkbox-item label,
+.radio-item label {
+    cursor: pointer;
+    user-select: none;
+}
