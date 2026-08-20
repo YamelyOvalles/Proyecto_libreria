@@ -1,95 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Bookstore Manager - Login</title>
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/theme.css"/>
-    <link rel="stylesheet" href="css/forms.css"/>
-    <link rel="stylesheet" href="css/layout.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Ventas de Libros</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .hero-accent {
+            border-left: 4px solid var(--color-secundario);
+            padding-left: 12px;
+        }
+    </style>
 </head>
-<body class="bg-background min-h-screen flex flex-col items-center justify-center body-md text-on-surface" style="padding: 0 var(--spacing-margin-mobile)">
-<!-- Main Container - Split Layout -->
-<div class="split-container mx-auto" style="width: 100%;">
-    <!-- Left Side: Branding -->
-    <div class="split-left">
-        <div style="position: absolute; inset: 0; background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuChDUhY77kbvyZ8BagKLHEavmrNqmVADpPTeuC6agUm-WTpg3yLMndTaKRNWQ163FhE8MMS4DFRK8iqJNX0nAK_L1hAcQwK5UA6csfXd47vTX6ljkXmiNFMqXN3bWaAEdnM9ypba1U614dcVKP_-Cw3rvn-hPBEvYGa_o6UfgzXFmEtJ8CNOSsDGJw4DyQTBP-z9SkPzs4Dm8eW79IUQk22oCEwl4jo4CGtFatgLL4xma8q_7bL0dxE'); background-size: cover; background-position: center;"></div>
-        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(252, 249, 248, 0.8), transparent);"></div>
-        <div class="p-xl" style="position: relative; z-index: 10; display: flex; flex-direction: column; justify-content: flex-end; height: 100%;">
-            <span class="material-symbols-outlined text-primary mb-md" style="font-size: 48px;">local_library</span>
-            <h1 class="display-lg text-on-surface mb-xs">Bookstore Manager</h1>
-            <p class="body-lg text-on-surface-variant">Intelligent inventory and retail operations.</p>
-        </div>
-    </div>
-    <!-- Right Side: Login Form -->
-    <div class="split-right">
-        <!-- Mobile Header -->
-        <div class="hidden md:flex flex-col items-center mb-xl" style="display: none;">
-            <span class="material-symbols-outlined text-primary mb-sm" style="font-size: 48px;">local_library</span>
-            <h1 class="headline-lg-mobile text-on-surface">Bookstore Manager</h1>
-        </div>
-        <div class="mb-lg">
-            <h2 class="headline-md text-on-surface mb-xs">Welcome back</h2>
-            <p class="body-sm text-on-surface-variant">Please enter your details to sign in.</p>
-        </div>
-        <form class="form-group" id="loginForm">
-            <!-- Email Field -->
-            <div class="form-field">
-                <label class="form-label" for="email">Email</label>
-                <input class="input-field" id="email" placeholder="Enter your email" type="email"/>
+<body>
+
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">📚</span> Ventas de Libros
             </div>
-            <!-- Password Field -->
-            <div class="form-field">
-                <label class="form-label" for="password">Password</label>
-                <input class="input-field" id="password" placeholder="••••••••" type="password"/>
-            </div>
-            <!-- Actions row -->
-            <div class="flex items-center justify-between mt-sm mb-lg">
-                <label class="checkbox-item">
-                    <input type="checkbox"/>
-                    <span class="body-sm text-on-surface-variant">Remember me</span>
-                </label>
-                <a class="label-sm text-primary" href="#" style="text-decoration: none;">Forgot password?</a>
-            </div>
-            <!-- Submit Button -->
-            <button class="btn-primary mt-md" type="submit">Sign in</button>
-        </form>
-        <!-- Divider -->
-        <div class="divider">
-            <span>OR</span>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-link active">Inicio</a></li>
+                    <li><a href="tienda.html" class="nav-link">Catálogo / Comprar</a></li>
+                    <li><a href="informativa.html" class="nav-link">Información</a></li>
+                    <li><a href="formulario.html" class="nav-link">Contacto</a></li>
+                    <li><a href="login.html" class="nav-link">Login</a></li>
+                </ul>
+            </nav>
         </div>
-        <!-- Google SSO Button -->
-        <button class="btn-secondary">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-            </svg>
-            Sign in with Google
-        </button>
-        <!-- Footer -->
-        <div class="mt-xl pt-lg border-t flex flex-col items-center gap-2">
-            <div class="flex items-center gap-1 text-primary">
-                <span class="material-symbols-outlined" style="font-size: 16px;">lock</span>
-                <span class="label-md">Sesión cifrada</span>
+    </header>
+
+    <main class="main-content">
+        <section id="hero-banner" class="hero">
+            <span class="badge" style="background-color: var(--color-terciario); color: white;">Novedad 2026</span>
+            <h1 style="color: var(--color-primario); font-size: 2.3rem; margin: 15px 0;">Tu Rincón de Lectura Digital</h1>
+            <p class="hero-accent">Explora nuestro catálogo en constante expansión y descubre universos fascinantes en cada página.</p>
+            <div style="margin-top: 20px;">
+                <a href="tienda.html" class="btn btn-primary">Ver Catálogo</a>
+                <a href="formulario.html" class="btn btn-secondary">Pedir Libro</a>
             </div>
-            <span class="body-sm text-on-surface-variant">© 2024 Bookstore Management System</span>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Nuestra Filosofía</h2>
+            <div class="grid grid-3">
+                <article class="card">
+                    <h3>Curaduría Especializada</h3>
+                    <p>Seleccionamos cuidadosamente cada ejemplar para ofrecerte solo lecturas transformadoras y de alta calidad.</p>
+                </article>
+                <article class="card">
+                    <h3>Comunidad de Lectores</h3>
+                    <p>Un espacio creado para compartir impresiones, reseñas y debatir sobre las grandes historias de la literatura.</p>
+                </article>
+                <article class="card">
+                    <h3>Envíos y Gestión</h3>
+                    <p>Accede a nuestro catálogo completo y solicita tus libros favoritos directamente a tu sucursal más cercana.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Colecciones Destacadas</h2>
+            <ul class="feature-list">
+                <li>Clásicos Inmortales de la Literatura Universal</li>
+                <li>Ficción Contemporánea y Realismo Mágico</li>
+                <li>Ensayos, Historia y Biografías Seleccionadas</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 YamelyOvalles/Proyecto_libreria. Todos los derechos reservados.</p>
         </div>
-    </div>
-</div>
-<script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Login sin validación - redirigir a inventory.html
-        window.location.href = 'inventory.html';
-    });
-</script>
+    </footer>
+
 </body>
 </html>

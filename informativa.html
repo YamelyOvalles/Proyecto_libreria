@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información - Librería Virtual</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .highlight-box {
+            background-color: #f0eaf0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .book-cover {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">📚</span> Proyecto Librería
+            </div>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li><a href="tienda.html" class="nav-link">Catálogo / Comprar</a></li>
+                    <li><a href="informativa.html" class="nav-link active">Información</a></li>
+                    <li><a href="formulario.html" class="nav-link">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="card">
+            <h1 style="color: var(--color-primario); border-bottom: 2px solid var(--color-primario-light); padding-bottom: 10px;">Obra Destacada: Cien Años de Soledad</h1>
+            
+            <div class="grid grid-2" style="align-items: center;">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80" alt="Portada del libro Cien Años de Soledad" class="book-cover">
+                </div>
+                <div>
+                    <h2>Ficha Técnica</h2>
+                    <ul class="details-list">
+                        <li><strong>Autor:</strong> Gabriel García Márquez</li>
+                        <li><strong>Género:</strong> Realismo Mágico / Novela</li>
+                        <li><strong>Publicación:</strong> 1967</li>
+                        <li><strong>Idioma Original:</strong> Español</li>
+                    </ul>
+                </div>
+            </div>
+
+            <article class="highlight-box">
+                <h3 style="color: var(--color-terciario); margin-top: 0;">Sinopsis General</h3>
+                <p>La obra narra la historia de la familia Buendía a lo largo de siete generaciones en el pueblo ficticio de Macondo. Una metáfora profunda sobre la soledad, el destino y la magia cotidiana.</p>
+            </article>
+
+            <h3 style="margin-top: 30px;">Disponibilidad en Red de Sucursales</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Sucursal</th>
+                        <th>Edición</th>
+                        <th>Estado</th>
+                        <th>Stock Disponible</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Central</td>
+                        <td>Tapa Dura (Conmemorativa)</td>
+                        <td><span class="badge badge-success">Disponible</span></td>
+                        <td>12 ejemplares</td>
+                    </tr>
+                    <tr>
+                        <td>Norte</td>
+                        <td>Tapa Blanda (Bolsillo)</td>
+                        <td><span class="badge badge-success">Disponible</span></td>
+                        <td>8 ejemplares</td>
+                    </tr>
+                    <tr>
+                        <td>Sur</td>
+                        <td>Edición Ilustrada</td>
+                        <td><span class="badge badge-warning">Pocas Unidades</span></td>
+                        <td>2 ejemplares</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 YamelyOvalles/Proyecto_libreria. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

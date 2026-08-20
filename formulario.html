@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto y Pedidos - Librería Virtual</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .form-container {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <span class="logo-icon">📚</span> Proyecto Librería
+            </div>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li><a href="tienda.html" class="nav-link">Catálogo / Comprar</a></li>
+                    <li><a href="informativa.html" class="nav-link">Información</a></li>
+                    <li><a href="formulario.html" class="nav-link active">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="card form-container">
+            <h1 style="color: var(--color-primario); text-align: center; margin-bottom: 10px;">Formulario de Solicitudes</h1>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Completa el siguiente formulario para consultar disponibilidad o realizar reservas de libros.</p>
+
+            <form action="#" method="post" class="form">
+                <div class="form-group">
+                    <label for="nombre" class="form-label">Nombre Completo *</label>
+                    <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Ej. Ana García" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="correo" class="form-label">Correo Electrónico *</label>
+                    <input type="email" id="correo" name="correo" class="form-input" placeholder="correo@ejemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono" class="form-label">Teléfono de Contacto</label>
+                    <input type="tel" id="telefono" name="telefono" class="form-input" placeholder="+809 000 0000">
+                </div>
+
+                <div class="form-group">
+                    <label for="tiposolicitud" class="form-label">Tipo de Solicitud *</label>
+                    <select id="tiposolicitud" name="tiposolicitud" class="form-select" required>
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="reserva">Reserva de Libro</option>
+                        <option value="consulta">Consulta de Stock</option>
+                        <option value="sugerencia">Sugerencia de Título</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="mensaje" class="form-label">Detalle del Mensaje o Pedido *</label>
+                    <textarea id="mensaje" name="mensaje" rows="5" class="form-textarea" placeholder="Indica el título del libro, autor o tu consulta..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem;">Enviar Solicitud</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; 2026 YamelyOvalles/Proyecto_libreria. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
