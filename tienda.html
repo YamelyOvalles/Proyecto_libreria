@@ -81,12 +81,40 @@
             justify-content: center;
             gap: 0.5rem;
             transition: opacity 0.2s;
+            pointer-events: auto;
+        }
+        .btn-buy * {
+            pointer-events: none; /* Asegura que el clic siempre sea tomado por el botón */
         }
         .btn-buy:hover {
             opacity: 0.9;
         }
         .footer-spaced {
             margin-top: 3rem;
+        }
+
+        /* Modal de confirmación en la misma página */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #0F172A;
+            color: #ffffff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(150%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 9999;
+        }
+        .toast-notification.show {
+            transform: translateY(0);
+        }
+        .toast-icon {
+            color: #22c55e;
         }
     </style>
 </head>
@@ -123,7 +151,7 @@
                     <h2 class="book-title">Cien Años de Soledad</h2>
                     <p class="book-author">Gabriel García Márquez</p>
                     <p class="book-price">RD$ 1,150.00</p>
-                    <button type="button" class="btn-buy" onclick="comprarLibro(event, 'Cien Años de Soledad', 'RD$ 1,150.00')">
+                    <button type="button" class="btn-buy" onclick="return comprarLibro(event, 'Cien Años de Soledad', 'RD$ 1,150.00')">
                         <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
                     </button>
                 </div>
@@ -135,7 +163,7 @@
                     <h2 class="book-title">El Principito</h2>
                     <p class="book-author">Antoine de Saint-Exupéry</p>
                     <p class="book-price">RD$ 750.00</p>
-                    <button type="button" class="btn-buy" onclick="comprarLibro(event, 'El Principito', 'RD$ 750.00')">
+                    <button type="button" class="btn-buy" onclick="return comprarLibro(event, 'El Principito', 'RD$ 750.00')">
                         <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
                     </button>
                 </div>
@@ -147,7 +175,7 @@
                     <h2 class="book-title">1984</h2>
                     <p class="book-author">George Orwell</p>
                     <p class="book-price">RD$ 900.00</p>
-                    <button type="button" class="btn-buy" onclick="comprarLibro(event, '1984', 'RD$ 900.00')">
+                    <button type="button" class="btn-buy" onclick="return comprarLibro(event, '1984', 'RD$ 900.00')">
                         <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
                     </button>
                 </div>
@@ -159,7 +187,7 @@
                     <h2 class="book-title">Don Quijote de la Mancha</h2>
                     <p class="book-author">Miguel de Cervantes</p>
                     <p class="book-price">RD$ 1,350.00</p>
-                    <button type="button" class="btn-buy" onclick="comprarLibro(event, 'Don Quijote de la Mancha', 'RD$ 1,350.00')">
+                    <button type="button" class="btn-buy" onclick="return comprarLibro(event, 'Don Quijote de la Mancha', 'RD$ 1,350.00')">
                         <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
                     </button>
                 </div>
@@ -168,6 +196,12 @@
         </div>
     </main>
 
+    <!-- Notificación emergente dentro de la misma vista -->
+    <div id="toast" class="toast-notification">
+        <span class="material-symbols-outlined toast-icon">check_circle</span>
+        <span id="toast-message">Libro agregado al carrito</span>
+    </div>
+
     <footer class="footer footer-spaced">
         <div class="footer-container">
             <p>&copy; 2026 YamelyOvalles/Proyecto_libreria. Todos los derechos reservados.</p>
@@ -175,9 +209,23 @@
     </footer>
 
     <script>
-        function comprarLibro(e, titulo, precio) {
-            e.preventDefault(); // Evita recargas o saltos de página
-            alert(`¡Excelente elección! Agregaste "${titulo}" (${precio}) a tu carrito de compras.`);
+        function comprarLibro(event, titulo, precio) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = `¡Agregado! "${titulo}" (${precio}) a tu carrito.`;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+
+            return false;
         }
     </script>
 </body>
