@@ -6,9 +6,21 @@
     <title>Inicio - Ventas de Libros</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
+        .hero-badge {
+            background-color: var(--color-terciario);
+            color: #ffffff;
+        }
+        .hero-title {
+            color: var(--color-primario);
+            font-size: 2.3rem;
+            margin: 15px 0;
+        }
         .hero-accent {
             border-left: 4px solid var(--color-secundario);
             padding-left: 12px;
+        }
+        .hero-actions {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -33,10 +45,10 @@
 
     <main class="main-content">
         <section id="hero-banner" class="hero">
-            <span class="badge" style="background-color: var(--color-terciario); color: white;">Novedad 2026</span>
-            <h1 style="color: var(--color-primario); font-size: 2.3rem; margin: 15px 0;">Tu Rincón de Lectura Digital</h1>
+            <span class="badge hero-badge">Novedad 2026</span>
+            <h1 class="hero-title">Tu Rincón de Lectura Digital</h1>
             <p class="hero-accent">Explora nuestro catálogo en constante expansión y descubre universos fascinantes en cada página.</p>
-            <div style="margin-top: 20px;">
+            <div class="hero-actions">
                 <a href="tienda.html" class="btn btn-primary">Ver Catálogo</a>
                 <a href="formulario.html" class="btn btn-secondary">Pedir Libro</a>
             </div>

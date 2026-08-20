@@ -10,6 +10,20 @@
             max-width: 650px;
             margin: 0 auto;
         }
+        .form-title {
+            color: var(--color-primario);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .form-description {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+        .btn-full {
+            width: 100%;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -25,30 +39,31 @@
                     <li><a href="tienda.html" class="nav-link">Catálogo / Comprar</a></li>
                     <li><a href="informativa.html" class="nav-link">Información</a></li>
                     <li><a href="formulario.html" class="nav-link active">Contacto</a></li>
+                    <li><a href="login.html" class="nav-link">Login</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main class="main-content">
-        <section class="card form-container">
-            <h1 style="color: var(--color-primario); text-align: center; margin-bottom: 10px;">Formulario de Solicitudes</h1>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px;">Completa el siguiente formulario para consultar disponibilidad o realizar reservas de libros.</p>
+        <article class="card form-container">
+            <h1 class="form-title">Formulario de Solicitudes</h1>
+            <p class="form-description">Completa el siguiente formulario para consultar disponibilidad o realizar reservas de libros.</p>
 
             <form action="#" method="post" class="form">
                 <div class="form-group">
                     <label for="nombre" class="form-label">Nombre Completo *</label>
-                    <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Ej. Ana García" required>
+                    <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Ej. Ana García" required autocomplete="name">
                 </div>
 
                 <div class="form-group">
                     <label for="correo" class="form-label">Correo Electrónico *</label>
-                    <input type="email" id="correo" name="correo" class="form-input" placeholder="correo@ejemplo.com" required>
+                    <input type="email" id="correo" name="correo" class="form-input" placeholder="correo@ejemplo.com" required autocomplete="email">
                 </div>
 
                 <div class="form-group">
                     <label for="telefono" class="form-label">Teléfono de Contacto</label>
-                    <input type="tel" id="telefono" name="telefono" class="form-input" placeholder="+809 000 0000">
+                    <input type="tel" id="telefono" name="telefono" class="form-input" placeholder="+809 000 0000" autocomplete="tel">
                 </div>
 
                 <div class="form-group">
@@ -67,10 +82,10 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1rem;">Enviar Solicitud</button>
+                    <button type="submit" class="btn btn-primary btn-full">Enviar Solicitud</button>
                 </div>
             </form>
-        </section>
+        </article>
     </main>
 
     <footer class="footer">

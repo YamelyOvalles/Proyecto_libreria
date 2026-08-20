@@ -6,11 +6,26 @@
     <title>Información - Librería Virtual</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
+        .page-title {
+            color: var(--color-primario);
+            border-bottom: 2px solid var(--color-primario-light);
+            padding-bottom: 10px;
+        }
+        .grid-valign {
+            align-items: center;
+        }
         .highlight-box {
             background-color: #f0eaf0;
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
+        }
+        .synopsis-title {
+            color: var(--color-terciario);
+            margin-top: 0;
+        }
+        .section-subtitle {
+            margin-top: 30px;
         }
         .book-cover {
             max-width: 100%;
@@ -32,16 +47,17 @@
                     <li><a href="tienda.html" class="nav-link">Catálogo / Comprar</a></li>
                     <li><a href="informativa.html" class="nav-link active">Información</a></li>
                     <li><a href="formulario.html" class="nav-link">Contacto</a></li>
+                    <li><a href="login.html" class="nav-link">Login</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main class="main-content">
-        <section class="card">
-            <h1 style="color: var(--color-primario); border-bottom: 2px solid var(--color-primario-light); padding-bottom: 10px;">Obra Destacada: Cien Años de Soledad</h1>
+        <article class="card">
+            <h1 class="page-title">Obra Destacada: Cien Años de Soledad</h1>
             
-            <div class="grid grid-2" style="align-items: center;">
+            <div class="grid grid-2 grid-valign">
                 <div>
                     <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80" alt="Portada del libro Cien Años de Soledad" class="book-cover">
                 </div>
@@ -56,19 +72,19 @@
                 </div>
             </div>
 
-            <article class="highlight-box">
-                <h3 style="color: var(--color-terciario); margin-top: 0;">Sinopsis General</h3>
+            <section class="highlight-box">
+                <h3 class="synopsis-title">Sinopsis General</h3>
                 <p>La obra narra la historia de la familia Buendía a lo largo de siete generaciones en el pueblo ficticio de Macondo. Una metáfora profunda sobre la soledad, el destino y la magia cotidiana.</p>
-            </article>
+            </section>
 
-            <h3 style="margin-top: 30px;">Disponibilidad en Red de Sucursales</h3>
+            <h3 class="section-subtitle">Disponibilidad en Red de Sucursales</h3>
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Sucursal</th>
-                        <th>Edición</th>
-                        <th>Estado</th>
-                        <th>Stock Disponible</th>
+                        <th scope="col">Sucursal</th>
+                        <th scope="col">Edición</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Stock Disponible</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,7 +108,7 @@
                     </tr>
                 </tbody>
             </table>
-        </section>
+        </article>
     </main>
 
     <footer class="footer">

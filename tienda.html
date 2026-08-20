@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo y Compra - Librería Virtual</title>
-    <!-- Estilos existentes del proyecto -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/theme.css">
     <link rel="stylesheet" href="css/layout.css">
@@ -15,6 +14,10 @@
             max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
+        }
+        .hero-banner-title {
+            text-align: center;
+            margin-bottom: 2rem;
         }
         .books-grid {
             display: grid;
@@ -68,7 +71,7 @@
             width: 100%;
             padding: 0.6rem;
             background-color: #2563eb;
-            color: white;
+            color: #ffffff;
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -81,11 +84,13 @@
         .btn-buy:hover {
             background-color: #1d4ed8;
         }
+        .footer-spaced {
+            margin-top: 3rem;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Navegación -->
     <header class="header">
         <div class="header-container">
             <div class="logo">
@@ -97,69 +102,64 @@
                     <li><a href="tienda.html" class="nav-link active">Catálogo / Comprar</a></li>
                     <li><a href="informativa.html" class="nav-link">Información</a></li>
                     <li><a href="formulario.html" class="nav-link">Contacto</a></li>
+                    <li><a href="login.html" class="nav-link">Login</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Sección Principal -->
     <main class="catalog-container">
-        <section class="hero-banner" style="text-align: center; margin-bottom: 2rem;">
+        <section class="hero-banner-title">
             <h1>Catálogo de Libros</h1>
             <p>Selecciona tu próximo libro favorito y realiza tu compra en línea.</p>
         </section>
 
-        <!-- Cuadrícula de Libros -->
         <div class="books-grid">
             
-            <!-- Libro 1 -->
             <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400" alt="Cien años de soledad" class="book-cover">
+                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400" alt="Portada del libro Cien Años de Soledad" class="book-cover">
                 <div class="book-info">
                     <h2 class="book-title">Cien Años de Soledad</h2>
                     <p class="book-author">Gabriel García Márquez</p>
                     <p class="book-price">RD$ 1,150.00</p>
-                    <button class="btn-buy" onclick="comprarLibro('Cien Años de Soledad', 'RD$ 1,150.00')">
-                        <span class="material-symbols-outlined">shopping_cart</span> Comprar
+                    <button type="button" class="btn-buy" onclick="comprarLibro('Cien Años de Soledad', 'RD$ 1,150.00')">
+                        <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
                     </button>
                 </div>
             </article>
 
-            <!-- Libro 2 -->
             <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400" alt="El Principito" class="book-cover">
+                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400" alt="Portada del libro El Principito" class="book-cover">
                 <div class="book-info">
                     <h2 class="book-title">El Principito</h2>
                     <p class="book-author">Antoine de Saint-Exupéry</p>
                     <p class="book-price">RD$ 750.00</p>
-                    <button class="btn-buy" onclick="comprarLibro('El Principito', 'RD$ 750.00')">
-                        <span class="material-symbols-outlined">shopping_cart</span> Comprar
+                    <button type="button" class="btn-buy" onclick="comprarLibro('El Principito', 'RD$ 750.00')">
+                        <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
                     </button>
                 </div>
             </article>
 
-            <!-- Libro 3 -->
             <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400" alt="1984" class="book-cover">
+                <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400" alt="Portada del libro 1984" class="book-cover">
                 <div class="book-info">
                     <h2 class="book-title">1984</h2>
                     <p class="book-author">George Orwell</p>
                     <p class="book-price">RD$ 900.00</p>
-                    <button class="btn-buy" onclick="comprarLibro('1984', 'RD$ 900.00')">
-                        <span class="material-symbols-outlined">shopping_cart</span> Comprar
+                    <button type="button" class="btn-buy" onclick="comprarLibro('1984', 'RD$ 900.00')">
+                        <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
                     </button>
                 </div>
             </article>
 
-            <!-- Libro 4 -->
             <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400" alt="Don Quijote de la Mancha" class="book-cover">
+                <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400" alt="Portada del libro Don Quijote de la Mancha" class="book-cover">
                 <div class="book-info">
                     <h2 class="book-title">Don Quijote de la Mancha</h2>
                     <p class="book-author">Miguel de Cervantes</p>
                     <p class="book-price">RD$ 1,350.00</p>
-                    <button class="btn-buy" onclick="comprarLibro('Don Quijote de la Mancha', 'RD$ 1,350.00')">
-                        <span class="material-symbols-outlined">shopping_cart</span> Comprar
+                    <button type="button" class="btn-buy" onclick="comprarLibro('Don Quijote de la Mancha', 'RD$ 1,350.00')">
+                        <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
                     </button>
                 </div>
             </article>
@@ -167,14 +167,12 @@
         </div>
     </main>
 
-    <!-- Pie de página -->
-    <footer class="footer" style="margin-top: 3rem;">
+    <footer class="footer footer-spaced">
         <div class="footer-container">
             <p>&copy; 2026 YamelyOvalles/Proyecto_libreria. Todos los derechos reservados.</p>
         </div>
     </footer>
 
-    <!-- Lógica de Compra Simplificada -->
     <script>
         function comprarLibro(titulo, precio) {
             const confirmar = confirm(`¿Deseas agregar "${titulo}" (${precio}) a tu proceso de compra?`);
