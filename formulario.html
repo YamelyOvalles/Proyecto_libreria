@@ -3,26 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto y Pedidos - Librería Virtual</title>
+    <title>Contacto - Ventas de Libros</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
-        .form-container {
-            max-width: 650px;
+        .contact-hero {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .contact-title {
+            color: var(--color-primario, #1e293b);
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        .contact-subtitle {
+            color: var(--text-muted, #64748b);
+            font-size: 1.1rem;
+            max-width: 600px;
             margin: 0 auto;
         }
-        .form-title {
-            color: var(--color-primario);
-            text-align: center;
-            margin-bottom: 10px;
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
         }
-        .form-description {
-            text-align: center;
-            color: var(--text-muted);
-            margin-bottom: 30px;
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
         }
-        .btn-full {
-            width: 100%;
+        .info-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .info-icon {
+            background-color: #f1f5f9;
+            color: var(--color-primario, #2563eb);
+            padding: 0.75rem;
+            border-radius: 10px;
+            font-size: 1.5rem;
+        }
+        .info-content h3 {
             font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+            color: var(--color-primario, #1e293b);
+        }
+        .info-content p {
+            margin: 0;
+            color: var(--text-muted, #64748b);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .form-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #334155;
+            font-size: 0.9rem;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--color-primario, #2563eb);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .btn-send {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--color-primario, #2563eb);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: opacity 0.2s;
+        }
+        .btn-send:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -31,7 +126,7 @@
     <header class="header">
         <div class="header-container">
             <div class="logo">
-                <span class="logo-icon">📚</span> Proyecto Librería
+                <span class="logo-icon">📚</span> Ventas de Libros
             </div>
             <nav class="nav">
                 <ul class="nav-list">
@@ -46,46 +141,90 @@
     </header>
 
     <main class="main-content">
-        <article class="card form-container">
-            <h1 class="form-title">Formulario de Solicitudes</h1>
-            <p class="form-description">Completa el siguiente formulario para consultar disponibilidad o realizar reservas de libros.</p>
+        <section class="contact-hero">
+            <h1 class="contact-title">Ponte en Contacto</h1>
+            <p class="contact-subtitle">¿Tienes alguna pregunta, deseas solicitar un libro especial o pedir asesoría? Escríbenos directamente o visítanos.</p>
+        </section>
 
-            <form action="#" method="post" class="form">
-                <div class="form-group">
-                    <label for="nombre" class="form-label">Nombre Completo *</label>
-                    <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Ej. Ana García" required autocomplete="name">
+        <div class="contact-grid">
+            <!-- Columna de información de contacto -->
+            <aside class="info-card">
+                <h2>Medios de Contacto</h2>
+                
+                <div class="info-item">
+                    <span class="material-symbols-outlined info-icon">call</span>
+                    <div class="info-content">
+                        <h3>Llámanos o WhatsApp</h3>
+                        <p>+1 (809) 555-0199</p>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="correo" class="form-label">Correo Electrónico *</label>
-                    <input type="email" id="correo" name="correo" class="form-input" placeholder="correo@ejemplo.com" required autocomplete="email">
+                <div class="info-item">
+                    <span class="material-symbols-outlined info-icon">mail</span>
+                    <div class="info-content">
+                        <h3>Correo Electrónico</h3>
+                        <p>contacto@ventasdelibros.com</p>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="telefono" class="form-label">Teléfono de Contacto</label>
-                    <input type="tel" id="telefono" name="telefono" class="form-input" placeholder="+809 000 0000" autocomplete="tel">
+                <div class="info-item">
+                    <span class="material-symbols-outlined info-icon">location_on</span>
+                    <div class="info-content">
+                        <h3>Ubicación Principal</h3>
+                        <p>Av. Winston Churchill #105, Santo Domingo, Rep. Dom.</p>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="tiposolicitud" class="form-label">Tipo de Solicitud *</label>
-                    <select id="tiposolicitud" name="tiposolicitud" class="form-select" required>
-                        <option value="" disabled selected>Selecciona una opción</option>
-                        <option value="reserva">Reserva de Libro</option>
-                        <option value="consulta">Consulta de Stock</option>
-                        <option value="sugerencia">Sugerencia de Título</option>
-                    </select>
+                <div class="info-item">
+                    <span class="material-symbols-outlined info-icon">schedule</span>
+                    <div class="info-content">
+                        <h3>Horario de Atención</h3>
+                        <p>Lun - Sáb: 8:00 AM - 7:00 PM<br>Domingos: Cerrado</p>
+                    </div>
                 </div>
+            </aside>
 
-                <div class="form-group">
-                    <label for="mensaje" class="form-label">Detalle del Mensaje o Pedido *</label>
-                    <textarea id="mensaje" name="mensaje" rows="5" class="form-textarea" placeholder="Indica el título del libro, autor o tu consulta..." required></textarea>
-                </div>
+            <!-- Columna del formulario -->
+            <section class="form-card">
+                <h2>Envíanos un Mensaje</h2>
+                <form action="#" method="post" onsubmit="enviarFormulario(event)">
+                    <div class="form-group">
+                        <label for="nombre" class="form-label">Nombre Completo *</label>
+                        <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Ej. Ana García" required autocomplete="name">
+                    </div>
 
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-full">Enviar Solicitud</button>
-                </div>
-            </form>
-        </article>
+                    <div class="form-group">
+                        <label for="correo" class="form-label">Correo Electrónico *</label>
+                        <input type="email" id="correo" name="correo" class="form-input" placeholder="correo@ejemplo.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono" class="form-label">Teléfono / WhatsApp</label>
+                        <input type="tel" id="telefono" name="telefono" class="form-input" placeholder="+1 809 000 0000" autocomplete="tel">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tiposolicitud" class="form-label">Motivo del Mensaje *</label>
+                        <select id="tiposolicitud" name="tiposolicitud" class="form-select" required>
+                            <option value="" disabled selected>Selecciona una opción</option>
+                            <option value="pedido">Pedido Especial / Encargo</option>
+                            <option value="consulta">Consulta de Stock</option>
+                            <option value="soporte">Atención al Cliente</option>
+                            <option value="otro">Otro Motivo</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mensaje" class="form-label">Mensaje *</label>
+                        <textarea id="mensaje" name="mensaje" rows="4" class="form-textarea" placeholder="Escribe aquí tu consulta o el título del libro que buscas..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-send">
+                        <span class="material-symbols-outlined">send</span> Enviar Mensaje
+                    </button>
+                </form>
+            </section>
+        </div>
     </main>
 
     <footer class="footer">
@@ -94,5 +233,12 @@
         </div>
     </footer>
 
+    <script>
+        function enviarFormulario(e) {
+            e.preventDefault();
+            alert("¡Gracias por contactarnos! Tu mensaje ha sido enviado correctamente. Te responderemos muy pronto.");
+            e.target.reset();
+        }
+    </script>
 </body>
 </html>
