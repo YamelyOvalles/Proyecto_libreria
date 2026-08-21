@@ -3,10 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto - Ventas de Libros</title>
+    <title>Contacto - Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #ffffff;
+            text-decoration: none;
+        }
+        .flag-icon-svg {
+            width: 28px;
+            height: 20px;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            object-fit: cover;
+            display: inline-block;
+        }
+
         .contact-hero {
             text-align: center;
             margin-bottom: 2.5rem;
@@ -126,14 +144,15 @@
     <header class="header">
         <div class="header-container">
             <div class="logo">
-                <span class="logo-icon">📚</span> Ventas de Libros
+                <img src="https://flagcdn.com/do.svg" alt="Bandera Dominicana" class="flag-icon-svg">
+                Librería Quisqueya
             </div>
             <nav class="nav">
                 <ul class="nav-list">
-                    <li><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li><a href="login.html" class="nav-link">Login</a></li>
+                    <li><a href="index.html" class="nav-link">Información</a></li>
                     <li><a href="tienda.html" class="nav-link">Catálogo / Comprar</a></li>
                     <li><a href="formulario.html" class="nav-link active">Contacto</a></li>
-                    <li><a href="login.html" class="nav-link">Login</a></li>
                 </ul>
             </nav>
         </div>
@@ -162,7 +181,7 @@
                     <span class="material-symbols-outlined info-icon">mail</span>
                     <div class="info-content">
                         <h3>Correo Electrónico</h3>
-                        <p>contacto@ventasdelibros.com</p>
+                        <p>contacto@libreriaquisqueya.com</p>
                     </div>
                 </div>
 
