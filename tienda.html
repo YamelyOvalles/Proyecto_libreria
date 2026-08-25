@@ -3,231 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo y Compra - Librería Virtual</title>
+    <meta name="description" content="Catálogo de Librería Quisqueya">
+    <title>Catálogo | Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
-    <style>
-        .catalog-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        .hero-banner-title {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-        .book-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .book-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        .book-cover {
-            width: 100%;
-            height: 260px;
-            object-fit: cover;
-            background-color: #f1f5f9;
-        }
-        .book-info {
-            padding: 1rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .book-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 0.25rem;
-        }
-        .book-author {
-            font-size: 0.9rem;
-            color: #64748b;
-            margin-bottom: 0.5rem;
-        }
-        .book-price {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: var(--color-primario, #2563eb);
-            margin: 0.5rem 0;
-        }
-        .btn-buy {
-            width: 100%;
-            padding: 0.6rem;
-            background-color: var(--color-primario, #2563eb);
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: opacity 0.2s;
-            pointer-events: auto;
-        }
-        .btn-buy * {
-            pointer-events: none; /* Asegura que el clic siempre sea tomado por el botón */
-        }
-        .btn-buy:hover {
-            opacity: 0.9;
-        }
-        .footer-spaced {
-            margin-top: 3rem;
-        }
-
-        /* Modal de confirmación en la misma página */
-        .toast-notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #0F172A;
-            color: #ffffff;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transform: translateY(150%);
-            transition: transform 0.3s ease-in-out;
-            z-index: 9999;
-        }
-        .toast-notification.show {
-            transform: translateY(0);
-        }
-        .toast-icon {
-            color: #22c55e;
-        }
-    </style>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js" defer></script>
 </head>
 <body>
-
-    <header class="header">
+    <header class="site-header">
         <div class="header-container">
-            <div class="logo">
-               <img src="https://flagcdn.com/do.svg" alt="Bandera Dominicana" class="flag-icon-svg">
-                Librería Quisqueya
-            </div>
-            <nav class="nav">
+            <a class="brand" href="informacion.html"><span aria-hidden="true">🇩🇴</span> Librería Quisqueya</a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav" class="site-nav" aria-label="Navegación principal">
                 <ul class="nav-list">
-                    <li><a href="index.html" class="nav-link">Inicio</a></li>
-                    <li><a href="tienda.html" class="nav-link active">Catálogo / Compra</a></li>
-                    <li><a href="informativa.html" class="nav-link">Información</a></li>
-                    <li><a href="formulario.html" class="nav-link">Contacto</a></li>
-                    <li><a href="login.html" class="nav-link">Login</a></li>
+                    <li><a class="nav-link" href="informacion.html">Información</a></li>
+                    <li><a class="nav-link active" aria-current="page" href="tienda.html">Catálogo</a></li>
+                    <li><a class="nav-link" href="formulario.html">Contacto</a></li>
+                    <li><button class="logout-button" type="button" data-logout>Cerrar sesión</button></li>
                 </ul>
             </nav>
         </div>
     </header>
-
-    <main class="catalog-container">
-        <section class="hero-banner-title">
-            <h1>Catálogo de Libros</h1>
-            <p>Selecciona tu próximo libro favorito y realiza tu compra en línea.</p>
-        </section>
-
-        <div class="books-grid">
-            
+    <main class="page-container content-section">
+        <div class="section-heading section-heading-left">
+            <p class="eyebrow">Catálogo</p>
+            <h1>Encuentra tu próxima lectura</h1>
+            <p>Una pequeña selección de títulos disponibles en Librería Quisqueya.</p>
+        </div>
+        <section class="book-grid" aria-label="Libros disponibles">
             <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400" alt="Portada del libro Cien Años de Soledad" class="book-cover">
+                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80" alt="Libro abierto sobre una mesa" class="book-cover">
                 <div class="book-info">
-                    <h2 class="book-title">Cien Años de Soledad</h2>
                     <p class="book-author">Gabriel García Márquez</p>
+                    <h2>Cien años de soledad</h2>
                     <p class="book-price">RD$ 1,150.00</p>
-                    <button type="button" class="btn-buy" onclick="return comprarLibro(event, 'Cien Años de Soledad', 'RD$ 1,150.00')">
-                        <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
-                    </button>
+                    <button class="button button-primary button-full" type="button" data-book="Cien años de soledad">Agregar al carrito</button>
                 </div>
             </article>
-
             <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400" alt="Portada del libro El Principito" class="book-cover">
+                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=500&q=80" alt="Pila de libros" class="book-cover">
                 <div class="book-info">
-                    <h2 class="book-title">El Principito</h2>
                     <p class="book-author">Antoine de Saint-Exupéry</p>
+                    <h2>El Principito</h2>
                     <p class="book-price">RD$ 750.00</p>
-                    <button type="button" class="btn-buy" onclick="return comprarLibro(event, 'El Principito', 'RD$ 750.00')">
-                        <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
-                    </button>
+                    <button class="button button-primary button-full" type="button" data-book="El Principito">Agregar al carrito</button>
                 </div>
             </article>
-
             <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400" alt="Portada del libro 1984" class="book-cover">
+                <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=500&q=80" alt="Libros en una biblioteca" class="book-cover">
                 <div class="book-info">
-                    <h2 class="book-title">1984</h2>
                     <p class="book-author">George Orwell</p>
+                    <h2>1984</h2>
                     <p class="book-price">RD$ 900.00</p>
-                    <button type="button" class="btn-buy" onclick="return comprarLibro(event, '1984', 'RD$ 900.00')">
-                        <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
-                    </button>
+                    <button class="button button-primary button-full" type="button" data-book="1984">Agregar al carrito</button>
                 </div>
             </article>
-
             <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400" alt="Portada del libro Don Quijote de la Mancha" class="book-cover">
+                <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=500&q=80" alt="Libro de tapa dura" class="book-cover">
                 <div class="book-info">
-                    <h2 class="book-title">Don Quijote de la Mancha</h2>
                     <p class="book-author">Miguel de Cervantes</p>
+                    <h2>Don Quijote de la Mancha</h2>
                     <p class="book-price">RD$ 1,350.00</p>
-                    <button type="button" class="btn-buy" onclick="return comprarLibro(event, 'Don Quijote de la Mancha', 'RD$ 1,350.00')">
-                        <span class="material-symbols-outlined" aria-hidden="true">shopping_cart</span> Comprar
-                    </button>
+                    <button class="button button-primary button-full" type="button" data-book="Don Quijote de la Mancha">Agregar al carrito</button>
                 </div>
             </article>
-
-        </div>
+        </section>
     </main>
-
-    <!-- Notificación emergente dentro de la misma vista -->
-    <div id="toast" class="toast-notification">
-        <span class="material-symbols-outlined toast-icon">check_circle</span>
-        <span id="toast-message">Libro agregado al carrito</span>
-    </div>
-
-    <footer class="footer footer-spaced">
-        <div class="footer-container">
-            <p>&copy; 2026 YamelyOvalles/Proyecto_libreria. Todos los derechos reservados.</p>
-        </div>
-    </footer>
-
-    <script>
-        function comprarLibro(event, titulo, precio) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            
-            toastMessage.textContent = `¡Agregado! "${titulo}" (${precio}) a tu carrito.`;
-            toast.classList.add('show');
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-
-            return false;
-        }
-    </script>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
 </body>
 </html>

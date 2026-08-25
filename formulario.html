@@ -3,260 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contacto - Librería Quisqueya</title>
+    <meta name="description" content="Contacto de Librería Quisqueya">
+    <title>Contacto | Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <style>
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            font-weight: 800;
-            font-size: 1.4rem;
-            color: #ffffff;
-            text-decoration: none;
-        }
-        .flag-icon-svg {
-            width: 28px;
-            height: 20px;
-            border-radius: 3px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            object-fit: cover;
-            display: inline-block;
-        }
-
-        .contact-hero {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-        .contact-title {
-            color: var(--color-primario, #1e293b);
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-        .contact-subtitle {
-            color: var(--text-muted, #64748b);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 2rem;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        @media (max-width: 768px) {
-            .contact-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .info-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 2rem;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-        .info-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-        .info-icon {
-            background-color: #f1f5f9;
-            color: var(--color-primario, #2563eb);
-            padding: 0.75rem;
-            border-radius: 10px;
-            font-size: 1.5rem;
-        }
-        .info-content h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            margin: 0 0 0.25rem 0;
-            color: var(--color-primario, #1e293b);
-        }
-        .info-content p {
-            margin: 0;
-            color: var(--text-muted, #64748b);
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-        .form-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 2rem;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-        .form-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #334155;
-            font-size: 0.9rem;
-        }
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            box-sizing: border-box;
-        }
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            border-color: var(--color-primario, #2563eb);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-        }
-        .btn-send {
-            width: 100%;
-            padding: 0.8rem;
-            background-color: var(--color-primario, #2563eb);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            transition: opacity 0.2s;
-        }
-        .btn-send:hover {
-            opacity: 0.9;
-        }
-    </style>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js" defer></script>
 </head>
 <body>
-
-    <header class="header">
+    <header class="site-header">
         <div class="header-container">
-            <div class="logo">
-                <img src="https://flagcdn.com/do.svg" alt="Bandera Dominicana" class="flag-icon-svg">
-                Librería Quisqueya
-            </div>
-            <nav class="nav">
+            <a class="brand" href="informacion.html"><span aria-hidden="true">🇩🇴</span> Librería Quisqueya</a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav" class="site-nav" aria-label="Navegación principal">
                 <ul class="nav-list">
-                    <li><a href="login.html" class="nav-link">Login</a></li>
-                    <li><a href="index.html" class="nav-link">Información</a></li>
-                    <li><a href="tienda.html" class="nav-link">Catálogo / Compra</a></li>
-                    <li><a href="formulario.html" class="nav-link active">Contacto</a></li>
+                    <li><a class="nav-link" href="informacion.html">Información</a></li>
+                    <li><a class="nav-link" href="tienda.html">Catálogo</a></li>
+                    <li><a class="nav-link active" aria-current="page" href="formulario.html">Contacto</a></li>
+                    <li><button class="logout-button" type="button" data-logout>Cerrar sesión</button></li>
                 </ul>
             </nav>
         </div>
     </header>
-
-    <main class="main-content">
-        <section class="contact-hero">
-            <h1 class="contact-title">Ponte en Contacto</h1>
-            <p class="contact-subtitle">¿Tienes alguna pregunta, deseas solicitar un libro especial o pedir asesoría? Escríbenos directamente o visítanos.</p>
-        </section>
-
+    <main class="page-container content-section">
+        <div class="section-heading">
+            <p class="eyebrow">Estamos para ayudarte</p>
+            <h1>Contáctanos</h1>
+            <p>Consulta un título, solicita un encargo o déjanos tu pregunta.</p>
+        </div>
         <div class="contact-grid">
-            <!-- Columna de información de contacto -->
-            <aside class="info-card">
-                <h2>Medios de Contacto</h2>
-                
-                <div class="info-item">
-                    <span class="material-symbols-outlined info-icon">call</span>
-                    <div class="info-content">
-                        <h3>Llámanos o WhatsApp</h3>
-                        <p>+1 (809) 555-0199</p>
+            <aside class="contact-details" aria-labelledby="contact-details-title">
+                <h2 id="contact-details-title">Información</h2>
+                <dl>
+                    <div>
+                        <dt>Teléfono y WhatsApp</dt>
+                        <dd>+1 (809) 555-0199</dd>
                     </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="material-symbols-outlined info-icon">mail</span>
-                    <div class="info-content">
-                        <h3>Correo Electrónico</h3>
-                        <p>contacto@libreriaquisqueya.com</p>
+                    <div>
+                        <dt>Correo</dt>
+                        <dd>contacto@libreriaquisqueya.com</dd>
                     </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="material-symbols-outlined info-icon">location_on</span>
-                    <div class="info-content">
-                        <h3>Ubicación Principal</h3>
-                        <p>Av. Winston Churchill #105, Santo Domingo, Rep. Dom.</p>
+                    <div>
+                        <dt>Dirección</dt>
+                        <dd>Av. Winston Churchill #105, Santo Domingo</dd>
                     </div>
-                </div>
-
-                <div class="info-item">
-                    <span class="material-symbols-outlined info-icon">schedule</span>
-                    <div class="info-content">
-                        <h3>Horario de Atención</h3>
-                        <p>Lun - Sáb: 8:00 AM - 7:00 PM<br>Domingos: Cerrado</p>
+                    <div>
+                        <dt>Horario</dt>
+                        <dd>Lunes a sábado, 8:00 a. m. – 7:00 p. m.</dd>
                     </div>
-                </div>
+                </dl>
             </aside>
-
-            <!-- Columna del formulario -->
-            <section class="form-card">
-                <h2>Envíanos un Mensaje</h2>
-                <form action="#" method="post" onsubmit="enviarFormulario(event)">
-                    <div class="form-group">
-                        <label for="nombre" class="form-label">Nombre Completo *</label>
-                        <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Ej. Ana García" required autocomplete="name">
+            <section class="form-card" aria-labelledby="contact-form-title">
+                <h2 id="contact-form-title">Envíanos un mensaje</h2>
+                <!-- Esta demostración confirma el envío sin transmitir datos a un servidor. -->
+                <form id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre">Nombre completo</label>
+                            <input type="text" id="nombre" name="nombre" autocomplete="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="correo">Correo electrónico</label>
+                            <input type="email" id="correo" name="correo" autocomplete="email" required>
+                        </div>
                     </div>
-
                     <div class="form-group">
-                        <label for="correo" class="form-label">Correo Electrónico *</label>
-                        <input type="email" id="correo" name="correo" class="form-input" placeholder="correo@ejemplo.com" required autocomplete="email">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="telefono" class="form-label">Teléfono / WhatsApp</label>
-                        <input type="tel" id="telefono" name="telefono" class="form-input" placeholder="+1 809 000 0000" autocomplete="tel">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tiposolicitud" class="form-label">Motivo del Mensaje *</label>
-                        <select id="tiposolicitud" name="tiposolicitud" class="form-select" required>
-                            <option value="" disabled selected>Selecciona una opción</option>
-                            <option value="pedido">Pedido Especial / Encargo</option>
-                            <option value="consulta">Consulta de Stock</option>
-                            <option value="soporte">Atención al Cliente</option>
-                            <option value="otro">Otro Motivo</option>
+                        <label for="motivo">Motivo</label>
+                        <select id="motivo" name="motivo" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="encargo">Pedido especial</option>
+                            <option value="existencia">Consulta de existencia</option>
+                            <option value="ayuda">Atención al cliente</option>
                         </select>
                     </div>
-
                     <div class="form-group">
-                        <label for="mensaje" class="form-label">Mensaje *</label>
-                        <textarea id="mensaje" name="mensaje" rows="4" class="form-textarea" placeholder="Escribe aquí tu consulta o el título del libro que buscas..." required></textarea>
+                        <label for="mensaje">Mensaje</label>
+                        <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
                     </div>
-
-                    <button type="submit" class="btn-send">
-                        <span class="material-symbols-outlined">send</span> Enviar Mensaje
-                    </button>
+                    <p id="contact-message" class="success-message" role="status" aria-live="polite"></p>
+                    <button class="button button-primary" type="submit">Enviar mensaje</button>
                 </form>
             </section>
         </div>
     </main>
-
-    <footer class="footer">
-        <div class="footer-container">
-            <p>&copy; 2026 YamelyOvalles/Proyecto_libreria. Todos los derechos reservados.</p>
-        </div>
-    </footer>
-
-    <script>
-        function enviarFormulario(e) {
-            e.preventDefault();
-            alert("¡Gracias por contactarnos! Tu mensaje ha sido enviado correctamente. Te responderemos muy pronto.");
-            e.target.reset();
-        }
-    </script>
+    <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
 </body>
 </html>

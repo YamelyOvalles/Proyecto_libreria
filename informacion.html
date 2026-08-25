@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Conoce Librería Quisqueya y nuestros servicios">
+    <title>Información | Librería Quisqueya</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Se ejecuta antes de mostrar la página para impedir visitas sin iniciar sesión. -->
+    <script src="js/auth.js"></script>
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a class="brand" href="informacion.html"><span aria-hidden="true">🇩🇴</span> Librería Quisqueya</a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav" class="site-nav" aria-label="Navegación principal">
+                <ul class="nav-list">
+                    <li><a class="nav-link active" aria-current="page" href="informacion.html">Información</a></li>
+                    <li><a class="nav-link" href="tienda.html">Catálogo</a></li>
+                    <li><a class="nav-link" href="formulario.html">Contacto</a></li>
+                    <li><button class="logout-button" type="button" data-logout>Cerrar sesión</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="hero page-container">
+            <div class="hero-copy">
+                <p class="eyebrow">Hecho en República Dominicana</p>
+                <h1>Tu rincón de lectura</h1>
+                <p>Acercamos historias inolvidables, clásicos y literatura dominicana a lectores de todo el país.</p>
+                <a class="button button-primary" href="tienda.html">Explorar catálogo</a>
+            </div>
+            <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=1000&q=80" alt="Estantes de una librería" class="hero-image">
+        </section>
+        <section class="page-container content-section" aria-labelledby="services-title">
+            <div class="section-heading">
+                <p class="eyebrow">Sobre nosotros</p>
+                <h2 id="services-title">Lo que nos define</h2>
+                <p>Queremos que encontrar un buen libro sea sencillo y agradable.</p>
+            </div>
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <span class="feature-number">01</span>
+                    <h3>Selección cuidada</h3>
+                    <p>Reunimos obras nacionales e internacionales para distintos gustos y edades.</p>
+                </article>
+                <article class="feature-card">
+                    <span class="feature-number">02</span>
+                    <h3>Envíos nacionales</h3>
+                    <p>Coordinamos entregas seguras en diferentes puntos del país.</p>
+                </article>
+                <article class="feature-card">
+                    <span class="feature-number">03</span>
+                    <h3>Atención cercana</h3>
+                    <p>Te ayudamos a consultar existencias o solicitar un título especial.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+    <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
+</body>
+</html>
