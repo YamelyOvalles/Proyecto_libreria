@@ -34,25 +34,37 @@
         </div>
         <div class="contact-grid">
             <aside class="contact-details" aria-labelledby="contact-details-title">
-                <h2 id="contact-details-title">Información</h2>
-                <dl>
-                    <div>
-                        <dt>Teléfono y WhatsApp</dt>
-                        <dd>+1 (809) 555-0199</dd>
+                <h2 id="contact-details-title">Medios de contacto</h2>
+                <div class="contact-list">
+                    <div class="contact-item">
+                        <span class="contact-icon" aria-hidden="true">☎</span>
+                        <div>
+                            <h3>Llámanos o WhatsApp</h3>
+                            <p>+1 (809) 555-0199</p>
+                        </div>
                     </div>
-                    <div>
-                        <dt>Correo</dt>
-                        <dd>contacto@libreriaquisqueya.com</dd>
+                    <div class="contact-item">
+                        <span class="contact-icon" aria-hidden="true">✉</span>
+                        <div>
+                            <h3>Correo electrónico</h3>
+                            <p>contacto@libreriaquisqueya.com</p>
+                        </div>
                     </div>
-                    <div>
-                        <dt>Dirección</dt>
-                        <dd>Av. Winston Churchill #105, Santo Domingo</dd>
+                    <div class="contact-item">
+                        <span class="contact-icon" aria-hidden="true">⌖</span>
+                        <div>
+                            <h3>Ubicación principal</h3>
+                            <p>Av. Winston Churchill #105, Santo Domingo, Rep. Dom.</p>
+                        </div>
                     </div>
-                    <div>
-                        <dt>Horario</dt>
-                        <dd>Lunes a sábado, 8:00 a. m. – 7:00 p. m.</dd>
+                    <div class="contact-item">
+                        <span class="contact-icon" aria-hidden="true">◷</span>
+                        <div>
+                            <h3>Horario de atención</h3>
+                            <p>Lun. – Sáb.: 8:00 a. m. – 7:00 p. m.<br>Domingos: cerrado</p>
+                        </div>
                     </div>
-                </dl>
+                </div>
             </aside>
             <section class="form-card" aria-labelledby="contact-form-title">
                 <h2 id="contact-form-title">Envíanos un mensaje</h2>
@@ -60,16 +72,20 @@
                 <form id="contact-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="nombre">Nombre completo</label>
-                            <input type="text" id="nombre" name="nombre" autocomplete="name" required>
+                            <label for="nombre">Nombre completo *</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" autocomplete="name" required>
                         </div>
                         <div class="form-group">
-                            <label for="correo">Correo electrónico</label>
-                            <input type="email" id="correo" name="correo" autocomplete="email" required>
+                            <label for="correo">Correo electrónico *</label>
+                            <input type="email" id="correo" name="correo" placeholder="correo@ejemplo.com" autocomplete="email" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="motivo">Motivo</label>
+                        <label for="telefono">Teléfono / WhatsApp</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="+1 809 000 0000" autocomplete="tel">
+                    </div>
+                    <div class="form-group">
+                        <label for="motivo">Motivo del mensaje *</label>
                         <select id="motivo" name="motivo" required>
                             <option value="">Selecciona una opción</option>
                             <option value="encargo">Pedido especial</option>
@@ -78,11 +94,11 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="mensaje">Mensaje</label>
-                        <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
+                        <label for="mensaje">Mensaje *</label>
+                        <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escribe aquí tu consulta o el título del libro que buscas..." required></textarea>
                     </div>
                     <p id="contact-message" class="success-message" role="status" aria-live="polite"></p>
-                    <button class="button button-primary" type="submit">Enviar mensaje</button>
+                    <button class="button button-primary button-full" type="submit">Enviar mensaje</button>
                 </form>
             </section>
         </div>

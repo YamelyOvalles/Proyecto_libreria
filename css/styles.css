@@ -117,6 +117,22 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 .feature-number { color: var(--tertiary); font-size: 0.78rem; font-weight: 800; }
 .feature-card h3 { margin: 1.8rem 0 0.5rem; }
 .feature-card p { margin: 0; color: var(--muted); }
+.collections-section { padding-block: clamp(3rem, 7vw, 5rem); background: var(--primary-light); }
+.collections-layout { display: grid; grid-template-columns: 0.75fr 1.25fr; gap: clamp(2rem, 6vw, 5rem); align-items: start; }
+.collections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.collection-card { display: flex; gap: 1rem; padding: 1.35rem; border: 1px solid rgba(77, 102, 45, 0.15); border-radius: 14px; background: rgba(255, 255, 255, 0.76); }
+.collection-card > span { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border-radius: 50%; background: var(--primary); color: #fff; font-size: 0.72rem; font-weight: 800; }
+.collection-card h3 { margin-bottom: 0.35rem; }
+.collection-card p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.steps-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.steps-list li { padding: 1.5rem; border-top: 3px solid var(--primary); background: var(--surface); box-shadow: var(--shadow); }
+.steps-list span { color: var(--tertiary); font-size: 0.82rem; font-weight: 800; }
+.steps-list h3 { margin: 1.3rem 0 0.4rem; }
+.steps-list p { margin: 0; color: var(--muted); }
+.info-cta { display: flex; align-items: center; justify-content: space-between; gap: 2rem; margin-bottom: clamp(3rem, 7vw, 5rem); padding: clamp(1.5rem, 4vw, 2.4rem); border-radius: var(--radius); background: var(--secondary); color: #fff; }
+.info-cta .eyebrow { color: var(--primary-light); }
+.info-cta h2 { margin-bottom: 0; }
+.info-cta .button { flex: 0 0 auto; }
 
 /* Catálogo. */
 .book-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.15rem; }
@@ -130,24 +146,27 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 .toast.show { opacity: 1; transform: translateY(0); }
 
 /* Contacto. */
-.contact-grid { display: grid; grid-template-columns: 0.75fr 1.25fr; gap: 1.25rem; align-items: start; }
-.contact-details, .form-card { padding: clamp(1.4rem, 4vw, 2rem); border-radius: var(--radius); }
-.contact-details dl { margin: 0; }
-.contact-details dl div { padding: 1rem 0; border-bottom: 1px solid var(--border); }
-.contact-details dl div:last-child { border-bottom: 0; }
-.contact-details dt { font-weight: 750; }
-.contact-details dd { margin: 0.2rem 0 0; color: var(--muted); overflow-wrap: anywhere; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.contact-grid { display: grid; grid-template-columns: 0.75fr 1.25fr; gap: 0; align-items: stretch; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+.contact-details, .form-card { padding: clamp(1.5rem, 4vw, 2.6rem); border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.contact-details h2, .form-card h2 { margin-bottom: 1.8rem; font-size: clamp(1.5rem, 3vw, 2rem); }
+.form-card { border-left: 1px solid var(--border); }
+.contact-list { display: grid; gap: 1.35rem; }
+.contact-item { display: grid; grid-template-columns: 50px 1fr; gap: 1rem; align-items: start; }
+.contact-icon { width: 50px; height: 50px; display: grid; place-items: center; border-radius: 10px; background: var(--primary-light); color: var(--primary); font-size: 1.35rem; font-weight: 800; }
+.contact-item h3 { margin-bottom: 0.2rem; color: var(--primary); font-size: 1rem; }
+.contact-item p { margin: 0; color: var(--muted); overflow-wrap: anywhere; }
+.form-row { display: grid; grid-template-columns: 1fr; gap: 0; }
 .site-footer { padding: 1.5rem 20px; color: var(--muted); text-align: center; }
 .site-footer p { margin: 0; }
 .redirect-page { display: grid; place-items: center; padding: 2rem; }
 
 /* Ajustes para tablet y teléfono. */
 @media (max-width: 850px) {
-    .login-layout, .hero, .contact-grid { grid-template-columns: 1fr; }
+    .login-layout, .hero, .contact-grid, .collections-layout { grid-template-columns: 1fr; }
+    .form-card { border-top: 1px solid var(--border); border-left: 0; }
     .login-photo { min-height: 300px; order: -1; }
     .hero-image { height: 360px; order: -1; }
-    .feature-grid { grid-template-columns: 1fr; }
+    .feature-grid, .steps-list { grid-template-columns: 1fr; }
     .book-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -167,8 +186,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
     .nav-list li { width: 100%; }
     .nav-link, .logout-button { width: 100%; justify-content: flex-start; white-space: nowrap; }
     .hero-image { height: 270px; }
-    .book-grid, .form-row { grid-template-columns: 1fr; }
+    .book-grid, .form-row, .collections-grid { grid-template-columns: 1fr; }
     .book-info h2 { min-height: 0; }
+    .info-cta { align-items: flex-start; flex-direction: column; }
 }
 
 @media (prefers-reduced-motion: reduce) {

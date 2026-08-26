@@ -5,7 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Conoce Librería Quisqueya y nuestros servicios">
     <title>Información | Librería Quisqueya</title>
+    <!-- Método externo: contiene casi todos los estilos del proyecto. -->
     <link rel="stylesheet" href="css/styles.css">
+
+    <!-- Método interno: ejemplo solicitado para esta página específica. -->
+    <style>
+        .hero-copy h1 {
+            text-wrap: balance;
+        }
+    </style>
     <!-- Se ejecuta antes de mostrar la página para impedir visitas sin iniciar sesión. -->
     <script src="js/auth.js"></script>
     <script src="js/app.js" defer></script>
@@ -30,7 +38,8 @@
     <main>
         <section class="hero page-container">
             <div class="hero-copy">
-                <p class="eyebrow">Hecho en República Dominicana</p>
+                <!-- Método en línea: este estilo afecta únicamente a este párrafo. -->
+                <p class="eyebrow" style="letter-spacing: 0.14em;">Hecho en República Dominicana</p>
                 <h1>Tu rincón de lectura</h1>
                 <p>Acercamos historias inolvidables, clásicos y literatura dominicana a lectores de todo el país.</p>
                 <a class="button button-primary" href="tienda.html">Explorar catálogo</a>
@@ -60,6 +69,68 @@
                     <p>Te ayudamos a consultar existencias o solicitar un título especial.</p>
                 </article>
             </div>
+        </section>
+
+        <section class="collections-section">
+            <div class="page-container collections-layout">
+                <div class="section-heading section-heading-left">
+                    <p class="eyebrow">Para cada lector</p>
+                    <h2>Explora nuestras colecciones</h2>
+                    <p>Organizamos el catálogo para ayudarte a encontrar historias según tus intereses.</p>
+                </div>
+
+                <div class="collections-grid">
+                    <article class="collection-card">
+                        <span aria-hidden="true">DO</span>
+                        <div>
+                            <h3>Literatura dominicana</h3>
+                            <p>Autores, historias y ensayos que forman parte de nuestra identidad.</p>
+                        </div>
+                    </article>
+                    <article class="collection-card">
+                        <span aria-hidden="true">CL</span>
+                        <div>
+                            <h3>Clásicos universales</h3>
+                            <p>Obras que continúan acompañando a lectores de distintas generaciones.</p>
+                        </div>
+                    </article>
+                    <article class="collection-card">
+                        <span aria-hidden="true">FI</span>
+                        <div>
+                            <h3>Ficción contemporánea</h3>
+                            <p>Novelas actuales, aventuras y nuevas voces de la literatura.</p>
+                        </div>
+                    </article>
+                    <article class="collection-card">
+                        <span aria-hidden="true">IN</span>
+                        <div>
+                            <h3>Lectura infantil</h3>
+                            <p>Libros pensados para despertar la imaginación desde temprana edad.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="page-container content-section" aria-labelledby="steps-title">
+            <div class="section-heading">
+                <p class="eyebrow">Compra fácilmente</p>
+                <h2 id="steps-title">¿Cómo funciona?</h2>
+                <p>Tres pasos sencillos para encontrar y solicitar tu próximo libro.</p>
+            </div>
+            <ol class="steps-list">
+                <li><span>1</span><h3>Explora</h3><p>Visita el catálogo y revisa los títulos disponibles.</p></li>
+                <li><span>2</span><h3>Selecciona</h3><p>Agrega al carrito el libro que deseas comprar.</p></li>
+                <li><span>3</span><h3>Consulta</h3><p>Escríbenos si necesitas confirmar una entrega o buscar otro título.</p></li>
+            </ol>
+        </section>
+
+        <section class="page-container info-cta">
+            <div>
+                <p class="eyebrow">¿Buscas un libro especial?</p>
+                <h2>Podemos ayudarte a encontrarlo.</h2>
+            </div>
+            <a class="button button-primary" href="formulario.html">Hablar con nosotros</a>
         </section>
     </main>
     <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
