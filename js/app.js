@@ -65,3 +65,49 @@ if (contactForm) {
         contactForm.reset();
     });
 }
+// ==========================================
+// VARIABLES Y ARREGLO DEL CATÁLOGO
+// ==========================================
+
+// Variable de tipo String
+let nombreLibreria = "Librería Quisqueya";
+
+// Variable de tipo Number
+let cantidadLibros = 4;
+
+// Variable de tipo Boolean
+let catalogoActivo = true;
+
+// Arreglo de objetos aplicado al catálogo de libros
+let catalogoLibros = [
+    {
+        titulo: "Cien años de soledad",
+        autor: "Gabriel García Márquez",
+        precio: 1150,
+        disponible: true
+    },
+    {
+        titulo: "El Principito",
+        autor: "Antoine de Saint-Exupéry",
+        precio: 750,
+        disponible: true
+    },
+    {
+        titulo: "1984",
+        autor: "George Orwell",
+        precio: 900,
+        disponible: true
+    },
+    {
+        titulo: "Don Quijote de la Mancha",
+        autor: "Miguel de Cervantes",
+        precio: 1350,
+        disponible: true
+    }
+];
+
+// Mostrar los datos en la consola
+console.log("Nombre de la librería:", nombreLibreria);
+console.log("Cantidad de libros:", cantidadLibros);
+console.log("Catálogo activo:", catalogoActivo);
+console.log("Catálogo de libros:", catalogoLibros);
