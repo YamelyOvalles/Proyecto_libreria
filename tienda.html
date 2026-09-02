@@ -7,7 +7,209 @@
     <title>Catálogo | Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="js/auth.js"></script>
-    <script src="js/app.js" defer></script>
+    
+    <style>
+        /* Variables de color basadas en la paleta del diseño */
+        :root {
+            --primary-green: #4c602a;    /* Verde oliva del header */
+            --accent-brown: #6b4731;     /* Marrón terracota del botón activo/hover */
+            --accent-red: #d9534f;       /* Rojo para la burbuja de notificación */
+            --bg-light: #f8f9fa;
+            --text-dark: #222222;
+        }
+
+        /* Estilos globales y botones de la página */
+        .eyebrow {
+            color: var(--accent-brown) !important;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .button-primary {
+            background-color: var(--primary-green) !important;
+            color: #ffffff !important;
+            border: none;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .button-primary:hover {
+            background-color: var(--accent-brown) !important;
+        }
+
+        .book-price {
+            color: var(--accent-brown) !important;
+            font-weight: bold;
+        }
+
+        /* Estilos del Botón Flotante del Carrito */
+        .cart-float-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: var(--primary-green);
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 22px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .cart-float-btn:hover {
+            background-color: var(--accent-brown);
+            transform: scale(1.05);
+        }
+
+        .cart-badge {
+            background-color: var(--accent-red);
+            color: white;
+            border-radius: 50%;
+            padding: 3px 9px;
+            font-size: 0.85rem;
+        }
+
+        /* Overlay oscuro de fondo */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1001;
+        }
+
+        .cart-overlay.active {
+            display: block;
+        }
+
+        /* Panel Lateral desplegable del Carrito */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 100%;
+            max-width: 380px;
+            height: 100vh;
+            background-color: #ffffff;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            z-index: 1002;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s ease-in-out;
+        }
+
+        .cart-sidebar.open {
+            right: 0 !important;
+        }
+
+        .cart-header {
+            padding: 20px;
+            background-color: var(--primary-green);
+            color: #ffffff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #ffffff;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #ffffff;
+        }
+
+        .cart-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-details h4 {
+            margin: 0 0 4px 0;
+            font-size: 0.95rem;
+            color: #222;
+        }
+
+        .cart-item-details p {
+            margin: 0;
+            color: var(--accent-brown);
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-qty {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-qty:hover {
+            background-color: #dee2e6;
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid #ddd;
+            background-color: var(--bg-light);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #111;
+        }
+
+        .empty-cart-msg {
+            text-align: center;
+            color: #777;
+            margin-top: 40px;
+            font-size: 1rem;
+        }
+    </style>
 </head>
 <body>
     <header class="site-header">
@@ -26,55 +228,214 @@
             </nav>
         </div>
     </header>
+
     <main class="page-container content-section">
         <div class="section-heading section-heading-left">
             <p class="eyebrow">Catálogo</p>
             <h1>Encuentra tu próxima lectura</h1>
             <p>Una pequeña selección de títulos disponibles en Librería Quisqueya.</p>
-                <!-- Aquí agregamos el contador -->
-    <p id="contador">Total de libros: {totalLibros}</p>
+            <p id="contador">Cargando catálogo...</p>
         </div>
-        <section class="book-grid" aria-label="Libros disponibles">
-            <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80" alt="Libro abierto sobre una mesa" class="book-cover">
-                <div class="book-info">
-                    <p class="book-author">Gabriel García Márquez</p>
-                    <h2>Cien años de soledad</h2>
-                    <p class="book-price">RD$ 1,150.00</p>
-                    <button class="button button-primary button-full" type="button" data-book="Cien años de soledad">Agregar al carrito</button>
-                </div>
-            </article>
-            <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=500&q=80" alt="Pila de libros" class="book-cover">
-                <div class="book-info">
-                    <p class="book-author">Antoine de Saint-Exupéry</p>
-                    <h2>El Principito</h2>
-                    <p class="book-price">RD$ 750.00</p>
-                    <button class="button button-primary button-full" type="button" data-book="El Principito">Agregar al carrito</button>
-                </div>
-            </article>
-            <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=500&q=80" alt="Libros en una biblioteca" class="book-cover">
-                <div class="book-info">
-                    <p class="book-author">George Orwell</p>
-                    <h2>1984</h2>
-                    <p class="book-price">RD$ 900.00</p>
-                    <button class="button button-primary button-full" type="button" data-book="1984">Agregar al carrito</button>
-                </div>
-            </article>
-            <article class="book-card">
-                <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=500&q=80" alt="Libro de tapa dura" class="book-cover">
-                <div class="book-info">
-                    <p class="book-author">Miguel de Cervantes</p>
-                    <h2>Don Quijote de la Mancha</h2>
-                    <p class="book-price">RD$ 1,350.00</p>
-                    <button class="button button-primary button-full" type="button" data-book="Don Quijote de la Mancha">Agregar al carrito</button>
-                </div>
-            </article>
+
+        <!-- Rejilla donde se renderizan los libros -->
+        <section id="book-grid" class="book-grid" aria-label="Libros disponibles">
         </section>
     </main>
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Botón Flotante para abrir el Carrito -->
+    <button id="cart-float-btn" class="cart-float-btn" type="button">
+        <span>🛒 Mi Carrito</span>
+        <span id="cart-badge" class="cart-badge">0</span>
+    </button>
+
+    <!-- Panel Lateral del Carrito y Fondo Oscuro -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+    <aside id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Tu Carrito de Compras</h2>
+            <button id="close-cart" class="close-cart" type="button">&times;</button>
+        </div>
+        <div id="cart-body" class="cart-body">
+            <!-- Los libros agregados aparecerán aquí dinámicamente -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total-price">RD$ 0.00</span>
+            </div>
+            <button id="checkout-btn" class="button button-primary button-full" type="button" style="width: 100%; padding: 12px;">Procesar Compra</button>
+        </div>
+    </aside>
+
     <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
-    <script src="js/catalog.js"></script>
+
+    <!-- Lógica JavaScript del Carrito Dinámico -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Lista de libros en catálogo
+            const libros = [
+                { id: 1, titulo: "Cien años de soledad", autor: "Gabriel García Márquez", precio: 1150, imagen: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80" },
+                { id: 2, titulo: "El Principito", autor: "Antoine de Saint-Exupéry", precio: 750, imagen: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=500&q=80" },
+                { id: 3, titulo: "1984", autor: "George Orwell", precio: 900, imagen: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=500&q=80" },
+                { id: 4, titulo: "Don Quijote de la Mancha", autor: "Miguel de Cervantes", precio: 1350, imagen: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=500&q=80" }
+            ];
+
+            // Estado del Carrito
+            let carrito = [];
+
+            // Selección de Elementos del DOM
+            const contenedorGrid = document.getElementById("book-grid");
+            const elementoContador = document.getElementById("contador");
+            const cartFloatBtn = document.getElementById("cart-float-btn");
+            const cartSidebar = document.getElementById("cart-sidebar");
+            const cartOverlay = document.getElementById("cart-overlay");
+            const closeCartBtn = document.getElementById("close-cart");
+            const cartBody = document.getElementById("cart-body");
+            const cartBadge = document.getElementById("cart-badge");
+            const cartTotalPrice = document.getElementById("cart-total-price");
+            const checkoutBtn = document.getElementById("checkout-btn");
+
+            // Renderizar los libros en la página
+            function renderizarCatalogo() {
+                if (elementoContador) {
+                    elementoContador.textContent = `Total de libros disponibles: ${libros.length}`;
+                }
+
+                if (contenedorGrid) {
+                    contenedorGrid.innerHTML = "";
+                    libros.forEach(libro => {
+                        const tarjeta = document.createElement("article");
+                        tarjeta.classList.add("book-card");
+                        tarjeta.innerHTML = `
+                            <img src="${libro.imagen}" alt="Portada de ${libro.titulo}" class="book-cover">
+                            <div class="book-info">
+                                <p class="book-author">${libro.autor}</p>
+                                <h2>${libro.titulo}</h2>
+                                <p class="book-price">RD$ ${libro.precio.toLocaleString('es-DO')}.00</p>
+                                <button class="button button-primary button-full btn-add" type="button" data-id="${libro.id}">
+                                    Agregar al carrito
+                                </button>
+                            </div>
+                        `;
+                        contenedorGrid.appendChild(tarjeta);
+                    });
+
+                    // Escuchar clics en los botones "Agregar al carrito"
+                    document.querySelectorAll(".btn-add").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const id = parseInt(e.target.getAttribute("data-id"));
+                            agregarAlCarrito(id);
+                        });
+                    });
+                }
+            }
+
+            // Agregar un libro al arreglo de carrito
+            function agregarAlCarrito(id) {
+                const productoExistente = carrito.find(item => item.id === id);
+                if (productoExistente) {
+                    productoExistente.cantidad++;
+                } else {
+                    const libro = libros.find(l => l.id === id);
+                    carrito.push({ ...libro, cantidad: 1 });
+                }
+                
+                actualizarCarritoUI();
+                abrirPanelCarrito();
+            }
+
+            // Cambiar la cantidad de un producto (+ / -)
+            function cambiarCantidad(id, cambio) {
+                const producto = carrito.find(item => item.id === id);
+                if (producto) {
+                    producto.cantidad += cambio;
+                    if (producto.cantidad <= 0) {
+                        carrito = carrito.filter(item => item.id !== id);
+                    }
+                    actualizarCarritoUI();
+                }
+            }
+
+            // Actualizar el HTML del panel lateral del carrito
+            function actualizarCarritoUI() {
+                // Cantidad de artículos en la burbuja roja
+                const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+                cartBadge.textContent = totalItems;
+
+                // Total acumulado en pesos
+                const totalMonto = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+                cartTotalPrice.textContent = `RD$ ${totalMonto.toLocaleString('es-DO')}.00`;
+
+                // Renderizar los ítems en el cuerpo del carrito
+                if (carrito.length === 0) {
+                    cartBody.innerHTML = `<p class="empty-cart-msg">Tu carrito está vacío actualmente.</p>`;
+                } else {
+                    cartBody.innerHTML = "";
+                    carrito.forEach(item => {
+                        const itemDiv = document.createElement("div");
+                        itemDiv.classList.add("cart-item");
+                        itemDiv.innerHTML = `
+                            <div class="cart-item-details">
+                                <h4>${item.titulo}</h4>
+                                <p>RD$ ${item.precio.toLocaleString('es-DO')} x ${item.cantidad}</p>
+                            </div>
+                            <div class="cart-item-controls">
+                                <button class="btn-qty btn-restar" data-id="${item.id}">-</button>
+                                <span>${item.cantidad}</span>
+                                <button class="btn-qty btn-sumar" data-id="${item.id}">+</button>
+                            </div>
+                        `;
+                        cartBody.appendChild(itemDiv);
+                    });
+
+                    // Eventos para botones + y - dentro del carrito
+                    document.querySelectorAll(".btn-restar").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const id = parseInt(e.target.getAttribute("data-id"));
+                            cambiarCantidad(id, -1);
+                        });
+                    });
+
+                    document.querySelectorAll(".btn-sumar").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const id = parseInt(e.target.getAttribute("data-id"));
+                            cambiarCantidad(id, 1);
+                        });
+                    });
+                }
+            }
+
+            // Controles para mostrar y ocultar el panel
+            function abrirPanelCarrito() {
+                cartSidebar.classList.add("open");
+                cartOverlay.classList.add("active");
+            }
+
+            function cerrarPanelCarrito() {
+                cartSidebar.classList.remove("open");
+                cartOverlay.classList.remove("active");
+            }
+
+            cartFloatBtn.addEventListener("click", abrirPanelCarrito);
+            closeCartBtn.addEventListener("click", cerrarPanelCarrito);
+            cartOverlay.addEventListener("click", cerrarPanelCarrito);
+
+            // Simular checkout
+            checkoutBtn.addEventListener("click", () => {
+                if (carrito.length === 0) {
+                    alert("El carrito está vacío. Agrega algún libro antes de procesar.");
+                } else {
+                    alert("¡Compra realizada con éxito! Gracias por tu pedido en Librería Quisqueya.");
+                    carrito = [];
+                    actualizarCarritoUI();
+                    cerrarPanelCarrito();
+                }
+            });
+
+            // Inicializar la carga de libros y el estado del carrito
+            renderizarCatalogo();
+            actualizarCarritoUI();
+        });
+    </script>
 </body>
 </html>
