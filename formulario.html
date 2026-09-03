@@ -73,7 +73,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nombre">Nombre completo *</label>
-                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" autocomplete="name" required>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" autocomplete="name" required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
                         </div>
                         <div class="form-group">
                             <label for="correo">Correo electrónico *</label>
@@ -82,7 +82,7 @@
                     </div>
                     <div class="form-group">
                         <label for="telefono">Teléfono / WhatsApp</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="+1 809 000 0000" autocomplete="tel">
+                        <input type="tel" id="telefono" name="telefono" placeholder="+1 809 000 0000" autocomplete="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <div class="form-group">
                         <label for="motivo">Motivo del mensaje *</label>
