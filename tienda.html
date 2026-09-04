@@ -379,11 +379,11 @@
             // Actualizar el HTML del panel lateral del carrito
             function actualizarCarritoUI() {
                 // Cantidad de artículos en la burbuja roja
-                const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+                const totalItems = calcularCantidadArticulos(carrito);
                 cartBadge.textContent = totalItems;
 
                 // Total acumulado en pesos
-                const totalMonto = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+                const totalMonto = calcularTotalCarrito(carrito);
                 cartTotalPrice.textContent = `RD$ ${totalMonto.toLocaleString('es-DO')}.00`;
 
                 // Renderizar los ítems en el cuerpo del carrito
