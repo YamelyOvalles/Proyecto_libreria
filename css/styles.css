@@ -33,7 +33,6 @@ h3 { font-size: 1.15rem; }
 /* Cabecera común de las páginas internas. */
 .site-header { position: sticky; top: 0; z-index: 10; background: var(--primary); color: #fff; box-shadow: 0 5px 18px rgba(43, 45, 47, 0.12); }
 .header-container { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-#main-nav { margin-left: auto; }
 .brand { display: inline-flex; align-items: center; gap: 0.55rem; color: inherit; font-size: 1.12rem; font-weight: 800; text-decoration: none; white-space: nowrap; }
 .brand-large { font-size: 1.35rem; }
 .flag { font-size: 1.5rem; }
@@ -109,15 +108,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 .hero-copy > p:not(.eyebrow) { max-width: 600px; margin-bottom: 1.6rem; color: var(--muted); font-size: 1.08rem; }
 .hero-image { width: 100%; height: min(52vw, 470px); object-fit: cover; border-radius: 35% 12px 35% 12px; box-shadow: var(--shadow); }
 .content-section { padding-block: clamp(2.8rem, 7vw, 5rem); }
-.table-wrapper { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
-.schedule-table { width: 100%; min-width: 620px; border-collapse: collapse; text-align: left; }
-.schedule-table caption { padding: 1rem 1.2rem 0.7rem; color: var(--muted); font-size: 0.92rem; text-align: left; }
-.schedule-table th, .schedule-table td { padding: 0.95rem 1.2rem; border-bottom: 1px solid var(--border); }
-.schedule-table thead { background: var(--primary); color: #fff; }
-.schedule-table thead th { font-size: 0.9rem; }
-.schedule-table tbody th { color: var(--primary-dark); font-weight: 750; }
-.schedule-table tbody tr:nth-child(even) { background: var(--primary-light); }
-.schedule-table tbody tr:last-child th, .schedule-table tbody tr:last-child td { border-bottom: 0; }
 .section-heading { max-width: 680px; margin: 0 auto 2rem; text-align: center; }
 .section-heading-left { margin-left: 0; text-align: left; }
 .section-heading h1, .section-heading h2 { margin-bottom: 0.7rem; }
@@ -188,7 +178,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
     .login-photo figcaption { right: 1.2rem; bottom: 1.2rem; left: 1.2rem; }
     .login-options { align-items: flex-start; flex-direction: column; }
     .header-container { min-height: 68px; align-items: center; flex-direction: row; flex-wrap: wrap; padding-block: 0.7rem; }
-    #main-nav { margin-left: 0; }
     .site-header { position: sticky; }
     .menu-toggle { display: flex; margin-left: auto; }
     .site-nav { display: none; width: 100%; padding-top: 0.45rem; }

@@ -14,6 +14,8 @@
             text-wrap: balance;
         }
     </style>
+    <!-- Se ejecuta antes de mostrar la página para impedir visitas sin iniciar sesión. -->
+    <script src="js/auth.js"></script>
     <script src="js/app.js" defer></script>
 </head>
 <body>
@@ -107,43 +109,6 @@
                         </div>
                     </article>
                 </div>
-            </div>
-        </section>
-
-        <section class="page-container content-section" aria-labelledby="hours-title">
-            <div class="section-heading">
-                <p class="eyebrow">Visítanos</p>
-                <h2 id="hours-title">Horario de atención</h2>
-                <p>Consulta nuestros horarios para recibir orientación y realizar tus pedidos.</p>
-            </div>
-            <div class="table-wrapper">
-                <table class="schedule-table">
-                    <caption>Horario semanal de Librería Quisqueya</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Día</th>
-                            <th scope="col">Horario</th>
-                            <th scope="col">Atención</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">Lunes a viernes</th>
-                            <td>8:00 a. m. – 6:00 p. m.</td>
-                            <td>Presencial y consultas</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Sábado</th>
-                            <td>9:00 a. m. – 2:00 p. m.</td>
-                            <td>Presencial y consultas</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Domingo</th>
-                            <td>Cerrado</td>
-                            <td>Consultas por formulario</td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </section>
 
