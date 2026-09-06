@@ -7,6 +7,10 @@
     <title>Catálogo | Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="js/auth.js"></script>
+    <script src="js/funciones.js" defer></script>
+    <script src="js/checkout.js" defer></script>
+    <script src="js/tienda.js" defer></script>
+    <link rel="stylesheet" href="css/catalogo.css">
     
     <style>
         /* Variables de color basadas en la paleta del diseño */
@@ -211,7 +215,7 @@
         }
     </style>
 </head>
-<body>
+<body class="catalog-page">
     <header class="site-header">
         <div class="header-container">
             <a class="brand" href="informacion.html"><img class="brand-logo" src="assets/logo-quisqueya-icono.png" alt=""><span class="brand-name">Librería Quisqueya</span></a>
@@ -234,7 +238,18 @@
             <p class="eyebrow">Catálogo</p>
             <h1>Encuentra tu próxima lectura</h1>
             <p>Una pequeña selección de títulos disponibles en Librería Quisqueya.</p>
-            <p id="contador">Cargando catálogo...</p>
+            <p id="contador" role="status" aria-live="polite">Cargando catálogo...</p>
+        </div>
+
+        <div class="form-row" role="search" aria-label="Filtrar catálogo">
+            <div class="form-group">
+                <label for="buscar-libros">Buscar por título o autor</label>
+                <input id="buscar-libros" type="search" placeholder="Ej. Principito o Cervantes">
+            </div>
+            <div class="form-group">
+                <label for="precio-maximo">Precio máximo (RD$)</label>
+                <input id="precio-maximo" type="number" min="0" step="0.01" placeholder="Sin límite">
+            </div>
         </div>
 
         <!-- Rejilla donde se renderizan los libros -->
@@ -242,9 +257,10 @@
         </section>
     </main>
 
-    <!-- Botón Flotante para abrir el Carrito -->
-    <button id="cart-float-btn" class="cart-float-btn" type="button">
-        <span>🛒 Mi Carrito</span>
+    <!-- Botón Flotante para abrir el Carrito (con ícono SVG limpio sin emojis) -->
+    <button id="cart-float-btn" class="cart-float-btn" type="button" aria-label="Abrir carrito de compras">
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;" focusable="false" aria-hidden="true"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span>Mi Carrito</span>
         <span id="cart-badge" class="cart-badge">0</span>
     </button>
 
@@ -263,179 +279,15 @@
                 <span>Total:</span>
                 <span id="cart-total-price">RD$ 0.00</span>
             </div>
-            <button id="checkout-btn" class="button button-primary button-full" type="button" style="width: 100%; padding: 12px;">Procesar Compra</button>
+            <button id="checkout-btn" class="button button-primary button-full" type="button" style="width: 100%; padding: 12px;">Confirmar pedido y enviar factura</button>
+            <p class="invoice-recipient">La factura se enviará a <strong>adamsdleons3@gmail.com</strong>.</p>
+            <p id="checkout-status" class="invoice-status" role="status" aria-live="polite"></p>
+            <a id="invoice-download" class="button button-primary button-full" hidden>Descargar factura PDF</a>
+            <button id="invoice-retry" class="button button-full" type="button" hidden>Reintentar envío</button>
         </div>
     </aside>
 
     <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
-
-    <!-- Lógica JavaScript del Carrito Dinámico -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Lista de libros en catálogo
-            const libros = [
-                { id: 1, titulo: "Cien años de soledad", autor: "Gabriel García Márquez", precio: 1150, imagen: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=500&q=80" },
-                { id: 2, titulo: "El Principito", autor: "Antoine de Saint-Exupéry", precio: 750, imagen: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=500&q=80" },
-                { id: 3, titulo: "1984", autor: "George Orwell", precio: 900, imagen: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=500&q=80" },
-                { id: 4, titulo: "Don Quijote de la Mancha", autor: "Miguel de Cervantes", precio: 1350, imagen: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=500&q=80" }
-            ];
-
-            // Estado del Carrito
-            let carrito = [];
-
-            // Selección de Elementos del DOM
-            const contenedorGrid = document.getElementById("book-grid");
-            const elementoContador = document.getElementById("contador");
-            const cartFloatBtn = document.getElementById("cart-float-btn");
-            const cartSidebar = document.getElementById("cart-sidebar");
-            const cartOverlay = document.getElementById("cart-overlay");
-            const closeCartBtn = document.getElementById("close-cart");
-            const cartBody = document.getElementById("cart-body");
-            const cartBadge = document.getElementById("cart-badge");
-            const cartTotalPrice = document.getElementById("cart-total-price");
-            const checkoutBtn = document.getElementById("checkout-btn");
-
-            // Renderizar los libros en la página
-            function renderizarCatalogo() {
-                if (elementoContador) {
-                    elementoContador.textContent = `Total de libros disponibles: ${libros.length}`;
-                }
-
-                if (contenedorGrid) {
-                    contenedorGrid.innerHTML = "";
-                    libros.forEach(libro => {
-                        const tarjeta = document.createElement("article");
-                        tarjeta.classList.add("book-card");
-                        tarjeta.innerHTML = `
-                            <img src="${libro.imagen}" alt="Portada de ${libro.titulo}" class="book-cover">
-                            <div class="book-info">
-                                <p class="book-author">${libro.autor}</p>
-                                <h2>${libro.titulo}</h2>
-                                <p class="book-price">RD$ ${libro.precio.toLocaleString('es-DO')}.00</p>
-                                <button class="button button-primary button-full btn-add" type="button" data-id="${libro.id}">
-                                    Agregar al carrito
-                                </button>
-                            </div>
-                        `;
-                        contenedorGrid.appendChild(tarjeta);
-                    });
-
-                    // Escuchar clics en los botones "Agregar al carrito"
-                    document.querySelectorAll(".btn-add").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            const id = parseInt(e.target.getAttribute("data-id"));
-                            agregarAlCarrito(id);
-                        });
-                    });
-                }
-            }
-
-            // Agregar un libro al arreglo de carrito
-            function agregarAlCarrito(id) {
-                const productoExistente = carrito.find(item => item.id === id);
-                if (productoExistente) {
-                    productoExistente.cantidad++;
-                } else {
-                    const libro = libros.find(l => l.id === id);
-                    carrito.push({ ...libro, cantidad: 1 });
-                }
-                
-                actualizarCarritoUI();
-                abrirPanelCarrito();
-            }
-
-            // Cambiar la cantidad de un producto (+ / -)
-            function cambiarCantidad(id, cambio) {
-                const producto = carrito.find(item => item.id === id);
-                if (producto) {
-                    producto.cantidad += cambio;
-                    if (producto.cantidad <= 0) {
-                        carrito = carrito.filter(item => item.id !== id);
-                    }
-                    actualizarCarritoUI();
-                }
-            }
-
-            // Actualizar el HTML del panel lateral del carrito
-            function actualizarCarritoUI() {
-                // Cantidad de artículos en la burbuja roja
-                const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-                cartBadge.textContent = totalItems;
-
-                // Total acumulado en pesos
-                const totalMonto = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-                cartTotalPrice.textContent = `RD$ ${totalMonto.toLocaleString('es-DO')}.00`;
-
-                // Renderizar los ítems en el cuerpo del carrito
-                if (carrito.length === 0) {
-                    cartBody.innerHTML = `<p class="empty-cart-msg">Tu carrito está vacío actualmente.</p>`;
-                } else {
-                    cartBody.innerHTML = "";
-                    carrito.forEach(item => {
-                        const itemDiv = document.createElement("div");
-                        itemDiv.classList.add("cart-item");
-                        itemDiv.innerHTML = `
-                            <div class="cart-item-details">
-                                <h4>${item.titulo}</h4>
-                                <p>RD$ ${item.precio.toLocaleString('es-DO')} x ${item.cantidad}</p>
-                            </div>
-                            <div class="cart-item-controls">
-                                <button class="btn-qty btn-restar" data-id="${item.id}">-</button>
-                                <span>${item.cantidad}</span>
-                                <button class="btn-qty btn-sumar" data-id="${item.id}">+</button>
-                            </div>
-                        `;
-                        cartBody.appendChild(itemDiv);
-                    });
-
-                    // Eventos para botones + y - dentro del carrito
-                    document.querySelectorAll(".btn-restar").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            const id = parseInt(e.target.getAttribute("data-id"));
-                            cambiarCantidad(id, -1);
-                        });
-                    });
-
-                    document.querySelectorAll(".btn-sumar").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            const id = parseInt(e.target.getAttribute("data-id"));
-                            cambiarCantidad(id, 1);
-                        });
-                    });
-                }
-            }
-
-            // Controles para mostrar y ocultar el panel
-            function abrirPanelCarrito() {
-                cartSidebar.classList.add("open");
-                cartOverlay.classList.add("active");
-            }
-
-            function cerrarPanelCarrito() {
-                cartSidebar.classList.remove("open");
-                cartOverlay.classList.remove("active");
-            }
-
-            cartFloatBtn.addEventListener("click", abrirPanelCarrito);
-            closeCartBtn.addEventListener("click", cerrarPanelCarrito);
-            cartOverlay.addEventListener("click", cerrarPanelCarrito);
-
-            // Simular checkout
-            checkoutBtn.addEventListener("click", () => {
-                if (carrito.length === 0) {
-                    alert("El carrito está vacío. Agrega algún libro antes de procesar.");
-                } else {
-                    alert("¡Compra realizada con éxito! Gracias por tu pedido en Librería Quisqueya.");
-                    carrito = [];
-                    actualizarCarritoUI();
-                    cerrarPanelCarrito();
-                }
-            });
-
-            // Inicializar la carga de libros y el estado del carrito
-            renderizarCatalogo();
-            actualizarCarritoUI();
-        });
-    </script>
+    <!-- La lógica dinámica del catálogo y carrito se ejecuta desde el archivo externo js/tienda.js -->
 </body>
 </html>

@@ -1,0 +1,20 @@
+{
+  "id": "b72e7092-864f-4eee-a560-72d2dd7671f9",
+  "numero": "LQ-20260906-B72E7092",
+  "fecha": "06/09/2026 11:38 (UTC-4)",
+  "correo": "adamsdleons3@gmail.com",
+  "productos": [
+    {
+      "id": 1,
+      "titulo": "Cien años de soledad",
+      "precio": 1150,
+      "cantidad": 1,
+      "subtotal": 1150
+    }
+  ],
+  "total": 1150,
+  "cantidad": 1,
+  "huella": "4b9dbc88c7eee69f2fcbce70a85cbf2c682c4a5e316da283899d5204353745aa",
+  "estado": "pendiente",
+  "mensaje": "Factura creada. Falta configurar la cuenta de envío. Puedes descargar el PDF."
+}

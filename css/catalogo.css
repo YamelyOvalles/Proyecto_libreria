@@ -1,0 +1,67 @@
+/* Mejoras visuales locales del catálogo. */
+.catalog-page .book-card {
+    display: flex;
+    flex-direction: column;
+    transition: transform 220ms ease, box-shadow 220ms ease;
+    animation: book-appear 420ms ease backwards;
+    animation-delay: var(--card-delay, 0ms);
+}
+.catalog-page .book-cover-frame {
+    display: grid;
+    place-items: center;
+    height: 300px;
+    padding: 22px;
+    background: linear-gradient(145deg, #f0ebdf, #e5e9de);
+    overflow: hidden;
+}
+.catalog-page .book-cover {
+    width: auto;
+    max-width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    object-fit: contain;
+    box-shadow: 5px 8px 14px #2b2d2f26;
+    transition: transform 240ms ease;
+}
+.catalog-page .book-info { display: flex; flex: 1; flex-direction: column; }
+.catalog-page .book-author { min-height: 2.7em; }
+.catalog-page .book-info .button { margin-top: auto; }
+.catalog-page .cart-item { gap: 10px; }
+.catalog-page .cart-item-cover { flex: 0 0 42px; object-fit: contain; }
+.catalog-page .cart-item-details { flex: 1; min-width: 0; }
+.catalog-page .cart-item-controls { flex-shrink: 0; }
+.catalog-page .cart-badge { display: inline-block; }
+.catalog-page button:focus-visible { outline: 3px solid #a27637; outline-offset: 4px; }
+.catalog-page .button:active { transform: scale(0.97); }
+@media (hover: hover) {
+    .catalog-page .book-card:hover { transform: translateY(-5px); box-shadow: 0 18px 35px #2b2d2f24; }
+    .catalog-page .book-card:hover .book-cover { transform: rotate(-2deg) scale(1.025); }
+}
+@keyframes book-appear {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@media (min-width: 651px) {
+    .catalog-page .form-row { grid-template-columns: 2fr 1fr; gap: 1.2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .catalog-page *, .catalog-page *::before, .catalog-page *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+    .catalog-page .book-card:hover, .catalog-page .book-card:hover .book-cover,
+    .catalog-page .button:active { transform: none; }
+}
+
+/* Confirmación y factura del pedido. */
+.catalog-page [hidden] { display: none !important; }
+.catalog-page .invoice-recipient { font-size: .8rem; overflow-wrap: anywhere; margin: 12px 0 6px; }
+.catalog-page .invoice-status { font-size: .85rem; line-height: 1.45; margin: 8px 0; }
+.catalog-page .invoice-status[data-estado="enviado"] { color: #3d5224; }
+.catalog-page .invoice-status[data-estado="pendiente"],
+.catalog-page .invoice-status[data-estado="incierto"] { color: #855018; }
+.catalog-page #invoice-retry { margin-top: 8px; }
+.catalog-page button:disabled { opacity: .65; cursor: wait; }
+.catalog-page .cart-footer { max-height: 55vh; overflow-y: auto; }
+.catalog-page .cart-body { min-height: 80px; }
