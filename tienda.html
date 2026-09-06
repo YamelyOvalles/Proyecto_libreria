@@ -9,6 +9,7 @@
     <script src="js/auth.js"></script>
     <script src="js/funciones.js" defer></script>
     <script src="js/checkout.js" defer></script>
+    <script src="js/tienda.js" defer></script>
     <link rel="stylesheet" href="css/catalogo.css">
     
     <style>
@@ -256,9 +257,10 @@
         </section>
     </main>
 
-    <!-- Botón Flotante para abrir el Carrito -->
-    <button id="cart-float-btn" class="cart-float-btn" type="button">
-        <span>🛒 Mi Carrito</span>
+    <!-- Botón Flotante para abrir el Carrito (con ícono SVG limpio sin emojis) -->
+    <button id="cart-float-btn" class="cart-float-btn" type="button" aria-label="Abrir carrito de compras">
+        <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;" focusable="false" aria-hidden="true"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        <span>Mi Carrito</span>
         <span id="cart-badge" class="cart-badge">0</span>
     </button>
 
@@ -286,201 +288,6 @@
     </aside>
 
     <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
-
-    <!-- Lógica JavaScript del Carrito Dinámico -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Lista de libros en catálogo
-            const libros = [
-                { id: 1, titulo: "Cien años de soledad", autor: "Gabriel García Márquez", precio: 1150, imagen: "assets/portadas/cien-anos-de-soledad.jpg" },
-                { id: 2, titulo: "El Principito", autor: "Antoine de Saint-Exupéry", precio: 750, imagen: "assets/portadas/el-principito.jpg" },
-                { id: 3, titulo: "1984", autor: "George Orwell", precio: 900, imagen: "assets/portadas/1984.jpg" },
-                { id: 4, titulo: "Don Quijote de la Mancha", autor: "Miguel de Cervantes", precio: 1350, imagen: "assets/portadas/don-quijote.jpg" }
-            ];
-
-            // Estado del Carrito
-            let carrito = [];
-            let checkout = null;
-
-            // Selección de Elementos del DOM
-            const contenedorGrid = document.getElementById("book-grid");
-            const elementoContador = document.getElementById("contador");
-            const cartFloatBtn = document.getElementById("cart-float-btn");
-            const cartSidebar = document.getElementById("cart-sidebar");
-            const cartOverlay = document.getElementById("cart-overlay");
-            const closeCartBtn = document.getElementById("close-cart");
-            const cartBody = document.getElementById("cart-body");
-            const cartBadge = document.getElementById("cart-badge");
-            const cartTotalPrice = document.getElementById("cart-total-price");
-            const checkoutBtn = document.getElementById("checkout-btn");
-            const campoBusqueda = document.getElementById("buscar-libros");
-            const campoPrecio = document.getElementById("precio-maximo");
-
-            // Renderizar los libros en la página
-            function renderizarCatalogo() {
-                const coincidencias = buscarLibrosPorTexto(libros, campoBusqueda.value);
-                const precioMaximo = campoPrecio.value === "" ? Infinity : Number(campoPrecio.value);
-                const librosVisibles = filtrarLibrosPorPrecio(coincidencias, precioMaximo);
-                if (elementoContador) {
-                    elementoContador.textContent = `Mostrando ${librosVisibles.length} de ${libros.length} libros disponibles`;
-                }
-
-                if (contenedorGrid) {
-                    contenedorGrid.innerHTML = "";
-                    if (librosVisibles.length === 0) {
-                        contenedorGrid.textContent = "No hay libros que coincidan con tu búsqueda y presupuesto.";
-                    }
-                    librosVisibles.forEach((libro, indice) => {
-                        const tarjeta = document.createElement("article");
-                        tarjeta.classList.add("book-card");
-                        tarjeta.style.setProperty("--card-delay", `${indice * 70}ms`);
-                        tarjeta.innerHTML = `
-                            <div class="book-cover-frame">
-                                <img src="${libro.imagen}" alt="Portada de ${libro.titulo}, de ${libro.autor}" class="book-cover" width="330" height="500" decoding="async">
-                            </div>
-                            <div class="book-info">
-                                <p class="book-author">${libro.autor}</p>
-                                <h2>${libro.titulo}</h2>
-                                <p class="book-price">RD$ ${libro.precio.toLocaleString('es-DO')}.00</p>
-                                <button class="button button-primary button-full btn-add" type="button" data-id="${libro.id}">
-                                    Agregar al carrito
-                                </button>
-                            </div>
-                        `;
-                        contenedorGrid.appendChild(tarjeta);
-                    });
-
-                    // Escuchar clics en los botones "Agregar al carrito"
-                    document.querySelectorAll(".btn-add").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            const id = parseInt(e.target.getAttribute("data-id"));
-                            agregarAlCarrito(id);
-                        });
-                    });
-                }
-            }
-
-            // Agregar un libro al arreglo de carrito
-            function agregarAlCarrito(id) {
-                if (checkout?.estaOcupado()) return;
-                const productoExistente = carrito.find(item => item.id === id);
-                if (productoExistente) {
-                    if (productoExistente.cantidad >= 999) return;
-                    productoExistente.cantidad++;
-                } else {
-                    const libro = libros.find(l => l.id === id);
-                    carrito.push({ ...libro, cantidad: 1 });
-                }
-                
-                actualizarCarritoUI();
-                if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-                    cartBadge.getAnimations().forEach(animacion => animacion.cancel());
-                    cartBadge.animate([
-                        { transform: "scale(1)" },
-                        { transform: "scale(1.3)" },
-                        { transform: "scale(1)" }
-                    ], { duration: 350, easing: "ease-out" });
-                }
-                abrirPanelCarrito();
-            }
-
-            // Cambiar la cantidad de un producto (+ / -)
-            function cambiarCantidad(id, cambio) {
-                if (checkout?.estaOcupado()) return;
-                const producto = carrito.find(item => item.id === id);
-                if (producto) {
-                    if (producto.cantidad + cambio > 999) return;
-                    producto.cantidad += cambio;
-                    if (producto.cantidad <= 0) {
-                        carrito = carrito.filter(item => item.id !== id);
-                    }
-                    actualizarCarritoUI();
-                }
-            }
-
-            // Actualizar el HTML del panel lateral del carrito
-            function actualizarCarritoUI() {
-                // Cantidad de artículos en la burbuja roja
-                const totalItems = obtenerCantidadArticulos(carrito);
-                cartBadge.textContent = totalItems;
-
-                // Total acumulado en pesos
-                const totalMonto = obtenerMontoTotal(carrito);
-                cartTotalPrice.textContent = `RD$ ${totalMonto.toLocaleString('es-DO')}.00`;
-
-                // Renderizar los ítems en el cuerpo del carrito
-                if (carrito.length === 0) {
-                    cartBody.innerHTML = `<p class="empty-cart-msg">Tu carrito está vacío actualmente.</p>`;
-                } else {
-                    cartBody.innerHTML = "";
-                    carrito.forEach(item => {
-                        const itemDiv = document.createElement("div");
-                        itemDiv.classList.add("cart-item");
-                        itemDiv.innerHTML = `
-                            <img class="cart-item-cover" src="${item.imagen}" alt="" width="42" height="64">
-                            <div class="cart-item-details">
-                                <h4>${item.titulo}</h4>
-                                <p>RD$ ${item.precio.toLocaleString('es-DO')} x ${item.cantidad}</p>
-                            </div>
-                            <div class="cart-item-controls">
-                                <button class="btn-qty btn-restar" data-id="${item.id}">-</button>
-                                <span>${item.cantidad}</span>
-                                <button class="btn-qty btn-sumar" data-id="${item.id}">+</button>
-                            </div>
-                        `;
-                        cartBody.appendChild(itemDiv);
-                    });
-
-                    // Eventos para botones + y - dentro del carrito
-                    document.querySelectorAll(".btn-restar").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            const id = parseInt(e.target.getAttribute("data-id"));
-                            cambiarCantidad(id, -1);
-                        });
-                    });
-
-                    document.querySelectorAll(".btn-sumar").forEach(btn => {
-                        btn.addEventListener("click", (e) => {
-                            const id = parseInt(e.target.getAttribute("data-id"));
-                            cambiarCantidad(id, 1);
-                        });
-                    });
-                }
-            }
-
-            // Controles para mostrar y ocultar el panel
-            function abrirPanelCarrito() {
-                cartSidebar.classList.add("open");
-                cartOverlay.classList.add("active");
-            }
-
-            function cerrarPanelCarrito() {
-                cartSidebar.classList.remove("open");
-                cartOverlay.classList.remove("active");
-            }
-
-            cartFloatBtn.addEventListener("click", abrirPanelCarrito);
-            closeCartBtn.addEventListener("click", cerrarPanelCarrito);
-            cartOverlay.addEventListener("click", cerrarPanelCarrito);
-
-            // El servidor genera la factura y confirma el resultado real del correo.
-            checkout = crearCheckout({
-                obtenerCarrito: () => carrito,
-                vaciarCarrito: productosConfirmados => {
-                    carrito = carrito.map(item => {
-                        const confirmado = productosConfirmados.find(producto => producto.id === item.id);
-                        return { ...item, cantidad: item.cantidad - (confirmado?.cantidad || 0) };
-                    }).filter(item => item.cantidad > 0);
-                    actualizarCarritoUI();
-                }
-            });
-
-            // Inicializar la carga de libros y el estado del carrito
-            campoBusqueda.addEventListener("input", renderizarCatalogo);
-            campoPrecio.addEventListener("input", renderizarCatalogo);
-            renderizarCatalogo();
-            actualizarCarritoUI();
-        });
-    </script>
+    <!-- La lógica dinámica del catálogo y carrito se ejecuta desde el archivo externo js/tienda.js -->
 </body>
 </html>

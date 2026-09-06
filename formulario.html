@@ -37,28 +37,40 @@
                 <h2 id="contact-details-title">Medios de contacto</h2>
                 <div class="contact-list">
                     <div class="contact-item">
-                        <span class="contact-icon" aria-hidden="true">☎</span>
+                        <span class="contact-icon" aria-hidden="true">
+                            <!-- Ícono vectorial de teléfono sin emojis -->
+                            <svg class="svg-icon" viewBox="0 0 24 24" focusable="false"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        </span>
                         <div>
                             <h3>Llámanos o WhatsApp</h3>
                             <p>+1 (809) 555-0199</p>
                         </div>
                     </div>
                     <div class="contact-item">
-                        <span class="contact-icon" aria-hidden="true">✉</span>
+                        <span class="contact-icon" aria-hidden="true">
+                            <!-- Ícono vectorial de correo electrónico -->
+                            <svg class="svg-icon" viewBox="0 0 24 24" focusable="false"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </span>
                         <div>
                             <h3>Correo electrónico</h3>
                             <p>contacto@libreriaquisqueya.com</p>
                         </div>
                     </div>
                     <div class="contact-item">
-                        <span class="contact-icon" aria-hidden="true">⌖</span>
+                        <span class="contact-icon" aria-hidden="true">
+                            <!-- Ícono vectorial de ubicación geográfica -->
+                            <svg class="svg-icon" viewBox="0 0 24 24" focusable="false"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        </span>
                         <div>
                             <h3>Ubicación principal</h3>
                             <p>Av. Winston Churchill #105, Santo Domingo, Rep. Dom.</p>
                         </div>
                     </div>
                     <div class="contact-item">
-                        <span class="contact-icon" aria-hidden="true">◷</span>
+                        <span class="contact-icon" aria-hidden="true">
+                            <!-- Ícono vectorial de horario y reloj -->
+                            <svg class="svg-icon" viewBox="0 0 24 24" focusable="false"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        </span>
                         <div>
                             <h3>Horario de atención</h3>
                             <p>Lun. – Sáb.: 8:00 a. m. – 7:00 p. m.<br>Domingos: cerrado</p>
@@ -68,12 +80,12 @@
             </aside>
             <section class="form-card" aria-labelledby="contact-form-title">
                 <h2 id="contact-form-title">Envíanos un mensaje</h2>
-                <!-- Esta demostración confirma el envío sin transmitir datos a un servidor. -->
-                <form id="contact-form">
+                <!-- Formulario con novalidate para permitir validación interactiva vía DOM en JS -->
+                <form id="contact-form" novalidate>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nombre">Nombre completo *</label>
-                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" autocomplete="name" required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" autocomplete="name" required>
                         </div>
                         <div class="form-group">
                             <label for="correo">Correo electrónico *</label>
@@ -82,7 +94,7 @@
                     </div>
                     <div class="form-group">
                         <label for="telefono">Teléfono / WhatsApp</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="+1 809 000 0000" autocomplete="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        <input type="tel" id="telefono" name="telefono" placeholder="8095550199" autocomplete="tel">
                     </div>
                     <div class="form-group">
                         <label for="motivo">Motivo del mensaje *</label>
@@ -97,13 +109,16 @@
                         <label for="mensaje">Mensaje *</label>
                         <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escribe aquí tu consulta o el título del libro que buscas..." required></textarea>
                     </div>
-                    <p id="contact-message" class="success-message" role="status" aria-live="polite"></p>
-                    <button class="button button-primary button-full" type="submit">Enviar mensaje</button>
+                    <!-- Contenedor dinámico para respuestas y mensajes de confirmación en el DOM -->
+                    <div id="contact-feedback" aria-live="polite"></div>
+                    <button id="contact-submit-btn" class="button button-primary button-full" type="submit">Enviar mensaje</button>
                 </form>
             </section>
         </div>
     </main>
     <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
+    <!-- Scripts externos modulares según los requerimientos de la Fase 2 -->
+    <script src="js/funciones.js"></script>
     <script src="js/validaciones.js"></script>
 </body>
 </html>

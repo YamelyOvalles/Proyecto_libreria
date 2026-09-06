@@ -3,41 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Acceso a Librería Quisqueya">
+    <meta name="description" content="Acceso a Librería Quisqueya para clientes y administración">
     <title>Iniciar sesión | Librería Quisqueya</title>
+    <!-- Estilos externos principales con selectores de etiqueta, clase e ID -->
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Script de autenticación y lógica de login -->
     <script src="js/login.js" defer></script>
 </head>
 <body class="login-page">
     <main class="login-layout">
         <section class="login-card" aria-labelledby="login-title">
-            <div class="login-heading">
-                <p class="eyebrow">Panel de lectores</p>
-                <h1 id="login-title">Bienvenida de vuelta</h1>
-                <p>Entra para gestionar tus pedidos y lecturas.</p>
+            
+            <!-- Selector de perfil de usuario: Lector/Cliente vs Dueño/Administrador -->
+            <div class="role-switcher" role="tablist" aria-label="Seleccionar perfil de acceso">
+                <button type="button" id="role-client" class="role-tab active" role="tab" aria-selected="true">
+                    Lector / Cliente
+                </button>
+                <button type="button" id="role-admin" class="role-tab" role="tab" aria-selected="false">
+                    Dueño / Administrador
+                </button>
             </div>
 
-            <button type="button" class="google-button" title="Disponible próximamente" disabled>
+            <div class="login-heading">
+                <p id="login-role-eyebrow" class="eyebrow">Panel de lectores</p>
+                <h1 id="login-title">Bienvenida de vuelta</h1>
+                <p id="login-subtitle">Entra para gestionar tus pedidos y lecturas.</p>
+            </div>
+
+            <!-- Ayuda visible con credenciales administrativas para fines de evaluación -->
+            <div id="admin-credentials-hint" class="admin-hint-box" hidden>
+                <strong>Credenciales de Demostración Administrativa:</strong><br>
+                Correo: <code>admin@libreriaquisqueya.com</code><br>
+                Contraseña: <code>admin123</code>
+            </div>
+
+            <button type="button" id="google-login-btn" class="google-button" title="Disponible próximamente" disabled>
                 <span class="google-letter" aria-hidden="true">G</span>
                 Entrar con Google
             </button>
 
             <div class="login-divider"><span>o continúa con tu correo</span></div>
 
-            <!-- El acceso es de demostración; todavía no se conecta a una base de datos. -->
-            <form id="login-form">
+            <!-- Formulario principal con selectores ID específicos (#login-form, #email, #password) -->
+            <form id="login-form" novalidate>
                 <div class="form-group">
                     <label for="email">Correo electrónico</label>
                     <div class="input-with-icon">
-                        <span aria-hidden="true">✉</span>
+                        <span aria-hidden="true">
+                            <!-- Ícono vectorial SVG limpio en lugar de emojis -->
+                            <svg class="svg-icon" viewBox="0 0 24 24" focusable="false"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </span>
                         <input type="email" id="email" name="email" placeholder="nombre@correo.com" autocomplete="email" required>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <div class="password-field input-with-icon">
-                        <span aria-hidden="true">▣</span>
-                        <input type="password" id="password" name="password" placeholder="Escribe cualquier contraseña" autocomplete="current-password" required>
+                        <span aria-hidden="true">
+                            <!-- Ícono vectorial SVG de seguridad -->
+                            <svg class="svg-icon" viewBox="0 0 24 24" focusable="false"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        </span>
+                        <input type="password" id="password" name="password" placeholder="Escribe tu contraseña" autocomplete="current-password" required>
                         <button type="button" id="toggle-password" class="password-toggle" aria-label="Mostrar contraseña">
                             <span class="eye-icon" aria-hidden="true"></span>
                         </button>
@@ -52,11 +79,15 @@
                     <button type="button" class="login-help" data-demo-message>¿Olvidaste tu contraseña?</button>
                 </div>
 
+                <!-- Mensaje de error/estado visible manipulado directamente desde el DOM -->
                 <p id="login-message" class="form-message" role="alert" aria-live="polite"></p>
-                <button type="submit" class="button button-primary button-full">Entrar a Librería Quisqueya</button>
+
+                <button type="submit" id="login-submit-btn" class="button button-primary button-full">
+                    Entrar a Librería Quisqueya
+                </button>
             </form>
 
-            <p class="register-copy">
+            <p id="register-container" class="register-copy">
                 ¿Aún no tienes cuenta?
                 <button type="button" class="login-help" data-demo-message>Regístrate</button>
             </p>

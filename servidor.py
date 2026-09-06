@@ -225,7 +225,7 @@ def crear_servidor(puerto=8000, pedidos=None):
                     return self.respuesta(404, {"error": "Factura no encontrada."})
             relativa = ruta.lstrip("/") or "index.html"
             archivo = (ROOT / relativa).resolve()
-            paginas = {"index.html", "login.html", "tienda.html", "informacion.html", "formulario.html"}
+            paginas = {"index.html", "login.html", "tienda.html", "informacion.html", "formulario.html", "admin.html"}
             permitido = relativa in paginas or relativa.startswith(("css/", "js/", "assets/"))
             if not permitido or not archivo.is_relative_to(ROOT) or not archivo.is_file():
                 return self.respuesta(404, {"error": "Archivo no encontrado."})
