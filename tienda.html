@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Catálogo de Librería Quisqueya">
+    <title>Catálogo | Librería Quisqueya</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/auth.js"></script>
+    <script src="js/funciones.js" defer></script>
+    <script src="js/checkout.js" defer></script>
+    <link rel="stylesheet" href="css/catalogo.css">
+    
+    <style>
+        /* Variables de color basadas en la paleta del diseño */
+        :root {
+            --primary-green: #4c602a;    /* Verde oliva del header */
+            --accent-brown: #6b4731;     /* Marrón terracota del botón activo/hover */
+            --accent-red: #d9534f;       /* Rojo para la burbuja de notificación */
+            --bg-light: #f8f9fa;
+            --text-dark: #222222;
+        }
+
+        /* Estilos globales y botones de la página */
+        .eyebrow {
+            color: var(--accent-brown) !important;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .button-primary {
+            background-color: var(--primary-green) !important;
+            color: #ffffff !important;
+            border: none;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .button-primary:hover {
+            background-color: var(--accent-brown) !important;
+        }
+
+        .book-price {
+            color: var(--accent-brown) !important;
+            font-weight: bold;
+        }
+
+        /* Estilos del Botón Flotante del Carrito */
+        .cart-float-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: var(--primary-green);
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 22px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .cart-float-btn:hover {
+            background-color: var(--accent-brown);
+            transform: scale(1.05);
+        }
+
+        .cart-badge {
+            background-color: var(--accent-red);
+            color: white;
+            border-radius: 50%;
+            padding: 3px 9px;
+            font-size: 0.85rem;
+        }
+
+        /* Overlay oscuro de fondo */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1001;
+        }
+
+        .cart-overlay.active {
+            display: block;
+        }
+
+        /* Panel Lateral desplegable del Carrito */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 100%;
+            max-width: 380px;
+            height: 100vh;
+            background-color: #ffffff;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+            z-index: 1002;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.3s ease-in-out;
+        }
+
+        .cart-sidebar.open {
+            right: 0 !important;
+        }
+
+        .cart-header {
+            padding: 20px;
+            background-color: var(--primary-green);
+            color: #ffffff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #ffffff;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #ffffff;
+        }
+
+        .cart-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-details h4 {
+            margin: 0 0 4px 0;
+            font-size: 0.95rem;
+            color: #222;
+        }
+
+        .cart-item-details p {
+            margin: 0;
+            color: var(--accent-brown);
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-qty {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-qty:hover {
+            background-color: #dee2e6;
+        }
+
+        .cart-footer {
+            padding: 20px;
+            border-top: 1px solid #ddd;
+            background-color: var(--bg-light);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.15rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #111;
+        }
+
+        .empty-cart-msg {
+            text-align: center;
+            color: #777;
+            margin-top: 40px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body class="catalog-page">
+    <header class="site-header">
+        <div class="header-container">
+            <a class="brand" href="informacion.html"><img class="brand-logo" src="assets/logo-quisqueya-icono.png" alt=""><span class="brand-name">Librería Quisqueya</span></a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav" class="site-nav" aria-label="Navegación principal">
+                <ul class="nav-list">
+                    <li><a class="nav-link" href="informacion.html">Información</a></li>
+                    <li><a class="nav-link active" aria-current="page" href="tienda.html">Catálogo</a></li>
+                    <li><a class="nav-link" href="formulario.html">Contacto</a></li>
+                    <li><button class="logout-button" type="button" data-logout>Cerrar sesión</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-container content-section">
+        <div class="section-heading section-heading-left">
+            <p class="eyebrow">Catálogo</p>
+            <h1>Encuentra tu próxima lectura</h1>
+            <p>Una pequeña selección de títulos disponibles en Librería Quisqueya.</p>
+            <p id="contador" role="status" aria-live="polite">Cargando catálogo...</p>
+        </div>
+
+        <div class="form-row" role="search" aria-label="Filtrar catálogo">
+            <div class="form-group">
+                <label for="buscar-libros">Buscar por título o autor</label>
+                <input id="buscar-libros" type="search" placeholder="Ej. Principito o Cervantes">
+            </div>
+            <div class="form-group">
+                <label for="precio-maximo">Precio máximo (RD$)</label>
+                <input id="precio-maximo" type="number" min="0" step="0.01" placeholder="Sin límite">
+            </div>
+        </div>
+
+        <!-- Rejilla donde se renderizan los libros -->
+        <section id="book-grid" class="book-grid" aria-label="Libros disponibles">
+        </section>
+    </main>
+
+    <!-- Botón Flotante para abrir el Carrito -->
+    <button id="cart-float-btn" class="cart-float-btn" type="button">
+        <span>🛒 Mi Carrito</span>
+        <span id="cart-badge" class="cart-badge">0</span>
+    </button>
+
+    <!-- Panel Lateral del Carrito y Fondo Oscuro -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+    <aside id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Tu Carrito de Compras</h2>
+            <button id="close-cart" class="close-cart" type="button">&times;</button>
+        </div>
+        <div id="cart-body" class="cart-body">
+            <!-- Los libros agregados aparecerán aquí dinámicamente -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total-price">RD$ 0.00</span>
+            </div>
+            <button id="checkout-btn" class="button button-primary button-full" type="button" style="width: 100%; padding: 12px;">Confirmar pedido y enviar factura</button>
+            <p class="invoice-recipient">La factura se enviará a <strong>adamsdleons3@gmail.com</strong>.</p>
+            <p id="checkout-status" class="invoice-status" role="status" aria-live="polite"></p>
+            <a id="invoice-download" class="button button-primary button-full" hidden>Descargar factura PDF</a>
+            <button id="invoice-retry" class="button button-full" type="button" hidden>Reintentar envío</button>
+        </div>
+    </aside>
+
+    <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
+
+    <!-- Lógica JavaScript del Carrito Dinámico -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Lista de libros en catálogo
+            const libros = [
+                { id: 1, titulo: "Cien años de soledad", autor: "Gabriel García Márquez", precio: 1150, imagen: "assets/portadas/cien-anos-de-soledad.jpg" },
+                { id: 2, titulo: "El Principito", autor: "Antoine de Saint-Exupéry", precio: 750, imagen: "assets/portadas/el-principito.jpg" },
+                { id: 3, titulo: "1984", autor: "George Orwell", precio: 900, imagen: "assets/portadas/1984.jpg" },
+                { id: 4, titulo: "Don Quijote de la Mancha", autor: "Miguel de Cervantes", precio: 1350, imagen: "assets/portadas/don-quijote.jpg" }
+            ];
+
+            // Estado del Carrito
+            let carrito = [];
+            let checkout = null;
+
+            // Selección de Elementos del DOM
+            const contenedorGrid = document.getElementById("book-grid");
+            const elementoContador = document.getElementById("contador");
+            const cartFloatBtn = document.getElementById("cart-float-btn");
+            const cartSidebar = document.getElementById("cart-sidebar");
+            const cartOverlay = document.getElementById("cart-overlay");
+            const closeCartBtn = document.getElementById("close-cart");
+            const cartBody = document.getElementById("cart-body");
+            const cartBadge = document.getElementById("cart-badge");
+            const cartTotalPrice = document.getElementById("cart-total-price");
+            const checkoutBtn = document.getElementById("checkout-btn");
+            const campoBusqueda = document.getElementById("buscar-libros");
+            const campoPrecio = document.getElementById("precio-maximo");
+
+            // Renderizar los libros en la página
+            function renderizarCatalogo() {
+                const coincidencias = buscarLibrosPorTexto(libros, campoBusqueda.value);
+                const precioMaximo = campoPrecio.value === "" ? Infinity : Number(campoPrecio.value);
+                const librosVisibles = filtrarLibrosPorPrecio(coincidencias, precioMaximo);
+                if (elementoContador) {
+                    elementoContador.textContent = `Mostrando ${librosVisibles.length} de ${libros.length} libros disponibles`;
+                }
+
+                if (contenedorGrid) {
+                    contenedorGrid.innerHTML = "";
+                    if (librosVisibles.length === 0) {
+                        contenedorGrid.textContent = "No hay libros que coincidan con tu búsqueda y presupuesto.";
+                    }
+                    librosVisibles.forEach((libro, indice) => {
+                        const tarjeta = document.createElement("article");
+                        tarjeta.classList.add("book-card");
+                        tarjeta.style.setProperty("--card-delay", `${indice * 70}ms`);
+                        tarjeta.innerHTML = `
+                            <div class="book-cover-frame">
+                                <img src="${libro.imagen}" alt="Portada de ${libro.titulo}, de ${libro.autor}" class="book-cover" width="330" height="500" decoding="async">
+                            </div>
+                            <div class="book-info">
+                                <p class="book-author">${libro.autor}</p>
+                                <h2>${libro.titulo}</h2>
+                                <p class="book-price">RD$ ${libro.precio.toLocaleString('es-DO')}.00</p>
+                                <button class="button button-primary button-full btn-add" type="button" data-id="${libro.id}">
+                                    Agregar al carrito
+                                </button>
+                            </div>
+                        `;
+                        contenedorGrid.appendChild(tarjeta);
+                    });
+
+                    // Escuchar clics en los botones "Agregar al carrito"
+                    document.querySelectorAll(".btn-add").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const id = parseInt(e.target.getAttribute("data-id"));
+                            agregarAlCarrito(id);
+                        });
+                    });
+                }
+            }
+
+            // Agregar un libro al arreglo de carrito
+            function agregarAlCarrito(id) {
+                if (checkout?.estaOcupado()) return;
+                const productoExistente = carrito.find(item => item.id === id);
+                if (productoExistente) {
+                    if (productoExistente.cantidad >= 999) return;
+                    productoExistente.cantidad++;
+                } else {
+                    const libro = libros.find(l => l.id === id);
+                    carrito.push({ ...libro, cantidad: 1 });
+                }
+                
+                actualizarCarritoUI();
+                if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                    cartBadge.getAnimations().forEach(animacion => animacion.cancel());
+                    cartBadge.animate([
+                        { transform: "scale(1)" },
+                        { transform: "scale(1.3)" },
+                        { transform: "scale(1)" }
+                    ], { duration: 350, easing: "ease-out" });
+                }
+                abrirPanelCarrito();
+            }
+
+            // Cambiar la cantidad de un producto (+ / -)
+            function cambiarCantidad(id, cambio) {
+                if (checkout?.estaOcupado()) return;
+                const producto = carrito.find(item => item.id === id);
+                if (producto) {
+                    if (producto.cantidad + cambio > 999) return;
+                    producto.cantidad += cambio;
+                    if (producto.cantidad <= 0) {
+                        carrito = carrito.filter(item => item.id !== id);
+                    }
+                    actualizarCarritoUI();
+                }
+            }
+
+            // Actualizar el HTML del panel lateral del carrito
+            function actualizarCarritoUI() {
+                // Cantidad de artículos en la burbuja roja
+                const totalItems = obtenerCantidadArticulos(carrito);
+                cartBadge.textContent = totalItems;
+
+                // Total acumulado en pesos
+                const totalMonto = obtenerMontoTotal(carrito);
+                cartTotalPrice.textContent = `RD$ ${totalMonto.toLocaleString('es-DO')}.00`;
+
+                // Renderizar los ítems en el cuerpo del carrito
+                if (carrito.length === 0) {
+                    cartBody.innerHTML = `<p class="empty-cart-msg">Tu carrito está vacío actualmente.</p>`;
+                } else {
+                    cartBody.innerHTML = "";
+                    carrito.forEach(item => {
+                        const itemDiv = document.createElement("div");
+                        itemDiv.classList.add("cart-item");
+                        itemDiv.innerHTML = `
+                            <img class="cart-item-cover" src="${item.imagen}" alt="" width="42" height="64">
+                            <div class="cart-item-details">
+                                <h4>${item.titulo}</h4>
+                                <p>RD$ ${item.precio.toLocaleString('es-DO')} x ${item.cantidad}</p>
+                            </div>
+                            <div class="cart-item-controls">
+                                <button class="btn-qty btn-restar" data-id="${item.id}">-</button>
+                                <span>${item.cantidad}</span>
+                                <button class="btn-qty btn-sumar" data-id="${item.id}">+</button>
+                            </div>
+                        `;
+                        cartBody.appendChild(itemDiv);
+                    });
+
+                    // Eventos para botones + y - dentro del carrito
+                    document.querySelectorAll(".btn-restar").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const id = parseInt(e.target.getAttribute("data-id"));
+                            cambiarCantidad(id, -1);
+                        });
+                    });
+
+                    document.querySelectorAll(".btn-sumar").forEach(btn => {
+                        btn.addEventListener("click", (e) => {
+                            const id = parseInt(e.target.getAttribute("data-id"));
+                            cambiarCantidad(id, 1);
+                        });
+                    });
+                }
+            }
+
+            // Controles para mostrar y ocultar el panel
+            function abrirPanelCarrito() {
+                cartSidebar.classList.add("open");
+                cartOverlay.classList.add("active");
+            }
+
+            function cerrarPanelCarrito() {
+                cartSidebar.classList.remove("open");
+                cartOverlay.classList.remove("active");
+            }
+
+            cartFloatBtn.addEventListener("click", abrirPanelCarrito);
+            closeCartBtn.addEventListener("click", cerrarPanelCarrito);
+            cartOverlay.addEventListener("click", cerrarPanelCarrito);
+
+            // El servidor genera la factura y confirma el resultado real del correo.
+            checkout = crearCheckout({
+                obtenerCarrito: () => carrito,
+                vaciarCarrito: productosConfirmados => {
+                    carrito = carrito.map(item => {
+                        const confirmado = productosConfirmados.find(producto => producto.id === item.id);
+                        return { ...item, cantidad: item.cantidad - (confirmado?.cantidad || 0) };
+                    }).filter(item => item.cantidad > 0);
+                    actualizarCarritoUI();
+                }
+            });
+
+            // Inicializar la carga de libros y el estado del carrito
+            campoBusqueda.addEventListener("input", renderizarCatalogo);
+            campoPrecio.addEventListener("input", renderizarCatalogo);
+            renderizarCatalogo();
+            actualizarCarritoUI();
+        });
+    </script>
+</body>
+</html>

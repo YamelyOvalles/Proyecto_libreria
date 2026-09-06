@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Acceso a Librería Quisqueya">
+    <title>Iniciar sesión | Librería Quisqueya</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/login.js" defer></script>
+</head>
+<body class="login-page">
+    <main class="login-layout">
+        <section class="login-card" aria-labelledby="login-title">
+            <div class="login-heading">
+                <p class="eyebrow">Panel de lectores</p>
+                <h1 id="login-title">Bienvenida de vuelta</h1>
+                <p>Entra para gestionar tus pedidos y lecturas.</p>
+            </div>
+
+            <button type="button" class="google-button" title="Disponible próximamente" disabled>
+                <span class="google-letter" aria-hidden="true">G</span>
+                Entrar con Google
+            </button>
+
+            <div class="login-divider"><span>o continúa con tu correo</span></div>
+
+            <!-- El acceso es de demostración; todavía no se conecta a una base de datos. -->
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <div class="input-with-icon">
+                        <span aria-hidden="true">✉</span>
+                        <input type="email" id="email" name="email" placeholder="nombre@correo.com" autocomplete="email" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="password-field input-with-icon">
+                        <span aria-hidden="true">▣</span>
+                        <input type="password" id="password" name="password" placeholder="Escribe cualquier contraseña" autocomplete="current-password" required>
+                        <button type="button" id="toggle-password" class="password-toggle" aria-label="Mostrar contraseña">
+                            <span class="eye-icon" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="login-options">
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="remember" name="remember" checked>
+                        Recordarme
+                    </label>
+                    <button type="button" class="login-help" data-demo-message>¿Olvidaste tu contraseña?</button>
+                </div>
+
+                <p id="login-message" class="form-message" role="alert" aria-live="polite"></p>
+                <button type="submit" class="button button-primary button-full">Entrar a Librería Quisqueya</button>
+            </form>
+
+            <p class="register-copy">
+                ¿Aún no tienes cuenta?
+                <button type="button" class="login-help" data-demo-message>Regístrate</button>
+            </p>
+        </section>
+
+        <figure class="login-photo">
+            <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Interior de una librería con estantes llenos de libros">
+            <figcaption>
+                <span class="brand brand-large"><img class="brand-logo-large" src="assets/logo-quisqueya-icono.png" alt=""><span class="brand-name brand-name-large">Librería Quisqueya</span></span>
+                <span>Historias que siempre encuentran un hogar.</span>
+            </figcaption>
+        </figure>
+    </main>
+</body>
+</html>

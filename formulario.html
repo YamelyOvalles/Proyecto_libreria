@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contacto de Librería Quisqueya">
+    <title>Contacto | Librería Quisqueya</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/auth.js"></script>
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <a class="brand" href="informacion.html"><img class="brand-logo" src="assets/logo-quisqueya-icono.png" alt=""><span class="brand-name">Librería Quisqueya</span></a>
+            <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav" class="site-nav" aria-label="Navegación principal">
+                <ul class="nav-list">
+                    <li><a class="nav-link" href="informacion.html">Información</a></li>
+                    <li><a class="nav-link" href="tienda.html">Catálogo</a></li>
+                    <li><a class="nav-link active" aria-current="page" href="formulario.html">Contacto</a></li>
+                    <li><button class="logout-button" type="button" data-logout>Cerrar sesión</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main class="page-container content-section">
+        <div class="section-heading">
+            <p class="eyebrow">Estamos para ayudarte</p>
+            <h1>Contáctanos</h1>
+            <p>Consulta un título, solicita un encargo o déjanos tu pregunta.</p>
+        </div>
+        <div class="contact-grid">
+            <aside class="contact-details" aria-labelledby="contact-details-title">
+                <h2 id="contact-details-title">Medios de contacto</h2>
+                <div class="contact-list">
+                    <div class="contact-item">
+                        <span class="contact-icon" aria-hidden="true">☎</span>
+                        <div>
+                            <h3>Llámanos o WhatsApp</h3>
+                            <p>+1 (809) 555-0199</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon" aria-hidden="true">✉</span>
+                        <div>
+                            <h3>Correo electrónico</h3>
+                            <p>contacto@libreriaquisqueya.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon" aria-hidden="true">⌖</span>
+                        <div>
+                            <h3>Ubicación principal</h3>
+                            <p>Av. Winston Churchill #105, Santo Domingo, Rep. Dom.</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon" aria-hidden="true">◷</span>
+                        <div>
+                            <h3>Horario de atención</h3>
+                            <p>Lun. – Sáb.: 8:00 a. m. – 7:00 p. m.<br>Domingos: cerrado</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <section class="form-card" aria-labelledby="contact-form-title">
+                <h2 id="contact-form-title">Envíanos un mensaje</h2>
+                <!-- Esta demostración confirma el envío sin transmitir datos a un servidor. -->
+                <form id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre">Nombre completo *</label>
+                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" autocomplete="name" required oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
+                        </div>
+                        <div class="form-group">
+                            <label for="correo">Correo electrónico *</label>
+                            <input type="email" id="correo" name="correo" placeholder="correo@ejemplo.com" autocomplete="email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono / WhatsApp</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="+1 809 000 0000" autocomplete="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="form-group">
+                        <label for="motivo">Motivo del mensaje *</label>
+                        <select id="motivo" name="motivo" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="encargo">Pedido especial</option>
+                            <option value="existencia">Consulta de existencia</option>
+                            <option value="ayuda">Atención al cliente</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="mensaje">Mensaje *</label>
+                        <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escribe aquí tu consulta o el título del libro que buscas..." required></textarea>
+                    </div>
+                    <p id="contact-message" class="success-message" role="status" aria-live="polite"></p>
+                    <button class="button button-primary button-full" type="submit">Enviar mensaje</button>
+                </form>
+            </section>
+        </div>
+    </main>
+    <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
+    <script src="js/validaciones.js"></script>
+</body>
+</html>
