@@ -1,295 +1,341 @@
-/**
- * Librería Quisqueya - Lógica del Módulo Administrativo (Fase 2)
- * 
- * Funcionalidades operativas:
- * 1. Carga y persistencia de pedidos en localStorage (sincronizados con el catálogo).
- * 2. Cálculo en tiempo real de métricas e indicadores clave de rendimiento (KPIs).
- * 3. Filtrado por estado de despacho y búsqueda por texto.
- * 4. Manipulación del DOM para renderizar la tabla semántica y actualizar estados sin recargar la página.
- * 5. Uso intensivo de funciones puras modulares importadas desde funciones.js.
- */
-
-// Clave de almacenamiento en localStorage para los pedidos del sistema
-const CLAVE_PEDIDOS_STORAGE = "libreria_pedidos_sistema";
-
-// Colección inicial de pedidos de demostración (si no existen pedidos previos en el navegador)
-const PEDIDOS_POR_DEFECTO = [
-    {
-        id: "b72e7092-864f-4eee-a560-72d2dd7671f9",
-        numero: "LQ-20260906-B72E7092",
-        fecha: "06/09/2026 11:38 (UTC-4)",
-        correo: "adamsdleons3@gmail.com",
-        cliente: "adamsdleons3",
-        productos: [
-            { id: 1, titulo: "Cien años de soledad", precio: 1150, cantidad: 1, subtotal: 1150 }
-        ],
-        total: 1150,
-        cantidad: 1,
-        estado: "pendiente",
-        mensaje: "Factura generada y en espera de confirmación de despacho."
-    },
-    {
-        id: "a1f3c490-55e1-4c5b-9d41-334455667788",
-        numero: "LQ-20260905-A1F3C490",
-        fecha: "05/09/2026 16:20 (UTC-4)",
-        correo: "cliente.lector@quisqueya.com",
-        cliente: "cliente.lector",
-        productos: [
-            { id: 2, titulo: "El Principito", precio: 750, cantidad: 1, subtotal: 750 },
-            { id: 3, titulo: "1984", precio: 900, cantidad: 1, subtotal: 900 }
-        ],
-        total: 1650,
-        cantidad: 2,
-        estado: "procesado",
-        mensaje: "Pedido preparado en empaque para entrega."
-    },
-    {
-        id: "89d12e7b-88a2-47d3-9821-aabbccddeeff",
-        numero: "LQ-20260904-89D12E7B",
-        fecha: "04/09/2026 10:15 (UTC-4)",
-        correo: "maria.lopez@dominio.do",
-        cliente: "maria.lopez",
-        productos: [
-            { id: 4, titulo: "Don Quijote de la Mancha", precio: 1350, cantidad: 1, subtotal: 1350 }
-        ],
-        total: 1350,
-        cantidad: 1,
-        estado: "entregado",
-        mensaje: "Entregado en sucursal Piantini."
-    }
-];
-
-// Arreglo en memoria con los pedidos activos
-let listaPedidos = [];
-
-/**
- * Obtiene los pedidos desde localStorage o inicializa con los valores por defecto.
- * @returns {Array<Object>} Arreglo de pedidos.
- */
-function cargarPedidos() {
-    try {
-        const datosLocales = localStorage.getItem(CLAVE_PEDIDOS_STORAGE);
-        if (datosLocales) {
-            const parseados = JSON.parse(datosLocales);
-            if (Array.isArray(parseados) && parseados.length > 0) {
-                return parseados;
-            }
-        }
-    } catch (error) {
-        console.warn("No se pudieron cargar los pedidos de localStorage, inicializando por defecto.", error);
-    }
-
-    // Si está vacío, guardar y retornar los pedidos de demostración iniciales
-    guardarPedidos(PEDIDOS_POR_DEFECTO);
-    return [...PEDIDOS_POR_DEFECTO];
-}
-
-/**
- * Persiste la lista de pedidos en localStorage.
- * @param {Array<Object>} pedidos - Arreglo de pedidos a guardar.
- */
-function guardarPedidos(pedidos) {
-    try {
-        localStorage.setItem(CLAVE_PEDIDOS_STORAGE, JSON.stringify(pedidos));
-    } catch (error) {
-        console.error("Error al guardar pedidos en localStorage:", error);
-    }
-}
-
-/**
- * Calcula y actualiza en el DOM los cuatro indicadores clave (KPIs) del panel.
- * Utiliza las funciones estructuradas de funciones.js:
- * - calcularTotalIngresos()
- * - calcularUnidadesVendidas()
- * - filtrarPedidosPorEstado()
- * - formatearMonedaRD()
- */
-function actualizarMetricas() {
-    const metricTotalOrders = document.getElementById("metric-total-orders");
-    const metricTotalRevenue = document.getElementById("metric-total-revenue");
-    const metricPendingOrders = document.getElementById("metric-pending-orders");
-    const metricTotalUnits = document.getElementById("metric-total-units");
-
-    // 1. Conteo total de órdenes registradas
-    if (metricTotalOrders) {
-        metricTotalOrders.textContent = listaPedidos.length;
-    }
-
-    // 2. Facturación total acumulada en pesos
-    if (metricTotalRevenue) {
-        const ingresosTotales = calcularTotalIngresos(listaPedidos);
-        metricTotalRevenue.textContent = formatearMonedaRD(ingresosTotales);
-    }
-
-    // 3. Cantidad de órdenes con estado "pendiente"
-    if (metricPendingOrders) {
-        const pendientes = filtrarPedidosPorEstado(listaPedidos, "pendiente");
-        metricPendingOrders.textContent = pendientes.length;
-    }
-
-    // 4. Conteo de unidades de libros vendidas
-    if (metricTotalUnits) {
-        const unidades = calcularUnidadesVendidas(listaPedidos);
-        metricTotalUnits.textContent = unidades;
-    }
-}
-
-/**
- * Renderiza la tabla semántica con los pedidos filtrados en el DOM.
- * @param {Array<Object>} pedidosAMostrar - Lista de pedidos a desplegar en las filas.
- */
-function renderizarTablaPedidos(pedidosAMostrar) {
+/** Panel administrativo conectado a Supabase y protegido por RLS. */
+document.addEventListener("DOMContentLoaded", async () => {
     const tbody = document.getElementById("orders-table-body");
-    if (!tbody) return;
+    const busqueda = document.getElementById("admin-search-input");
+    const filtro = document.getElementById("admin-status-filter");
+    const refrescar = document.getElementById("admin-refresh-btn");
+    const feedback = document.getElementById("admin-feedback");
+    const formularioLibro = document.getElementById("book-form");
+    const cuerpoLibros = document.getElementById("books-table-body");
+    const feedbackLibro = document.getElementById("book-feedback");
+    const botonGuardarLibro = document.getElementById("book-save-btn");
+    const botonCancelarLibro = document.getElementById("book-cancel-btn");
+    let pedidos = [];
+    let libros = [];
 
-    tbody.innerHTML = "";
-
-    // Mensaje si no existen coincidencias con los filtros aplicados
-    if (pedidosAMostrar.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--muted);">
-                    No se encontraron pedidos que coincidan con el criterio de búsqueda o estado seleccionado.
-                </td>
-            </tr>
-        `;
-        return;
+    function nodo(tag, contenido, clase) {
+        const elemento = document.createElement(tag);
+        if (clase) elemento.className = clase;
+        if (contenido !== undefined) elemento.textContent = contenido;
+        return elemento;
     }
 
-    // Construir cada fila de la tabla
-    pedidosAMostrar.forEach((pedido) => {
-        const tr = document.createElement("tr");
+    function botonIcono(tipo, etiqueta) {
+        const rutas = {
+            editar: "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25ZM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z",
+            eliminar: "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12Zm3.46-8.12 1.41-1.41L12 10.59l1.12-1.12 1.41 1.41L13.41 12l1.12 1.12-1.41 1.41L12 13.41l-1.12 1.12-1.41-1.41L10.59 12l-1.13-1.12ZM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5Z"
+        };
+        const boton = document.createElement("button");
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        const ruta = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        boton.type = "button";
+        boton.className = `icon-button icon-button-${tipo}`;
+        boton.setAttribute("aria-label", etiqueta);
+        boton.title = etiqueta;
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("aria-hidden", "true");
+        svg.setAttribute("focusable", "false");
+        ruta.setAttribute("d", rutas[tipo]);
+        svg.appendChild(ruta);
+        boton.appendChild(svg);
+        return boton;
+    }
 
-        // Construir la lista de artículos comprados
-        const listaItemsHtml = (pedido.productos || []).map(p => 
-            `<li><strong>${p.cantidad}x</strong> ${p.titulo} (${formatearMonedaRD(p.subtotal)})</li>`
-        ).join("");
+    async function cargarPedidos() {
+        refrescar.disabled = true;
+        const { data, error } = await window.libreriaSupabase
+            .from("pedidos")
+            .select("id,numero,cliente_nombre,cliente_correo,metodo_entrega,metodo_pago,estado_pago,estado,subtotal,costo_envio,total,creado_en,pedido_detalles(libro_id,titulo,cantidad,precio_unitario,subtotal)")
+            .order("creado_en", { ascending: false });
+        refrescar.disabled = false;
+        if (error) throw error;
+        pedidos = data;
+        actualizarMetricas();
+        aplicarFiltros();
+    }
 
-        // Clase css del badge según el estado
-        const estadoLimpio = (pedido.estado || "pendiente").toLowerCase();
-        const badgeClase = `badge-${estadoLimpio}`;
+    function actualizarMetricas() {
+        const pagados = pedidos.filter(pedido => pedido.estado_pago === "pagado");
+        const despachados = pedidos.filter(pedido => ["enviado", "entregado"].includes(pedido.estado));
+        document.getElementById("metric-total-orders").textContent = pedidos.length;
+        document.getElementById("metric-total-revenue").textContent = formatearMonedaRD(
+            pagados.reduce((suma, pedido) => suma + Number(pedido.total), 0)
+        );
+        document.getElementById("metric-pending-orders").textContent = pedidos.filter(pedido => pedido.estado === "pendiente").length;
+        document.getElementById("metric-total-units").textContent = despachados.reduce((suma, pedido) =>
+            suma + pedido.pedido_detalles.reduce((cantidad, detalle) => cantidad + detalle.cantidad, 0), 0);
+    }
 
-        tr.innerHTML = `
-            <td>
-                <strong>${pedido.numero || pedido.id.slice(0, 8)}</strong>
-            </td>
-            <td>${pedido.fecha || "Reciente"}</td>
-            <td>
-                <div>${pedido.cliente || "Cliente"}</div>
-                <small style="color: var(--muted);">${pedido.correo || ""}</small>
-            </td>
-            <td>
-                <ul class="order-items-list">
-                    ${listaItemsHtml}
-                </ul>
-            </td>
-            <td>
-                <strong>${formatearMonedaRD(pedido.total)}</strong>
-            </td>
-            <td>
-                <span class="badge-status ${badgeClase}" id="badge-estado-${pedido.id}">
-                    ${estadoLimpio.charAt(0).toUpperCase() + estadoLimpio.slice(1)}
-                </span>
-            </td>
-            <td>
-                <select class="status-select" data-pedido-id="${pedido.id}" aria-label="Cambiar estado del pedido ${pedido.numero}">
-                    <option value="pendiente" ${estadoLimpio === "pendiente" ? "selected" : ""}>Pendiente</option>
-                    <option value="procesado" ${estadoLimpio === "procesado" ? "selected" : ""}>Procesado</option>
-                    <option value="enviado" ${estadoLimpio === "enviado" ? "selected" : ""}>Enviado</option>
-                    <option value="entregado" ${estadoLimpio === "entregado" ? "selected" : ""}>Entregado</option>
-                </select>
-            </td>
-        `;
-
-        tbody.appendChild(tr);
-    });
-
-    // Escuchar cambios de estado en cada select individual
-    tbody.querySelectorAll(".status-select").forEach(select => {
-        select.addEventListener("change", (evento) => {
-            const pedidoId = evento.target.getAttribute("data-pedido-id");
-            const nuevoEstado = evento.target.value;
-            actualizarEstadoPedido(pedidoId, nuevoEstado);
-        });
-    });
-}
-
-/**
- * Actualiza el estado de un pedido específico, lo persiste y actualiza la vista.
- * @param {string} id - Identificador del pedido.
- * @param {string} nuevoEstado - Nuevo estado asignado ('pendiente', 'procesado', etc.).
- */
-function actualizarEstadoPedido(id, nuevoEstado) {
-    const indice = listaPedidos.findIndex(p => p.id === id);
-    if (indice >= 0) {
-        listaPedidos[indice].estado = nuevoEstado;
-        guardarPedidos(listaPedidos);
-
-        // Actualizar el badge visual en la fila correspondiente
-        const badge = document.getElementById(`badge-estado-${id}`);
-        if (badge) {
-            badge.className = `badge-status badge-${nuevoEstado}`;
-            badge.textContent = nuevoEstado.charAt(0).toUpperCase() + nuevoEstado.slice(1);
-        }
-
-        // Recalcular métricas de inmediato
+    async function actualizarPedido(id, cambios) {
+        const cambioEstado = Object.prototype.hasOwnProperty.call(cambios, "estado");
+        const resultado = cambioEstado
+            ? await window.libreriaSupabase.rpc("actualizar_estado_pedido", { p_pedido_id: id, p_estado: cambios.estado })
+            : await window.libreriaSupabase.from("pedidos").update(cambios).eq("id", id);
+        const { error } = resultado;
+        if (error) throw error;
+        const pedido = pedidos.find(item => item.id === id);
+        Object.assign(pedido, cambios);
         actualizarMetricas();
     }
-}
 
-/**
- * Aplica los filtros combinados de búsqueda por texto y selección de estado.
- */
-function aplicarFiltros() {
-    const campoBusqueda = document.getElementById("admin-search-input");
-    const filtroEstado = document.getElementById("admin-status-filter");
-
-    const texto = campoBusqueda ? campoBusqueda.value : "";
-    const estado = filtroEstado ? filtroEstado.value : "todos";
-
-    // 1. Filtrar por término de búsqueda (título, número o cliente)
-    let resultado = buscarPedidosPorTexto(listaPedidos, texto);
-
-    // 2. Filtrar por estado seleccionado
-    resultado = filtrarPedidosPorEstado(resultado, estado);
-
-    // Renderizar la tabla con el resultado procesado
-    renderizarTablaPedidos(resultado);
-}
-
-// =============================================================================
-// INICIALIZACIÓN DEL CONTROLADOR ADMINISTRATIVO
-// =============================================================================
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Cargar la lista inicial de pedidos
-    listaPedidos = cargarPedidos();
-
-    // Actualizar métricas iniciales
-    actualizarMetricas();
-
-    // Renderizar tabla con todos los pedidos
-    renderizarTablaPedidos(listaPedidos);
-
-    // Asignar listeners a los controles de la barra de herramientas
-    const campoBusqueda = document.getElementById("admin-search-input");
-    const filtroEstado = document.getElementById("admin-status-filter");
-    const btnRefrescar = document.getElementById("admin-refresh-btn");
-
-    if (campoBusqueda) {
-        campoBusqueda.addEventListener("input", aplicarFiltros);
+    function crearSelector(valor, opciones, etiqueta, onChange, titulo) {
+        const control = document.createElement("label");
+        const nombreControl = document.createElement("span");
+        const select = document.createElement("select");
+        control.className = "status-control";
+        nombreControl.textContent = titulo;
+        select.className = "status-select";
+        select.setAttribute("aria-label", etiqueta);
+        opciones.forEach(([codigo, nombre]) => select.add(new Option(nombre, codigo, false, codigo === valor)));
+        select.addEventListener("change", async () => {
+            select.disabled = true;
+            try { await onChange(select.value); }
+            catch (error) {
+                feedback.textContent = window.mensajeErrorSupabase(error, "No se pudo actualizar el pedido.");
+                await cargarPedidos();
+            } finally { select.disabled = false; }
+        });
+        control.append(nombreControl, select);
+        return control;
     }
 
-    if (filtroEstado) {
-        filtroEstado.addEventListener("change", aplicarFiltros);
+    function etiquetaEstado(valor) {
+        return valor.replaceAll("_", " ").replace(/^./, letra => letra.toUpperCase());
     }
 
-    if (btnRefrescar) {
-        btnRefrescar.addEventListener("click", () => {
-            listaPedidos = cargarPedidos();
-            actualizarMetricas();
-            aplicarFiltros();
+    function renderizar(lista) {
+        tbody.replaceChildren();
+        if (!lista.length) {
+            const fila = document.createElement("tr");
+            const celda = nodo("td", "No se encontraron pedidos.");
+            celda.colSpan = 7;
+            celda.className = "table-empty";
+            fila.appendChild(celda);
+            tbody.appendChild(fila);
+            return;
+        }
+
+        lista.forEach(pedido => {
+            const fila = document.createElement("tr");
+            fila.appendChild(nodo("td", pedido.numero));
+            fila.appendChild(nodo("td", new Date(pedido.creado_en).toLocaleString("es-DO")));
+            const cliente = document.createElement("td");
+            cliente.append(nodo("strong", pedido.cliente_nombre), nodo("small", pedido.cliente_correo));
+            fila.appendChild(cliente);
+            const detalleCelda = document.createElement("td");
+            const listaLibros = document.createElement("ul");
+            listaLibros.className = "order-items-list";
+            pedido.pedido_detalles.forEach(item => listaLibros.appendChild(
+                nodo("li", `${item.cantidad}× ${item.titulo} (${formatearMonedaRD(item.subtotal)})`)
+            ));
+            detalleCelda.appendChild(listaLibros);
+            fila.appendChild(detalleCelda);
+            fila.appendChild(nodo("td", formatearMonedaRD(pedido.total)));
+
+            const estados = document.createElement("td");
+            estados.className = "order-statuses";
+            estados.append(
+                nodo("span", `Pedido: ${etiquetaEstado(pedido.estado)}`, `badge-status badge-${pedido.estado}`),
+                nodo("span", `Pago: ${etiquetaEstado(pedido.estado_pago)}`, `badge-status badge-pago-${pedido.estado_pago}`)
+            );
+            fila.appendChild(estados);
+
+            const acciones = document.createElement("td");
+            acciones.className = "order-actions";
+            acciones.append(
+                crearSelector(pedido.estado, [
+                    ["pendiente", "Pendiente"], ["confirmado", "Confirmado"],
+                    ["procesando", "Procesando"], ["listo_retiro", "Listo para retiro"],
+                    ["enviado", "Enviado"], ["entregado", "Entregado"], ["cancelado", "Cancelado"]
+                ], `Estado del pedido ${pedido.numero}`, estado => actualizarPedido(pedido.id, { estado }), "Pedido"),
+                crearSelector(pedido.estado_pago, [
+                    ["pendiente", "Pago pendiente"], ["verificando", "Verificando pago"],
+                    ["pagado", "Pagado"], ["rechazado", "Pago rechazado"], ["reembolsado", "Reembolsado"]
+                ], `Estado de pago ${pedido.numero}`, estado_pago => actualizarPedido(pedido.id, { estado_pago }), "Pago")
+            );
+            fila.appendChild(acciones);
+            tbody.appendChild(fila);
         });
     }
-});
 
+    function aplicarFiltros() {
+        const texto = busqueda.value.trim().toLowerCase();
+        renderizar(pedidos.filter(pedido =>
+            (filtro.value === "todos" || pedido.estado === filtro.value) &&
+            (!texto || [pedido.numero, pedido.cliente_nombre, pedido.cliente_correo]
+                .some(valor => valor?.toLowerCase().includes(texto)))
+        ));
+    }
+
+    busqueda.addEventListener("input", aplicarFiltros);
+    filtro.addEventListener("change", aplicarFiltros);
+    refrescar.addEventListener("click", () => cargarPedidos().catch(error => {
+        tbody.replaceChildren(nodo("tr", window.mensajeErrorSupabase(error)));
+    }));
+
+    function inventarioDe(libro) {
+        return Array.isArray(libro.inventarios) ? libro.inventarios[0] : libro.inventarios;
+    }
+
+    function autorDe(libro) {
+        return libro.libro_autor?.map(relacion => relacion.autores?.nombre)
+            .filter(Boolean).join(", ") || "";
+    }
+
+    function informarLibro(texto, exito = false) {
+        feedbackLibro.textContent = texto;
+        feedbackLibro.classList.toggle("success-message", exito);
+    }
+
+    function limpiarFormularioLibro() {
+        formularioLibro.reset();
+        document.getElementById("book-id").value = "";
+        document.getElementById("book-language").value = "Español";
+        document.getElementById("book-active").checked = true;
+        botonGuardarLibro.textContent = "Guardar libro";
+        botonCancelarLibro.hidden = true;
+    }
+
+    async function cargarLibros() {
+        const { data, error } = await window.libreriaSupabase
+            .from("libros")
+            .select("id,isbn,titulo,descripcion,precio,formato,idioma,imagen_portada,activo,inventarios(cantidad_existencia,cantidad_reservada,cantidad_disponible),libro_autor(autores(nombre))")
+            .order("titulo");
+        if (error) throw error;
+        libros = data;
+        renderizarLibros();
+    }
+
+    function editarLibro(libro) {
+        const inventario = inventarioDe(libro);
+        document.getElementById("book-id").value = libro.id;
+        document.getElementById("book-isbn").value = libro.isbn || "";
+        document.getElementById("book-title").value = libro.titulo;
+        document.getElementById("book-author").value = autorDe(libro);
+        document.getElementById("book-price").value = Number(libro.precio).toFixed(2);
+        document.getElementById("book-stock").value = inventario?.cantidad_existencia ?? 0;
+        document.getElementById("book-format").value = libro.formato;
+        document.getElementById("book-language").value = libro.idioma;
+        document.getElementById("book-image").value = libro.imagen_portada || "";
+        document.getElementById("book-description").value = libro.descripcion || "";
+        document.getElementById("book-active").checked = libro.activo;
+        botonGuardarLibro.textContent = "Actualizar libro";
+        botonCancelarLibro.hidden = false;
+        informarLibro(`Editando “${libro.titulo}”.`);
+        formularioLibro.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    async function eliminarLibro(libro) {
+        const confirmado = window.confirm(
+            `¿Eliminar definitivamente “${libro.titulo}”? Esta acción no se puede deshacer.`
+        );
+        if (!confirmado) return;
+
+        informarLibro("Eliminando libro…");
+        const { error } = await window.libreriaSupabase
+            .rpc("eliminar_libro_admin", { p_libro_id: libro.id });
+        if (error) throw error;
+        if (document.getElementById("book-id").value === String(libro.id)) limpiarFormularioLibro();
+        await cargarLibros();
+        informarLibro("Libro eliminado correctamente.", true);
+    }
+
+    function renderizarLibros() {
+        cuerpoLibros.replaceChildren();
+        if (!libros.length) {
+            const fila = document.createElement("tr");
+            const celda = nodo("td", "No hay libros registrados.", "table-empty");
+            celda.colSpan = 6;
+            fila.appendChild(celda);
+            cuerpoLibros.appendChild(fila);
+            return;
+        }
+
+        libros.forEach(libro => {
+            const inventario = inventarioDe(libro);
+            const fila = document.createElement("tr");
+            fila.appendChild(nodo("td", libro.isbn || "—"));
+
+            const detalle = document.createElement("td");
+            detalle.append(nodo("strong", libro.titulo), nodo("small", autorDe(libro) || "Autor no indicado"));
+            fila.appendChild(detalle);
+            fila.appendChild(nodo("td", formatearMonedaRD(Number(libro.precio))));
+            fila.appendChild(nodo("td", `${inventario?.cantidad_disponible ?? 0} disponible(s)`));
+            fila.appendChild(nodo("td", libro.activo ? "Activo" : "Inactivo",
+                `badge-status ${libro.activo ? "badge-activo" : "badge-inactivo"}`));
+
+            const acciones = document.createElement("td");
+            acciones.className = "crud-row-actions";
+            const editar = botonIcono("editar", `Editar ${libro.titulo}`);
+            editar.addEventListener("click", () => editarLibro(libro));
+            const eliminar = botonIcono("eliminar", `Eliminar ${libro.titulo}`);
+            eliminar.addEventListener("click", () => eliminarLibro(libro).catch(error => {
+                informarLibro(window.mensajeErrorSupabase(error, "No se pudo eliminar el libro."));
+            }));
+            acciones.append(editar, eliminar);
+            fila.appendChild(acciones);
+            cuerpoLibros.appendChild(fila);
+        });
+    }
+
+    formularioLibro.addEventListener("submit", async evento => {
+        evento.preventDefault();
+        informarLibro("");
+        if (!formularioLibro.reportValidity()) return;
+
+        const existencia = Number(document.getElementById("book-stock").value);
+        const precioLibro = Number(document.getElementById("book-price").value);
+        if (!Number.isInteger(existencia) || existencia < 0 || !Number.isFinite(precioLibro) || precioLibro < 0) {
+            return informarLibro("Revisa el precio y la existencia.");
+        }
+
+        botonGuardarLibro.disabled = true;
+        try {
+            const identificador = document.getElementById("book-id").value;
+            const { error } = await window.libreriaSupabase.rpc("guardar_libro_admin", {
+                p_libro_id: identificador ? Number(identificador) : null,
+                p_isbn: document.getElementById("book-isbn").value,
+                p_titulo: document.getElementById("book-title").value,
+                p_autor: document.getElementById("book-author").value,
+                p_descripcion: document.getElementById("book-description").value,
+                p_precio: precioLibro,
+                p_formato: document.getElementById("book-format").value,
+                p_idioma: document.getElementById("book-language").value,
+                p_imagen_portada: document.getElementById("book-image").value,
+                p_existencia: existencia,
+                p_activo: document.getElementById("book-active").checked
+            });
+            if (error) throw error;
+
+            const mensaje = identificador ? "Libro actualizado correctamente." : "Libro creado correctamente.";
+            limpiarFormularioLibro();
+            await cargarLibros();
+            informarLibro(mensaje, true);
+        } catch (error) {
+            informarLibro(window.mensajeErrorSupabase(error, "No se pudo guardar el libro."));
+        } finally {
+            botonGuardarLibro.disabled = false;
+        }
+    });
+
+    botonCancelarLibro.addEventListener("click", () => {
+        limpiarFormularioLibro();
+        informarLibro("");
+    });
+
+    try {
+        await cargarPedidos();
+    } catch (error) {
+        const fila = document.createElement("tr");
+        const celda = nodo("td", window.mensajeErrorSupabase(error, "No se pudieron cargar los pedidos."));
+        celda.colSpan = 7;
+        fila.appendChild(celda);
+        tbody.replaceChildren(fila);
+    }
+
+    try {
+        await cargarLibros();
+    } catch (error) {
+        informarLibro(window.mensajeErrorSupabase(error, "No se pudieron cargar los libros."));
+    }
+});

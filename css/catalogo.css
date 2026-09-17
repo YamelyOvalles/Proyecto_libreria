@@ -61,7 +61,10 @@
 .catalog-page .invoice-status[data-estado="enviado"] { color: #3d5224; }
 .catalog-page .invoice-status[data-estado="pendiente"],
 .catalog-page .invoice-status[data-estado="incierto"] { color: #855018; }
-.catalog-page #invoice-retry { margin-top: 8px; }
 .catalog-page button:disabled { opacity: .65; cursor: wait; }
 .catalog-page .cart-footer { max-height: 55vh; overflow-y: auto; }
 .catalog-page .cart-body { min-height: 80px; }
+.catalog-page .checkout-fields { display: grid; gap: 6px; margin-bottom: 14px; }
+.catalog-page .checkout-fields label { margin-top: 5px; font-size: .82rem; }
+.catalog-page #address-fields, .catalog-page #pickup-fields { display: grid; gap: 6px; }
+.catalog-page #address-fields[hidden], .catalog-page #pickup-fields[hidden] { display: none; }

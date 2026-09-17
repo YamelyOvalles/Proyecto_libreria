@@ -6,7 +6,12 @@
     <meta name="description" content="Catálogo de Librería Quisqueya">
     <title>Catálogo | Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/app.js" defer></script>
     <script src="js/funciones.js" defer></script>
     <script src="js/checkout.js" defer></script>
     <script src="js/tienda.js" defer></script>
@@ -266,10 +271,10 @@
 
     <!-- Panel Lateral del Carrito y Fondo Oscuro -->
     <div id="cart-overlay" class="cart-overlay"></div>
-    <aside id="cart-sidebar" class="cart-sidebar">
+    <aside id="cart-sidebar" class="cart-sidebar" role="dialog" aria-modal="true" aria-labelledby="cart-title" aria-hidden="true">
         <div class="cart-header">
-            <h2>Tu Carrito de Compras</h2>
-            <button id="close-cart" class="close-cart" type="button">&times;</button>
+            <h2 id="cart-title">Tu Carrito de Compras</h2>
+            <button id="close-cart" class="close-cart" type="button" aria-label="Cerrar carrito">&times;</button>
         </div>
         <div id="cart-body" class="cart-body">
             <!-- Los libros agregados aparecerán aquí dinámicamente -->
@@ -279,11 +284,41 @@
                 <span>Total:</span>
                 <span id="cart-total-price">RD$ 0.00</span>
             </div>
-            <button id="checkout-btn" class="button button-primary button-full" type="button" style="width: 100%; padding: 12px;">Confirmar pedido y enviar factura</button>
-            <p class="invoice-recipient">La factura se enviará a <strong>adamsdleons3@gmail.com</strong>.</p>
+            <div class="checkout-fields">
+                <label for="delivery-method">Entrega</label>
+                <select id="delivery-method">
+                    <option value="retiro">Retiro en sucursal</option>
+                    <option value="domicilio">Envío a domicilio</option>
+                </select>
+                <div id="pickup-fields">
+                    <label for="pickup-branch">Sucursal</label>
+                    <select id="pickup-branch"><option value="">Cargando sucursales…</option></select>
+                </div>
+                <div id="address-fields" hidden>
+                    <label for="delivery-recipient">Persona que recibe</label>
+                    <input id="delivery-recipient" maxlength="160" autocomplete="name">
+                    <label for="delivery-phone">Teléfono</label>
+                    <input id="delivery-phone" maxlength="25" autocomplete="tel">
+                    <label for="delivery-line1">Dirección</label>
+                    <input id="delivery-line1" maxlength="200" autocomplete="address-line1">
+                    <label for="delivery-sector">Sector</label>
+                    <input id="delivery-sector" maxlength="120" autocomplete="address-line2">
+                    <label for="delivery-city">Ciudad</label>
+                    <input id="delivery-city" maxlength="100" autocomplete="address-level2">
+                    <label for="delivery-province">Provincia</label>
+                    <input id="delivery-province" maxlength="100" autocomplete="address-level1">
+                    <label for="delivery-reference">Referencia (opcional)</label>
+                    <textarea id="delivery-reference" rows="2" maxlength="500"></textarea>
+                </div>
+                <label for="payment-method">Forma de pago</label>
+                <select id="payment-method">
+                    <option value="contra_entrega">Pago contra entrega</option>
+                    <option value="transferencia">Transferencia bancaria</option>
+                </select>
+            </div>
+            <button id="checkout-btn" class="button button-primary button-full" type="button" style="width: 100%; padding: 12px;">Confirmar pedido</button>
+            <p class="invoice-recipient">El pedido quedará asociado a tu cuenta de Supabase.</p>
             <p id="checkout-status" class="invoice-status" role="status" aria-live="polite"></p>
-            <a id="invoice-download" class="button button-primary button-full" hidden>Descargar factura PDF</a>
-            <button id="invoice-retry" class="button button-full" type="button" hidden>Reintentar envío</button>
         </div>
     </aside>
 

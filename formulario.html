@@ -6,6 +6,10 @@
     <meta name="description" content="Contacto de Librería Quisqueya">
     <title>Contacto | Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js" defer></script>
 </head>
@@ -85,16 +89,16 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="nombre">Nombre completo *</label>
-                            <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" autocomplete="name" required>
+                        <input type="text" id="nombre" name="nombre" maxlength="160" placeholder="Ej. Ana García" autocomplete="name" required>
                         </div>
                         <div class="form-group">
                             <label for="correo">Correo electrónico *</label>
-                            <input type="email" id="correo" name="correo" placeholder="correo@ejemplo.com" autocomplete="email" required>
+                        <input type="email" id="correo" name="correo" maxlength="320" placeholder="correo@ejemplo.com" autocomplete="email" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="telefono">Teléfono / WhatsApp</label>
-                        <input type="tel" id="telefono" name="telefono" placeholder="8095550199" autocomplete="tel">
+                        <input type="tel" id="telefono" name="telefono" maxlength="25" placeholder="8095550199" autocomplete="tel">
                     </div>
                     <div class="form-group">
                         <label for="motivo">Motivo del mensaje *</label>
@@ -107,7 +111,7 @@
                     </div>
                     <div class="form-group">
                         <label for="mensaje">Mensaje *</label>
-                        <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escribe aquí tu consulta o el título del libro que buscas..." required></textarea>
+                        <textarea id="mensaje" name="mensaje" rows="5" minlength="10" maxlength="5000" placeholder="Escribe aquí tu consulta o el título del libro que buscas..." required></textarea>
                     </div>
                     <!-- Contenedor dinámico para respuestas y mensajes de confirmación en el DOM -->
                     <div id="contact-feedback" aria-live="polite"></div>
@@ -118,7 +122,6 @@
     </main>
     <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
     <!-- Scripts externos modulares según los requerimientos de la Fase 2 -->
-    <script src="js/funciones.js"></script>
     <script src="js/validaciones.js"></script>
 </body>
 </html>

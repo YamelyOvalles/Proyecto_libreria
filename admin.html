@@ -7,7 +7,11 @@
     <title>Panel Operativo de Pedidos | Librería Quisqueya</title>
     <!-- Estilos externos principales con selectores de etiqueta, clase e ID -->
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
     <!-- Protección por rol: solo accesible si el usuario ha iniciado sesión como administrador -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js" defer></script>
     <script src="js/funciones.js" defer></script>
@@ -52,10 +56,9 @@
             <h1>Recepción y Control de Pedidos</h1>
             <p>Monitoreo en tiempo real de las compras efectuadas en la librería, actualización del estado de despacho y resumen financiero.</p>
         </div>
+        <p id="admin-feedback" class="form-message" role="alert" aria-live="polite"></p>
 
-        <!-- ==================================================================
-             TARJETAS DE MÉTRICAS Y KPIs (Cálculo dinámico en funciones.js)
-             ================================================================== -->
+        <!-- Tarjetas de métricas calculadas en funciones.js. -->
         <section id="admin-stats" class="stats-grid" aria-label="Métricas del sistema">
             <article class="stat-card">
                 <span class="stat-label">Total de Pedidos</span>
@@ -82,9 +85,7 @@
             </article>
         </section>
 
-        <!-- ==================================================================
-             BARRA DE HERRAMIENTAS: BÚSQUEDA Y FILTROS INTERACTIVOS
-             ================================================================== -->
+        <!-- Búsqueda y filtros de pedidos. -->
         <div class="admin-toolbar">
             <div class="admin-filter-group">
                 <label for="admin-search-input" style="font-weight: 700; margin-bottom: 0;">Buscar pedido:</label>
@@ -96,21 +97,23 @@
                 <select id="admin-status-filter">
                     <option value="todos">Todos los estados</option>
                     <option value="pendiente">Pendiente</option>
-                    <option value="procesado">Procesado</option>
+                    <option value="confirmado">Confirmado</option>
+                    <option value="procesando">Procesando</option>
+                    <option value="listo_retiro">Listo para retiro</option>
                     <option value="enviado">Enviado</option>
                     <option value="entregado">Entregado</option>
+                    <option value="cancelado">Cancelado</option>
                 </select>
-                <button type="button" id="admin-refresh-btn" class="button button-primary" style="min-height: 38px; padding: 0.45rem 1rem;">
-                    Actualizar
+                <button type="button" id="admin-refresh-btn" class="icon-button icon-button-refresh" aria-label="Actualizar pedidos" title="Actualizar pedidos">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 16.2 7.8L13 11h8V3l-3.35 3.35Z"/>
+                    </svg>
                 </button>
             </div>
         </div>
 
-        <!-- ==================================================================
-             TABLA SEMÁNTICA DE PEDIDOS (Requisito de Rúbrica: Elemento <table>)
-             Contiene estructura completa: thead, tbody, tr, th con scope y td.
-             ================================================================== -->
-        <div class="table-responsive">
+        <!-- Tabla semántica de pedidos. -->
+        <div class="table-responsive orders-table-wrap">
             <table id="orders-table" class="data-table">
                 <caption>Registro detallado de órdenes recibidas en la librería</caption>
                 <thead>
@@ -120,8 +123,8 @@
                         <th scope="col">Cliente / Correo</th>
                         <th scope="col">Detalle de Libros</th>
                         <th scope="col">Total Facturado</th>
-                        <th scope="col">Estado</th>
-                        <th scope="col">Acciones</th>
+                        <th scope="col">Estados</th>
+                        <th scope="col">Actualizar</th>
                     </tr>
                 </thead>
                 <tbody id="orders-table-body">
@@ -129,6 +132,85 @@
                 </tbody>
             </table>
         </div>
+
+        <section class="crud-section" aria-labelledby="books-admin-title">
+            <div class="section-heading section-heading-left">
+                <p class="eyebrow">CRUD de entidad principal</p>
+                <h2 id="books-admin-title">Administración de libros</h2>
+                <p>Crea, consulta, actualiza y elimina libros del catálogo.</p>
+            </div>
+
+            <form id="book-form" class="crud-form">
+                <input type="hidden" id="book-id">
+                <div class="crud-form-grid">
+                    <div class="form-group">
+                        <label for="book-isbn">ISBN</label>
+                        <input type="text" id="book-isbn" maxlength="32" placeholder="978-0000000000">
+                    </div>
+                    <div class="form-group">
+                        <label for="book-title">Título *</label>
+                        <input type="text" id="book-title" maxlength="200" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-author">Autor *</label>
+                        <input type="text" id="book-author" maxlength="160" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-price">Precio (RD$) *</label>
+                        <input type="number" id="book-price" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-stock">Existencia *</label>
+                        <input type="number" id="book-stock" min="0" step="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-format">Formato *</label>
+                        <select id="book-format" required>
+                            <option value="fisico">Físico</option>
+                            <option value="digital">Digital</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-language">Idioma *</label>
+                        <input type="text" id="book-language" maxlength="80" value="Español" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="book-image">Ruta o URL de portada</label>
+                        <input type="text" id="book-image" maxlength="500" placeholder="assets/portadas/libro.jpg">
+                    </div>
+                    <div class="form-group crud-field-wide">
+                        <label for="book-description">Descripción</label>
+                        <textarea id="book-description" rows="3" maxlength="2000"></textarea>
+                    </div>
+                </div>
+                <label class="checkbox-row">
+                    <input type="checkbox" id="book-active" checked>
+                    Libro visible y disponible en el catálogo
+                </label>
+                <div class="crud-form-actions">
+                    <button type="submit" id="book-save-btn" class="button button-primary">Guardar libro</button>
+                    <button type="button" id="book-cancel-btn" class="button button-secondary" hidden>Cancelar edición</button>
+                </div>
+                <p id="book-feedback" class="form-message" role="status" aria-live="polite"></p>
+            </form>
+
+            <div class="table-responsive">
+                <table id="books-table" class="data-table">
+                    <caption>Libros almacenados en la base de datos</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">ISBN</th>
+                            <th scope="col">Libro / Autor</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Inventario</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="books-table-body"></tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <footer class="site-footer">

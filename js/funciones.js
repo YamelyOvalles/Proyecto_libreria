@@ -8,9 +8,7 @@
  * - Son funciones puras: no mutan los datos originales ni dependen de elementos del DOM.
  */
 
-// =============================================================================
-// FUNCIONES PARA EL CATÁLOGO DE LIBROS
-// =============================================================================
+// Funciones del catálogo de libros.
 
 /**
  * Filtra un arreglo de libros buscando coincidencias en el título o autor.
@@ -46,9 +44,7 @@ function filtrarLibrosPorPrecio(libros, precioMaximo) {
 }
 
 
-// =============================================================================
-// FUNCIONES PARA EL CARRITO DE COMPRAS
-// =============================================================================
+// Funciones del carrito de compras.
 
 /**
  * Calcula el monto total a pagar sumando los subtotales de cada producto en el carrito.
@@ -79,9 +75,7 @@ function obtenerCantidadArticulos(carrito) {
 }
 
 
-// =============================================================================
-// FUNCIONES PARA EL MÓDULO ADMINISTRATIVO Y GESTIÓN DE PEDIDOS
-// =============================================================================
+// Funciones del módulo administrativo y los pedidos.
 
 /**
  * Filtra la lista de pedidos según el estado seleccionado (pendiente, procesado, etc.).

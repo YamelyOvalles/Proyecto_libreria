@@ -7,6 +7,7 @@
     <title>Información | Librería Quisqueya</title>
     <!-- Método externo: contiene casi todos los estilos del proyecto. -->
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
 
     <!-- Método interno: ejemplo solicitado para esta página específica. -->
     <style>
@@ -15,6 +16,9 @@
         }
     </style>
     <!-- Se ejecuta antes de mostrar la página para impedir visitas sin iniciar sesión. -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js" defer></script>
 </head>
@@ -125,11 +129,7 @@
             </ol>
         </section>
 
-        <!-- ==================================================================
-             TABLA SEMÁNTICA REQUERIDA POR LA RÚBRICA DE EVALUACIÓN
-             Contiene: table, caption, thead, tbody, tr, th (con scope) y td.
-             Estilizada mediante el selector de ID #schedule-table y clase .data-table.
-             ================================================================== -->
+        <!-- Tabla semántica de horarios. -->
         <section class="page-container content-section" aria-labelledby="schedule-heading">
             <div class="section-heading">
                 <p class="eyebrow">Presencia física y cobertura</p>
