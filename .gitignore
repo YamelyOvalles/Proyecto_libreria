@@ -4,8 +4,21 @@
 
 /.vs
 
+# Configuración local y secretos. Nunca deben versionarse.
 .env
+.env.*
+!.env.example
+js/supabase-config.js
+*.pem
+*.p12
+*.pfx
+*.key
+credentials*.json
+service-account*.json
+
+# Archivos locales o generados.
 datos/
 __pycache__/
 .venv/
+supabase/.temp/
 

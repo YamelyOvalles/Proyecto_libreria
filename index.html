@@ -7,6 +7,10 @@
     <title>Iniciar sesión | Librería Quisqueya</title>
     <!-- Estilos externos principales con selectores de etiqueta, clase e ID -->
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
     <!-- Script de autenticación y lógica de login -->
     <script src="js/login.js" defer></script>
 </head>
@@ -15,11 +19,11 @@
         <section class="login-card" aria-labelledby="login-title">
             
             <!-- Selector de perfil de usuario: Lector/Cliente vs Dueño/Administrador -->
-            <div class="role-switcher" role="tablist" aria-label="Seleccionar perfil de acceso">
-                <button type="button" id="role-client" class="role-tab active" role="tab" aria-selected="true">
+            <div class="role-switcher" aria-label="Seleccionar perfil de acceso">
+                <button type="button" id="role-client" class="role-tab active" aria-pressed="true">
                     Lector / Cliente
                 </button>
-                <button type="button" id="role-admin" class="role-tab" role="tab" aria-selected="false">
+                <button type="button" id="role-admin" class="role-tab" aria-pressed="false">
                     Dueño / Administrador
                 </button>
             </div>
@@ -30,14 +34,13 @@
                 <p id="login-subtitle">Entra para gestionar tus pedidos y lecturas.</p>
             </div>
 
-            <!-- Ayuda visible con credenciales administrativas para fines de evaluación -->
+            <!-- Las cuentas administrativas se asignan de forma segura en Supabase. -->
             <div id="admin-credentials-hint" class="admin-hint-box" hidden>
-                <strong>Credenciales de Demostración Administrativa:</strong><br>
-                Correo: <code>admin@libreriaquisqueya.com</code><br>
-                Contraseña: <code>admin123</code>
+                <strong>Acceso restringido:</strong><br>
+                Solo las cuentas con rol de administrador pueden ingresar.
             </div>
 
-            <button type="button" id="google-login-btn" class="google-button" title="Disponible próximamente" disabled>
+            <button type="button" id="google-login-btn" class="google-button">
                 <span class="google-letter" aria-hidden="true">G</span>
                 Entrar con Google
             </button>
@@ -72,11 +75,7 @@
                 </div>
 
                 <div class="login-options">
-                    <label class="checkbox-row">
-                        <input type="checkbox" id="remember" name="remember" checked>
-                        Recordarme
-                    </label>
-                    <button type="button" class="login-help" data-demo-message>¿Olvidaste tu contraseña?</button>
+                    <button type="button" class="login-help" data-recover>¿Olvidaste tu contraseña?</button>
                 </div>
 
                 <!-- Mensaje de error/estado visible manipulado directamente desde el DOM -->
@@ -89,7 +88,7 @@
 
             <p id="register-container" class="register-copy">
                 ¿Aún no tienes cuenta?
-                <button type="button" class="login-help" data-demo-message>Regístrate</button>
+                <button type="button" class="login-help" data-register>Regístrate</button>
             </p>
         </section>
 

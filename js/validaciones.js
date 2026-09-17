@@ -8,9 +8,7 @@
  * 4. Funciones estructuradas con parámetros y valores de retorno.
  */
 
-// =============================================================================
-// FUNCIONES PURAS DE VALIDACIÓN (Parámetros y Retorno)
-// =============================================================================
+// Funciones puras de validación.
 
 /**
  * Comprueba si un valor de texto está vacío o contiene solo espacios.
@@ -54,9 +52,7 @@ function cumpleLongitudMinima(texto, longitudMinima) {
 }
 
 
-// =============================================================================
-// MANIPULACIÓN DINÁMICA DEL DOM (Inserción y Limpieza de Errores)
-// =============================================================================
+// Inserta y limpia mensajes de error en el DOM.
 
 /**
  * Muestra un mensaje de error visual directamente en el DOM, debajo del campo.
@@ -111,14 +107,12 @@ function limpiarTodosLosErrores(formulario) {
 
     const feedbackContenedor = document.getElementById("contact-feedback");
     if (feedbackContenedor) {
-        feedbackContenedor.innerHTML = "";
+        feedbackContenedor.replaceChildren();
     }
 }
 
 
-// =============================================================================
-// CONTROLADOR PRINCIPAL DEL FORMULARIO DE CONTACTO
-// =============================================================================
+// Controlador del formulario de contacto.
 
 document.addEventListener("DOMContentLoaded", () => {
     const formulario = document.getElementById("contact-form");
@@ -141,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Escuchar el evento submit del formulario
-    formulario.addEventListener("submit", (evento) => {
+    formulario.addEventListener("submit", async (evento) => {
         // Prevenir la recarga predeterminada del navegador
         evento.preventDefault();
 
@@ -207,25 +201,50 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // =========================================================================
-        // RESPUESTA DINÁMICA EN EL DOM (Sin recargar la página - Fase 2)
-        // =========================================================================
+        // Muestra la respuesta en el DOM sin recargar la página.
         const nombreIngresado = campoNombre.value.trim();
         const correoIngresado = campoCorreo.value.trim();
         const motivoSeleccionado = campoMotivo.options[campoMotivo.selectedIndex].text;
 
-        // Construir e inyectar tarjeta de éxito en el DOM
-        if (feedbackContenedor) {
-            feedbackContenedor.innerHTML = `
-                <div class="feedback-card success" role="status">
-                    <span class="feedback-title">¡Mensaje preparado con éxito!</span>
-                    <p>Gracias <strong>${nombreIngresado}</strong> por ponerte en contacto con Librería Quisqueya. Hemos registrado tu solicitud sobre <em>${motivoSeleccionado}</em>.</p>
-                    <p>Nos comunicaremos contigo a <strong>${correoIngresado}</strong> en un plazo máximo de 24 horas laborables.</p>
-                </div>
-            `;
-        }
+        const boton = document.getElementById("contact-submit-btn");
+        boton.disabled = true;
+        boton.textContent = "Enviando…";
 
-        // Restablecer los campos del formulario
-        formulario.reset();
+        try {
+            if (!window.libreriaSupabase || !window.libreriaUsuario) {
+                throw new Error("No existe una sesión válida de Supabase.");
+            }
+
+            const { error } = await window.libreriaSupabase.from("mensajes_contacto").insert({
+                perfil_id: window.libreriaUsuario.id,
+                nombre: nombreIngresado,
+                correo: correoIngresado,
+                telefono: campoTelefono.value.trim() || null,
+                motivo: campoMotivo.value,
+                mensaje: campoMensaje.value.trim()
+            });
+            if (error) throw error;
+
+            const tarjeta = document.createElement("div");
+            tarjeta.className = "feedback-card success";
+            tarjeta.setAttribute("role", "status");
+            const encabezado = document.createElement("span");
+            encabezado.className = "feedback-title";
+            encabezado.textContent = "¡Mensaje enviado con éxito!";
+            const detalle = document.createElement("p");
+            detalle.textContent = `Gracias ${nombreIngresado}. Registramos tu solicitud sobre ${motivoSeleccionado} y responderemos al correo ${correoIngresado}.`;
+            tarjeta.append(encabezado, detalle);
+            feedbackContenedor?.replaceChildren(tarjeta);
+            formulario.reset();
+        } catch (error) {
+            const tarjeta = document.createElement("div");
+            tarjeta.className = "feedback-card error";
+            tarjeta.setAttribute("role", "alert");
+            tarjeta.textContent = window.mensajeErrorSupabase(error, "No se pudo enviar el mensaje. Inténtalo nuevamente.");
+            feedbackContenedor?.replaceChildren(tarjeta);
+        } finally {
+            boton.disabled = false;
+            boton.textContent = "Enviar mensaje";
+        }
     });
 });

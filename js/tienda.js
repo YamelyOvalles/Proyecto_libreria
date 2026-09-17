@@ -1,287 +1,235 @@
-/**
- * Librería Quisqueya - Controlador Dinámico del Catálogo y Carrito (Fase 2)
- * 
- * Cumplimiento del Requerimiento 1:
- * - Código en archivo externo .js enlazado a la página.
- * - Variables de diferentes tipos de datos: String, Number, Boolean, Array, Object.
- * - Arreglo de datos real aplicado al catálogo de libros.
- * 
- * Cumplimiento del Requerimiento 4:
- * - Componente interactivo dinámico: Catálogo con buscador en tiempo real,
- *   filtro por precio y carrito de compras desplegable con cálculo de totales.
- */
+/** Catálogo y carrito persistente respaldados por Supabase. */
+document.addEventListener("DOMContentLoaded", async () => {
+    const grid = document.getElementById("book-grid");
+    const contador = document.getElementById("contador");
+    const buscar = document.getElementById("buscar-libros");
+    const precio = document.getElementById("precio-maximo");
+    const panel = document.getElementById("cart-sidebar");
+    const overlay = document.getElementById("cart-overlay");
+    const abrir = document.getElementById("cart-float-btn");
+    const cerrar = document.getElementById("close-cart");
+    const cuerpo = document.getElementById("cart-body");
+    const badge = document.getElementById("cart-badge");
+    const total = document.getElementById("cart-total-price");
 
-// =============================================================================
-// VARIABLES Y TIPOS DE DATOS DEL PROYECTO (Requerimiento 1 de la Rúbrica)
-// =============================================================================
+    let libros = [];
+    let carrito = [];
+    let carritoId = null;
+    let checkout = null;
+    let focoAnterior = null;
 
-// Variable de tipo String
-const NOMBRE_COMERCIAL = "Librería Quisqueya";
-
-// Variable de tipo Number
-const MAX_ARTICULOS_POR_LINEA = 999;
-
-// Variable de tipo Boolean
-const MODO_CATALOGO_DISPONIBLE = true;
-
-// Arreglo de objetos: Catálogo oficial de libros de la librería
-const libros = [
-    { 
-        id: 1, 
-        titulo: "Cien años de soledad", 
-        autor: "Gabriel García Márquez", 
-        precio: 1150, 
-        imagen: "assets/portadas/cien-anos-de-soledad.jpg",
-        disponible: true 
-    },
-    { 
-        id: 2, 
-        titulo: "El Principito", 
-        autor: "Antoine de Saint-Exupéry", 
-        precio: 750, 
-        imagen: "assets/portadas/el-principito.jpg",
-        disponible: true 
-    },
-    { 
-        id: 3, 
-        titulo: "1984", 
-        autor: "George Orwell", 
-        precio: 900, 
-        imagen: "assets/portadas/1984.jpg",
-        disponible: true 
-    },
-    { 
-        id: 4, 
-        titulo: "Don Quijote de la Mancha", 
-        autor: "Miguel de Cervantes", 
-        precio: 1350, 
-        imagen: "assets/portadas/don-quijote.jpg",
-        disponible: true 
-    }
-];
-
-// Estado dinámico del carrito (Arreglo mutable de objetos)
-let carrito = [];
-let checkout = null;
-
-
-// =============================================================================
-// INICIALIZACIÓN Y MANIPULACIÓN DEL DOM
-// =============================================================================
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Referencias a elementos del DOM
-    const contenedorGrid = document.getElementById("book-grid");
-    const elementoContador = document.getElementById("contador");
-    const cartFloatBtn = document.getElementById("cart-float-btn");
-    const cartSidebar = document.getElementById("cart-sidebar");
-    const cartOverlay = document.getElementById("cart-overlay");
-    const closeCartBtn = document.getElementById("close-cart");
-    const cartBody = document.getElementById("cart-body");
-    const cartBadge = document.getElementById("cart-badge");
-    const cartTotalPrice = document.getElementById("cart-total-price");
-    const campoBusqueda = document.getElementById("buscar-libros");
-    const campoPrecio = document.getElementById("precio-maximo");
-
-    /**
-     * Renderiza las tarjetas de libros en la cuadrícula según los filtros aplicados.
-     * Utiliza las funciones estructuradas de funciones.js: buscarLibrosPorTexto y filtrarLibrosPorPrecio.
-     */
-    function renderizarCatalogo() {
-        // Filtrado dinámico en memoria
-        const coincidencias = buscarLibrosPorTexto(libros, campoBusqueda.value);
-        const precioMaximo = campoPrecio.value === "" ? Infinity : Number(campoPrecio.value);
-        const librosVisibles = filtrarLibrosPorPrecio(coincidencias, precioMaximo);
-
-        // Actualización reactiva del contador
-        if (elementoContador) {
-            elementoContador.textContent = `Mostrando ${librosVisibles.length} de ${libros.length} libros disponibles`;
-        }
-
-        if (contenedorGrid) {
-            contenedorGrid.innerHTML = "";
-
-            if (librosVisibles.length === 0) {
-                contenedorGrid.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--muted);">
-                        <p style="font-size: 1.1rem; font-weight: 600;">No se encontraron libros que coincidan con tu búsqueda.</p>
-                        <p style="font-size: 0.9rem;">Prueba ajustando el término de búsqueda o el límite de precio máximo.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            librosVisibles.forEach((libro, indice) => {
-                const tarjeta = document.createElement("article");
-                tarjeta.classList.add("book-card");
-                tarjeta.style.setProperty("--card-delay", `${indice * 70}ms`);
-                tarjeta.innerHTML = `
-                    <div class="book-cover-frame">
-                        <img src="${libro.imagen}" alt="Portada de ${libro.titulo}, de ${libro.autor}" class="book-cover" width="330" height="500" decoding="async">
-                    </div>
-                    <div class="book-info">
-                        <p class="book-author">${libro.autor}</p>
-                        <h2>${libro.titulo}</h2>
-                        <p class="book-price">${formatearMonedaRD(libro.precio)}</p>
-                        <button class="button button-primary button-full btn-add" type="button" data-id="${libro.id}">
-                            Agregar al carrito
-                        </button>
-                    </div>
-                `;
-                contenedorGrid.appendChild(tarjeta);
-            });
-
-            // Asignación de eventos a los botones "Agregar al carrito"
-            contenedorGrid.querySelectorAll(".btn-add").forEach(btn => {
-                btn.addEventListener("click", (e) => {
-                    const id = parseInt(e.target.getAttribute("data-id"), 10);
-                    agregarAlCarrito(id);
-                });
-            });
-        }
+    function texto(tag, contenido, clase) {
+        const nodo = document.createElement(tag);
+        if (clase) nodo.className = clase;
+        nodo.textContent = contenido;
+        return nodo;
     }
 
-    /**
-     * Agrega un libro al carrito o incrementa su cantidad si ya existe.
-     * @param {number} id - Identificador numérico del libro.
-     */
-    function agregarAlCarrito(id) {
-        if (checkout?.estaOcupado()) return;
-
-        const productoExistente = carrito.find(item => item.id === id);
-        if (productoExistente) {
-            if (productoExistente.cantidad >= MAX_ARTICULOS_POR_LINEA) return;
-            productoExistente.cantidad++;
-        } else {
-            const libroEncontrado = libros.find(l => l.id === id);
-            if (libroEncontrado) {
-                carrito.push({ ...libroEncontrado, cantidad: 1 });
-            }
-        }
-
-        actualizarCarritoUI();
-
-        // Animación suave del badge numérico
-        if (cartBadge && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            cartBadge.getAnimations().forEach(a => a.cancel());
-            cartBadge.animate([
-                { transform: "scale(1)" },
-                { transform: "scale(1.3)" },
-                { transform: "scale(1)" }
-            ], { duration: 300, easing: "ease-out" });
-        }
-
-        abrirPanelCarrito();
+    function mostrarError(error, alternativo) {
+        contador.textContent = window.mensajeErrorSupabase(error, alternativo);
+        contador.classList.add("form-message");
     }
 
-    /**
-     * Modifica la cantidad de un producto (+1 o -1) en el carrito.
-     * @param {number} id - Identificador del libro.
-     * @param {number} cambio - Variación (+1 o -1).
-     */
-    function cambiarCantidad(id, cambio) {
-        if (checkout?.estaOcupado()) return;
-
-        const producto = carrito.find(item => item.id === id);
-        if (producto) {
-            if (producto.cantidad + cambio > MAX_ARTICULOS_POR_LINEA) return;
-            producto.cantidad += cambio;
-
-            // Si la cantidad llega a 0, se remueve el producto
-            if (producto.cantidad <= 0) {
-                carrito = carrito.filter(item => item.id !== id);
-            }
-            actualizarCarritoUI();
-        }
-    }
-
-    /**
-     * Sincroniza la interfaz del panel lateral del carrito con el arreglo en memoria.
-     * Hace uso de las funciones estructuradas obtenerCantidadArticulos y obtenerMontoTotal.
-     */
-    function actualizarCarritoUI() {
-        const totalItems = obtenerCantidadArticulos(carrito);
-        if (cartBadge) cartBadge.textContent = totalItems;
-
-        const totalMonto = obtenerMontoTotal(carrito);
-        if (cartTotalPrice) cartTotalPrice.textContent = formatearMonedaRD(totalMonto);
-
-        if (!cartBody) return;
-
-        if (carrito.length === 0) {
-            cartBody.innerHTML = `<p class="empty-cart-msg">Tu carrito de compras está vacío actualmente.</p>`;
-        } else {
-            cartBody.innerHTML = "";
-            carrito.forEach(item => {
-                const itemDiv = document.createElement("div");
-                itemDiv.classList.add("cart-item");
-                itemDiv.innerHTML = `
-                    <img class="cart-item-cover" src="${item.imagen}" alt="Portada" width="42" height="64">
-                    <div class="cart-item-details">
-                        <h4>${item.titulo}</h4>
-                        <p>${formatearMonedaRD(item.precio)} x ${item.cantidad}</p>
-                    </div>
-                    <div class="cart-item-controls">
-                        <button class="btn-qty btn-restar" data-id="${item.id}" aria-label="Restar una unidad">-</button>
-                        <span>${item.cantidad}</span>
-                        <button class="btn-qty btn-sumar" data-id="${item.id}" aria-label="Sumar una unidad">+</button>
-                    </div>
-                `;
-                cartBody.appendChild(itemDiv);
-            });
-
-            // Asignar listeners a los botones de incremento y decremento
-            cartBody.querySelectorAll(".btn-restar").forEach(btn => {
-                btn.addEventListener("click", (e) => {
-                    const id = parseInt(e.target.getAttribute("data-id"), 10);
-                    cambiarCantidad(id, -1);
-                });
-            });
-
-            cartBody.querySelectorAll(".btn-sumar").forEach(btn => {
-                btn.addEventListener("click", (e) => {
-                    const id = parseInt(e.target.getAttribute("data-id"), 10);
-                    cambiarCantidad(id, 1);
-                });
-            });
-        }
-    }
-
-    // Controles de visibilidad del panel lateral del carrito
-    function abrirPanelCarrito() {
-        if (cartSidebar) cartSidebar.classList.add("open");
-        if (cartOverlay) cartOverlay.classList.add("active");
-    }
-
-    function cerrarPanelCarrito() {
-        if (cartSidebar) cartSidebar.classList.remove("open");
-        if (cartOverlay) cartOverlay.classList.remove("active");
-    }
-
-    if (cartFloatBtn) cartFloatBtn.addEventListener("click", abrirPanelCarrito);
-    if (closeCartBtn) closeCartBtn.addEventListener("click", cerrarPanelCarrito);
-    if (cartOverlay) cartOverlay.addEventListener("click", cerrarPanelCarrito);
-
-    // Inicializar el gestor de checkout integrado
-    if (typeof window.crearCheckout === "function") {
-        checkout = window.crearCheckout({
-            obtenerCarrito: () => carrito,
-            vaciarCarrito: productosConfirmados => {
-                carrito = carrito.map(item => {
-                    const confirmado = productosConfirmados.find(p => p.id === item.id);
-                    return { ...item, cantidad: item.cantidad - (confirmado?.cantidad || 0) };
-                }).filter(item => item.cantidad > 0);
-                actualizarCarritoUI();
-            }
+    async function cargarCatalogo() {
+        const { data, error } = await window.libreriaSupabase
+            .from("libros")
+            .select("id,isbn,titulo,descripcion,precio,formato,idioma,imagen_portada,inventarios(cantidad_disponible),libro_autor(autores(nombre))")
+            .eq("activo", true)
+            .order("titulo");
+        if (error) throw error;
+        libros = data.map(libro => {
+            const inventario = Array.isArray(libro.inventarios) ? libro.inventarios[0] : libro.inventarios;
+            return {
+                ...libro,
+                precio: Number(libro.precio),
+                autor: libro.libro_autor.map(relacion => relacion.autores?.nombre).filter(Boolean).join(", ") || "Autor no indicado",
+                disponible: Number(inventario?.cantidad_disponible || 0)
+            };
         });
     }
 
-    // Eventos de filtrado en vivo en los campos de entrada
-    if (campoBusqueda) campoBusqueda.addEventListener("input", renderizarCatalogo);
-    if (campoPrecio) campoPrecio.addEventListener("input", renderizarCatalogo);
+    async function obtenerCarrito(usuarioId) {
+        let { data, error } = await window.libreriaSupabase
+            .from("carritos").select("id").eq("perfil_id", usuarioId).maybeSingle();
+        if (error) throw error;
+        if (!data) {
+            const resultado = await window.libreriaSupabase
+                .from("carritos").insert({ perfil_id: usuarioId }).select("id").single();
+            if (resultado.error) throw resultado.error;
+            data = resultado.data;
+        }
+        carritoId = data.id;
 
-    // Renderizado inicial
-    renderizarCatalogo();
-    actualizarCarritoUI();
+        const detalles = await window.libreriaSupabase
+            .from("carrito_detalles").select("libro_id,cantidad").eq("carrito_id", carritoId);
+        if (detalles.error) throw detalles.error;
+        carrito = detalles.data.map(item => {
+            const libro = libros.find(actual => actual.id === item.libro_id);
+            return libro ? { ...libro, cantidad: item.cantidad } : null;
+        }).filter(Boolean);
+    }
+
+    function renderizarCatalogo() {
+        const termino = buscar.value.trim().toLowerCase();
+        const limite = precio.value === "" ? Infinity : Number(precio.value);
+        const visibles = libros.filter(libro =>
+            (libro.titulo.toLowerCase().includes(termino) || libro.autor.toLowerCase().includes(termino)) &&
+            libro.precio <= limite
+        );
+        contador.textContent = `Mostrando ${visibles.length} de ${libros.length} libros`;
+        grid.replaceChildren();
+
+        if (!visibles.length) {
+            grid.appendChild(texto("p", "No se encontraron libros con esos filtros.", "empty-cart-msg"));
+            return;
+        }
+
+        visibles.forEach((libro, indice) => {
+            const tarjeta = document.createElement("article");
+            tarjeta.className = "book-card";
+            tarjeta.style.setProperty("--card-delay", `${indice * 70}ms`);
+            const marco = document.createElement("div");
+            marco.className = "book-cover-frame";
+            const imagen = document.createElement("img");
+            imagen.className = "book-cover";
+            imagen.src = libro.imagen_portada || "assets/logo-quisqueya-icono.png";
+            imagen.alt = `Portada de ${libro.titulo}`;
+            imagen.width = 330;
+            imagen.height = 500;
+            marco.appendChild(imagen);
+            const info = document.createElement("div");
+            info.className = "book-info";
+            info.append(
+                texto("p", libro.autor, "book-author"),
+                texto("h2", libro.titulo),
+                texto("p", formatearMonedaRD(libro.precio), "book-price"),
+                texto("p", libro.disponible > 0 ? `${libro.disponible} disponible(s)` : "Agotado", "book-stock")
+            );
+            const boton = texto("button", "Agregar al carrito", "button button-primary button-full btn-add");
+            boton.type = "button";
+            boton.disabled = libro.disponible < 1;
+            boton.addEventListener("click", () => agregar(libro));
+            info.appendChild(boton);
+            tarjeta.append(marco, info);
+            grid.appendChild(tarjeta);
+        });
+    }
+
+    async function guardarCantidad(libroId, cantidad) {
+        if (cantidad <= 0) {
+            const { error } = await window.libreriaSupabase.from("carrito_detalles")
+                .delete().eq("carrito_id", carritoId).eq("libro_id", libroId);
+            if (error) throw error;
+            return;
+        }
+        const { error } = await window.libreriaSupabase.from("carrito_detalles").upsert({
+            carrito_id: carritoId, libro_id: libroId, cantidad
+        }, { onConflict: "carrito_id,libro_id" });
+        if (error) throw error;
+    }
+
+    async function agregar(libro) {
+        if (checkout?.estaOcupado()) return;
+        const existente = carrito.find(item => item.id === libro.id);
+        const cantidad = (existente?.cantidad || 0) + 1;
+        if (cantidad > libro.disponible) return mostrarError(null, "No hay más unidades disponibles.");
+        try {
+            await guardarCantidad(libro.id, cantidad);
+            if (existente) existente.cantidad = cantidad;
+            else carrito.push({ ...libro, cantidad: 1 });
+            renderizarCarrito();
+            abrirPanel();
+        } catch (error) {
+            mostrarError(error, "No se pudo actualizar el carrito.");
+        }
+    }
+
+    async function cambiarCantidad(libroId, cambio) {
+        const item = carrito.find(actual => actual.id === libroId);
+        if (!item || checkout?.estaOcupado()) return;
+        const nueva = item.cantidad + cambio;
+        if (nueva > item.disponible) return;
+        try {
+            await guardarCantidad(libroId, nueva);
+            if (nueva <= 0) carrito = carrito.filter(actual => actual.id !== libroId);
+            else item.cantidad = nueva;
+            renderizarCarrito();
+        } catch (error) {
+            mostrarError(error, "No se pudo actualizar el carrito.");
+        }
+    }
+
+    function renderizarCarrito() {
+        badge.textContent = obtenerCantidadArticulos(carrito);
+        total.textContent = formatearMonedaRD(obtenerMontoTotal(carrito));
+        cuerpo.replaceChildren();
+        if (!carrito.length) {
+            cuerpo.appendChild(texto("p", "Tu carrito está vacío.", "empty-cart-msg"));
+            return;
+        }
+        carrito.forEach(item => {
+            const fila = document.createElement("div");
+            fila.className = "cart-item";
+            const imagen = document.createElement("img");
+            imagen.className = "cart-item-cover";
+            imagen.src = item.imagen_portada || "assets/logo-quisqueya-icono.png";
+            imagen.alt = "";
+            imagen.width = 42;
+            imagen.height = 64;
+            const detalle = document.createElement("div");
+            detalle.className = "cart-item-details";
+            detalle.append(texto("h4", item.titulo), texto("p", `${formatearMonedaRD(item.precio)} × ${item.cantidad}`));
+            const controles = document.createElement("div");
+            controles.className = "cart-item-controls";
+            const restar = texto("button", "−", "btn-qty");
+            const sumar = texto("button", "+", "btn-qty");
+            restar.type = sumar.type = "button";
+            restar.setAttribute("aria-label", `Restar ${item.titulo}`);
+            sumar.setAttribute("aria-label", `Sumar ${item.titulo}`);
+            restar.addEventListener("click", () => cambiarCantidad(item.id, -1));
+            sumar.addEventListener("click", () => cambiarCantidad(item.id, 1));
+            controles.append(restar, texto("span", String(item.cantidad)), sumar);
+            fila.append(imagen, detalle, controles);
+            cuerpo.appendChild(fila);
+        });
+    }
+
+    function abrirPanel() {
+        focoAnterior = document.activeElement;
+        panel.classList.add("open");
+        overlay.classList.add("active");
+        panel.setAttribute("aria-hidden", "false");
+        cerrar.focus();
+    }
+
+    function cerrarPanel() {
+        panel.classList.remove("open");
+        overlay.classList.remove("active");
+        panel.setAttribute("aria-hidden", "true");
+        focoAnterior?.focus();
+    }
+
+    abrir.addEventListener("click", abrirPanel);
+    cerrar.addEventListener("click", cerrarPanel);
+    overlay.addEventListener("click", cerrarPanel);
+    document.addEventListener("keydown", evento => {
+        if (evento.key === "Escape" && panel.classList.contains("open")) cerrarPanel();
+    });
+    buscar.addEventListener("input", renderizarCatalogo);
+    precio.addEventListener("input", renderizarCatalogo);
+
+    try {
+        const sesion = await window.obtenerSesionLibreria();
+        if (!sesion?.user) return;
+        await cargarCatalogo();
+        await obtenerCarrito(sesion.user.id);
+        renderizarCatalogo();
+        renderizarCarrito();
+        checkout = window.crearCheckout({
+            obtenerCarrito: () => carrito,
+            vaciarCarrito: () => { carrito = []; renderizarCarrito(); }
+        });
+    } catch (error) {
+        mostrarError(error, "No se pudo cargar la tienda.");
+    }
 });
-
