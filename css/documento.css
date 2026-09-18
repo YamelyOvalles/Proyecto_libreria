@@ -1,0 +1,85 @@
+:root {
+    --green: #405c27;
+    --green-dark: #2f481c;
+    --green-soft: #eef3e9;
+    --ink: #252a26;
+    --muted: #667066;
+    --line: #cfd8c9;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: #eef0ed; color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+.document-toolbar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: center; gap: 1rem; padding: 0.75rem 1rem; background: #fff; box-shadow: 0 3px 18px rgba(24, 35, 19, 0.12); }
+.document-toolbar a { color: var(--green-dark); font-weight: 700; text-decoration: none; }
+.document-toolbar p { margin: 0 auto; color: var(--muted); font-size: 0.86rem; }
+.document-toolbar button { min-height: 42px; padding: 0.6rem 1rem; border: 0; border-radius: 8px; background: var(--green); color: #fff; font-weight: 700; cursor: pointer; }
+.document-page { width: 8.5in; min-height: 11in; margin: 1rem auto; padding: 0.48in 0.52in 0.38in; background: #fff; box-shadow: 0 8px 30px rgba(25, 33, 23, 0.13); }
+.document-brand { display: flex; justify-content: space-between; gap: 1.2rem; padding-bottom: 0.18in; border-bottom: 2px solid var(--green); }
+.brand-identity { display: flex; align-items: center; gap: 0.12in; }
+.brand-identity img { width: 0.72in; max-height: 0.72in; object-fit: contain; }
+.brand-identity strong, .brand-identity span { display: block; }
+.brand-identity strong { color: var(--green-dark); font-size: 19px; }
+.brand-identity span { margin-top: 3px; color: var(--muted); font-size: 10px; }
+.document-brand address { max-width: 3.25in; color: var(--muted); font-size: 9.5px; font-style: normal; line-height: 1.45; text-align: right; white-space: pre-line; }
+.document-heading { display: flex; align-items: center; justify-content: space-between; margin-top: 0.18in; padding: 0.12in 0.16in; background: var(--green); color: #fff; }
+.document-heading > div span, .document-heading > div strong { display: block; }
+.document-heading > div span { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; }
+.document-heading > div strong { margin-top: 2px; font-size: 17px; }
+dl { margin: 0; }
+.document-heading dl { display: grid; grid-template-columns: auto auto; gap: 3px 10px; font-size: 9px; }
+.document-heading dt { opacity: 0.8; }
+.document-heading dd { margin: 0; font-weight: 700; text-align: right; }
+.document-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 0.14in; margin-top: 0.14in; }
+.meta-card { min-height: 1.22in; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; break-inside: avoid; }
+.meta-card h2 { margin: 0; padding: 6px 9px; background: var(--green-soft); color: var(--green-dark); font-size: 10px; text-transform: uppercase; }
+.meta-card dl { display: grid; grid-template-columns: 0.88in 1fr; gap: 4px 8px; padding: 8px 9px; font-size: 9px; }
+.meta-card dt { color: var(--muted); }
+.meta-card dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.items-table { width: 100%; margin-top: 0.15in; border-collapse: collapse; font-size: 9px; }
+.items-table thead { display: table-header-group; }
+.items-table th { padding: 7px; background: var(--green-dark); color: #fff; font-size: 8px; letter-spacing: 0.04em; text-align: right; text-transform: uppercase; }
+.items-table th:nth-child(2) { text-align: left; }
+.items-table td { padding: 7px; border-bottom: 1px solid #e0e5dd; text-align: right; vertical-align: top; }
+.items-table td:nth-child(2) { text-align: left; }
+.items-table tr { break-inside: avoid; }
+.item-isbn { display: block; margin-top: 2px; color: var(--muted); font-size: 8px; }
+.document-summary { display: grid; grid-template-columns: minmax(0, 1fr) 2.35in; gap: 0.18in; margin-top: 0.15in; align-items: start; }
+.document-texts { display: grid; gap: 0.1in; }
+.text-block { padding: 8px 9px; border: 1px solid var(--line); border-radius: 5px; break-inside: avoid; }
+.text-block strong { display: block; margin-bottom: 4px; color: var(--green-dark); font-size: 8px; text-transform: uppercase; }
+.text-block p { margin: 0; font-size: 8.5px; line-height: 1.45; white-space: pre-line; }
+.totals { padding: 7px 9px; border: 1px solid var(--line); border-radius: 5px; break-inside: avoid; }
+.totals > div { display: grid; grid-template-columns: 1fr auto; gap: 8px; padding: 4px 0; font-size: 9px; }
+.totals dd { margin: 0; font-weight: 700; }
+.totals .grand-total { margin: 5px -9px -7px; padding: 8px 9px; background: var(--green); color: #fff; font-size: 11px; }
+.signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65in; margin: 0.45in 0 0.28in; break-inside: avoid; }
+.signatures div { text-align: center; }
+.signatures span { display: block; border-top: 1px solid var(--ink); }
+.signatures strong { display: block; margin-top: 5px; font-size: 8px; }
+.document-page footer { display: flex; justify-content: space-between; gap: 1rem; padding-top: 7px; border-top: 1px solid var(--green); color: var(--muted); font-size: 8px; }
+.document-error { width: min(560px, calc(100% - 2rem)); margin: 4rem auto; padding: 2rem; border-radius: 12px; background: #fff; text-align: center; }
+.document-error a { color: var(--green-dark); font-weight: 700; }
+
+@page { size: Letter portrait; margin: 0.48in 0.52in 0.38in; }
+@media print {
+    body { background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .no-print { display: none !important; }
+    .document-page { width: auto; min-height: auto; margin: 0; padding: 0; box-shadow: none; }
+}
+
+@media (max-width: 850px) {
+    .document-toolbar { flex-wrap: wrap; }
+    .document-toolbar p { order: 3; width: 100%; text-align: center; }
+    .document-page { width: calc(100% - 1rem); min-height: auto; padding: 1.2rem; }
+    .document-meta, .document-summary { grid-template-columns: 1fr; }
+    .document-brand { align-items: flex-start; }
+}
+
+@media (max-width: 520px) {
+    .document-brand { display: block; }
+    .document-brand address { margin-top: 0.8rem; text-align: left; }
+    .document-heading { align-items: flex-start; gap: 0.8rem; }
+    .items-table { font-size: 8px; }
+    .items-table th, .items-table td { padding: 5px 3px; }
+    .signatures { gap: 0.25in; }
+}

@@ -3,11 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=index.html">
-    <title>Acceso | Librería Quisqueya</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <meta name="description" content="Acceso a Librería Quisqueya para clientes y administración">
+    <title>Iniciar sesión | Librería Quisqueya</title>
+    <link rel="stylesheet" href="css/styles.css?v=20260917-3">
+    <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/login.js?v=20260917-3" defer></script>
 </head>
-<body class="redirect-page">
-    <p>Ir a <a href="index.html">iniciar sesión</a>.</p>
+<body class="login-page">
+    <main class="login-layout">
+        <section class="login-card" aria-labelledby="login-title">
+            <a class="login-back" href="informacion.html">← Volver al sitio</a>
+
+            <div class="role-switcher" aria-label="Seleccionar perfil de acceso">
+                <button type="button" id="role-client" class="role-tab active" aria-pressed="true">
+                    Lector / Cliente
+                </button>
+                <button type="button" id="role-admin" class="role-tab" aria-pressed="false">
+                    Personal administrativo
+                </button>
+            </div>
+
+            <div class="login-heading">
+                <p id="login-role-eyebrow" class="eyebrow">Panel de lectores</p>
+                <h1 id="login-title">Bienvenida de vuelta</h1>
+                <p id="login-subtitle">Entra para gestionar tus pedidos y lecturas.</p>
+            </div>
+
+            <div id="admin-credentials-hint" class="admin-hint-box" hidden>
+                <strong>Acceso restringido:</strong><br>
+                Disponible para administradores y empleados autorizados.
+            </div>
+
+            <button type="button" id="google-login-btn" class="google-button">
+                <span class="google-letter" aria-hidden="true">G</span>
+                Entrar con Google
+            </button>
+
+            <div class="login-divider"><span>o continúa con tu correo</span></div>
+            <form id="login-form" novalidate>
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <div class="input-with-icon">
+                        <span aria-hidden="true">
+                            <svg class="svg-icon" viewBox="0 0 24 24" focusable="false"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </span>
+                        <input type="email" id="email" name="email" placeholder="nombre@correo.com" autocomplete="email" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="password-field input-with-icon">
+                        <span aria-hidden="true">
+                            <svg class="svg-icon" viewBox="0 0 24 24" focusable="false"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        </span>
+                        <input type="password" id="password" name="password" placeholder="Escribe tu contraseña" autocomplete="current-password" required>
+                        <button type="button" id="toggle-password" class="password-toggle" aria-label="Mostrar contraseña">
+                            <span class="eye-icon" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="login-options">
+                    <button type="button" class="login-help" data-recover>¿Olvidaste tu contraseña?</button>
+                </div>
+
+                <p id="login-message" class="form-message" role="alert" aria-live="polite"></p>
+
+                <button type="submit" id="login-submit-btn" class="button button-primary button-full">
+                    Entrar a Librería Quisqueya
+                </button>
+            </form>
+
+            <p id="register-container" class="register-copy">
+                ¿Aún no tienes cuenta?
+                <button type="button" class="login-help" data-register>Regístrate</button>
+            </p>
+
+        </section>
+
+        <figure class="login-photo">
+            <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&amp;fit=crop&amp;w=1200&amp;q=85" alt="Interior de una librería con estantes llenos de libros">
+            <figcaption>
+                <span class="brand brand-large"><img class="brand-logo-large" src="assets/logo-quisqueya-icono.png" alt=""><span class="brand-name brand-name-large">Librería Quisqueya</span></span>
+                <span>Historias que siempre encuentran un hogar.</span>
+            </figcaption>
+        </figure>
+    </main>
 </body>
 </html>

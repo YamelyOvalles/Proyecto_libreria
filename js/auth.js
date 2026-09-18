@@ -1,29 +1,81 @@
-/**
- * Librería Quisqueya - Control de Acceso y Autorización por Roles
- * Se ejecuta en el <head> para proteger las páginas antes de renderizar el DOM.
- * Verifica la existencia de una sesión activa y autoriza según el perfil (cliente o admin).
- */
-(function protectPage() {
-    // Comprobar si existe sesión activa en almacenamiento de sesión o local
-    const hasSession = sessionStorage.getItem("libreriaSession") === "active";
-    const isRemembered = localStorage.getItem("libreriaSession") === "active";
-    const isAuthenticated = hasSession || isRemembered;
+// Protege el panel administrativo.
+(async function protegerPagina() {
+    const esPaginaAdmin = window.location.pathname.toLowerCase().endsWith("admin.html");
+    if (esPaginaAdmin) document.documentElement.style.visibility = "hidden";
 
-    // 1. Si no hay sesión iniciada, redirigir a la pantalla de login
-    if (!isAuthenticated) {
-        window.location.replace("index.html");
-        return;
+    function continuarComoInvitado() {
+        window.libreriaSesion = null;
+        window.libreriaUsuario = null;
+        window.libreriaRol = null;
+        window.libreriaAuthResuelta = true;
+        document.documentElement.style.visibility = "";
+        document.dispatchEvent(new CustomEvent("libreria:auth-lista", {
+            detail: { usuario: null, rol: null, nombre: "" }
+        }));
     }
 
-    // Obtener el rol actual del usuario autenticado
-    const currentRole = sessionStorage.getItem("libreriaRole") || localStorage.getItem("libreriaRole") || "cliente";
-    const currentPath = window.location.pathname.toLowerCase();
-
-    // 2. Proteger la vista administrativa: solo usuarios con rol 'admin' pueden ingresar
-    const isTryingAdmin = currentPath.endsWith("admin.html") || currentPath.includes("admin.html");
-    if (isTryingAdmin && currentRole !== "admin") {
-        // Un cliente que intente acceder al panel operativo es redirigido al catálogo de la tienda
-        window.location.replace("tienda.html");
+    try {
+        if (!window.libreriaSupabaseConfigurado) {
+            if (esPaginaAdmin) window.location.replace("login.html?config=pendiente");
+            else continuarComoInvitado();
+            return;
+        }
+        const sesion = await window.obtenerSesionLibreria();
+        if (!sesion?.user) {
+            if (esPaginaAdmin) window.location.replace("login.html");
+            else continuarComoInvitado();
+            return;
+        }
+        const [rol, perfil] = await Promise.all([
+            window.obtenerRolLibreria(sesion.user.id),
+            window.obtenerPerfilLibreria(sesion.user.id).catch(() => null)
+        ]);
+        if (perfil?.activo === false) {
+            await window.libreriaSupabase.auth.signOut({ scope: "local" });
+            window.location.replace("login.html?auth=inactivo");
+            return;
+        }
+        if (esPaginaAdmin && !["administrador", "empleado"].includes(rol)) {
+            window.location.replace("tienda.html");
+            return;
+        }
+        const nombre = perfil?.nombres?.trim()
+            || sesion.user.user_metadata?.given_name
+            || sesion.user.user_metadata?.full_name?.trim().split(/\s+/)[0]
+            || sesion.user.email?.split("@")[0]
+            || "Usuario";
+        window.libreriaSesion = Object.freeze({
+            usuario: sesion.user,
+            rol: rol || "cliente",
+            nombre
+        });
+        window.libreriaUsuario = sesion.user;
+        window.libreriaRol = window.libreriaSesion.rol;
+        window.libreriaAuthResuelta = true;
+        sessionStorage.setItem("libreria.usuario", JSON.stringify({
+            id: sesion.user.id,
+            correo: sesion.user.email,
+            rol: window.libreriaRol,
+            nombre
+        }));
+        document.documentElement.style.visibility = "";
+        document.dispatchEvent(new CustomEvent("libreria:auth-lista", {
+            detail: window.libreriaSesion
+        }));
+    } catch (error) {
+        console.error("No se pudo validar la sesión:", error);
+        if (esPaginaAdmin) window.location.replace("login.html?auth=error");
+        else continuarComoInvitado();
     }
 }());
+
+window.libreriaSupabase?.auth.onAuthStateChange(evento => {
+    if (evento !== "SIGNED_OUT") return;
+    sessionStorage.removeItem("libreria.usuario");
+    window.libreriaSesion = null;
+    window.libreriaUsuario = null;
+    window.libreriaRol = null;
+    const esPaginaAdmin = window.location.pathname.toLowerCase().endsWith("admin.html");
+    window.location.replace(esPaginaAdmin ? "login.html" : "informacion.html");
+});
 

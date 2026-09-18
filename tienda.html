@@ -6,14 +6,19 @@
     <meta name="description" content="Catálogo de Librería Quisqueya">
     <title>Catálogo | Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/app.js" defer></script>
     <script src="js/funciones.js" defer></script>
-    <script src="js/checkout.js" defer></script>
-    <script src="js/tienda.js" defer></script>
+    <script src="js/checkout.js?v=20260917-2" defer></script>
+    <script src="js/tienda.js?v=20260917-2" defer></script>
     <link rel="stylesheet" href="css/catalogo.css">
     
     <style>
-        /* Variables de color basadas en la paleta del diseño */
+        /* Colores del catálogo. */
         :root {
             --primary-green: #4c602a;    /* Verde oliva del header */
             --accent-brown: #6b4731;     /* Marrón terracota del botón activo/hover */
@@ -22,7 +27,7 @@
             --text-dark: #222222;
         }
 
-        /* Estilos globales y botones de la página */
+        /* Botones y textos. */
         .eyebrow {
             color: var(--accent-brown) !important;
             font-weight: bold;
@@ -45,7 +50,33 @@
             font-weight: bold;
         }
 
-        /* Estilos del Botón Flotante del Carrito */
+        .book-offer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .book-offer .book-price {
+            margin: 0;
+        }
+
+        .book-price-old {
+            color: #72776f;
+            font-size: 0.82rem;
+            text-decoration: line-through;
+        }
+
+        .book-discount {
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: #eef5e8;
+            color: #36521f;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        /* Botón del carrito. */
         .cart-float-btn {
             position: fixed;
             bottom: 25px;
@@ -79,7 +110,7 @@
             font-size: 0.85rem;
         }
 
-        /* Overlay oscuro de fondo */
+        /* Fondo del carrito. */
         .cart-overlay {
             position: fixed;
             top: 0;
@@ -95,7 +126,7 @@
             display: block;
         }
 
-        /* Panel Lateral desplegable del Carrito */
+        /* Panel del carrito. */
         .cart-sidebar {
             position: fixed;
             top: 0;
@@ -251,43 +282,71 @@
                 <input id="precio-maximo" type="number" min="0" step="0.01" placeholder="Sin límite">
             </div>
         </div>
-
-        <!-- Rejilla donde se renderizan los libros -->
         <section id="book-grid" class="book-grid" aria-label="Libros disponibles">
         </section>
     </main>
-
-    <!-- Botón Flotante para abrir el Carrito (con ícono SVG limpio sin emojis) -->
     <button id="cart-float-btn" class="cart-float-btn" type="button" aria-label="Abrir carrito de compras">
         <svg class="svg-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px;" focusable="false" aria-hidden="true"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
         <span>Mi Carrito</span>
         <span id="cart-badge" class="cart-badge">0</span>
     </button>
-
-    <!-- Panel Lateral del Carrito y Fondo Oscuro -->
     <div id="cart-overlay" class="cart-overlay"></div>
-    <aside id="cart-sidebar" class="cart-sidebar">
+    <aside id="cart-sidebar" class="cart-sidebar" role="dialog" aria-modal="true" aria-labelledby="cart-title" aria-hidden="true">
         <div class="cart-header">
-            <h2>Tu Carrito de Compras</h2>
-            <button id="close-cart" class="close-cart" type="button">&times;</button>
+            <h2 id="cart-title">Tu Carrito de Compras</h2>
+            <button id="close-cart" class="close-cart" type="button" aria-label="Cerrar carrito">&times;</button>
         </div>
         <div id="cart-body" class="cart-body">
-            <!-- Los libros agregados aparecerán aquí dinámicamente -->
         </div>
         <div class="cart-footer">
             <div class="cart-total">
                 <span>Total:</span>
                 <span id="cart-total-price">RD$ 0.00</span>
             </div>
-            <button id="checkout-btn" class="button button-primary button-full" type="button" style="width: 100%; padding: 12px;">Confirmar pedido y enviar factura</button>
-            <p class="invoice-recipient">La factura se enviará a <strong>adamsdleons3@gmail.com</strong>.</p>
+            <div class="checkout-fields">
+                <label for="checkout-customer-phone">Teléfono de contacto</label>
+                <input id="checkout-customer-phone" type="tel" maxlength="25" autocomplete="tel">
+                <label for="checkout-customer-document">RNC o cédula (opcional)</label>
+                <input id="checkout-customer-document" type="text" maxlength="30">
+                <label for="delivery-method">Entrega</label>
+                <select id="delivery-method">
+                    <option value="retiro">Retiro en sucursal</option>
+                    <option value="domicilio">Envío a domicilio</option>
+                </select>
+                <div id="pickup-fields">
+                    <label for="pickup-branch">Sucursal</label>
+                    <select id="pickup-branch"><option value="">Cargando sucursales…</option></select>
+                </div>
+                <div id="address-fields" hidden>
+                    <label for="delivery-recipient">Persona que recibe</label>
+                    <input id="delivery-recipient" maxlength="160" autocomplete="name">
+                    <label for="delivery-phone">Teléfono</label>
+                    <input id="delivery-phone" maxlength="25" autocomplete="tel">
+                    <label for="delivery-line1">Dirección</label>
+                    <input id="delivery-line1" maxlength="200" autocomplete="address-line1">
+                    <label for="delivery-sector">Sector</label>
+                    <input id="delivery-sector" maxlength="120" autocomplete="address-line2">
+                    <label for="delivery-city">Ciudad</label>
+                    <input id="delivery-city" maxlength="100" autocomplete="address-level2">
+                    <label for="delivery-province">Provincia</label>
+                    <input id="delivery-province" maxlength="100" autocomplete="address-level1">
+                    <label for="delivery-reference">Referencia (opcional)</label>
+                    <textarea id="delivery-reference" rows="2" maxlength="500"></textarea>
+                </div>
+                <label for="payment-method">Forma de pago</label>
+                <select id="payment-method">
+                    <option value="contra_entrega">Pago contra entrega</option>
+                    <option value="efectivo">Efectivo al retirar</option>
+                    <option value="tarjeta">Tarjeta al retirar</option>
+                    <option value="transferencia">Transferencia bancaria</option>
+                </select>
+            </div>
+            <button id="checkout-btn" class="button button-primary button-full" type="button" style="width: 100%; padding: 12px;">Confirmar pedido</button>
+            <p class="invoice-recipient">El pedido quedará asociado a tu cuenta de Supabase.</p>
             <p id="checkout-status" class="invoice-status" role="status" aria-live="polite"></p>
-            <a id="invoice-download" class="button button-primary button-full" hidden>Descargar factura PDF</a>
-            <button id="invoice-retry" class="button button-full" type="button" hidden>Reintentar envío</button>
         </div>
     </aside>
 
     <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya</p></footer>
-    <!-- La lógica dinámica del catálogo y carrito se ejecuta desde el archivo externo js/tienda.js -->
 </body>
 </html>

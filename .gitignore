@@ -1,11 +1,26 @@
-﻿################################################################################
-# Este archivo .gitignore ha sido creado automáticamente por Microsoft(R) Visual Studio.
-################################################################################
-
+# Archivos de Visual Studio.
 /.vs
 
+# Configuración local y secretos. Nunca deben versionarse.
 .env
+.env.*
+!.env.example
+js/supabase-config.js
+*.pem
+*.p12
+*.pfx
+*.key
+credentials*.json
+service-account*.json
+
+# Archivos locales o generados.
 datos/
 __pycache__/
 .venv/
-
+supabase/.temp/
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
