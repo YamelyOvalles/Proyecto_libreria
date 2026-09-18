@@ -1,4 +1,4 @@
-/** Confirmación segura de pedidos mediante la función PostgreSQL de Supabase. */
+// Confirma pedidos en Supabase.
 window.crearCheckout = function ({ obtenerCarrito, vaciarCarrito }) {
     const boton = document.getElementById("checkout-btn");
     const estado = document.getElementById("checkout-status");

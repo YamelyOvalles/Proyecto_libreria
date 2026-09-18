@@ -1,4 +1,4 @@
-/** Valida y guarda los mensajes de contacto en Supabase. */
+// Formulario de contacto.
 document.addEventListener("DOMContentLoaded", () => {
     const formulario = document.getElementById("contact-form");
     if (!formulario) return;

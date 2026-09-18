@@ -1,4 +1,4 @@
-/** Inicio de sesión, registro y recuperación mediante Supabase Auth. */
+// Acceso y registro.
 const formulario = document.getElementById("login-form");
 const correo = document.getElementById("email");
 const clave = document.getElementById("password");

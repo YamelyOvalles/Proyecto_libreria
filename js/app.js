@@ -1,7 +1,7 @@
-/** Navegación, cuenta y cierre de sesión. */
+// Navegación y sesión.
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Control del menú responsivo.
+    // Menú responsive.
     const menuToggle = document.querySelector(".menu-toggle");
     const siteNav = document.querySelector(".site-nav");
 
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Adapta la navegación al rol autenticado.
+    // Ajusta el menú según el rol.
     function agregarAccesoAdministrativo(rol) {
         const navList = document.querySelector(".nav-list");
         if (document.body.classList.contains("admin-page")) return;
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.addEventListener("libreria:auth-lista", evento => actualizarCuenta(evento.detail));
     if (window.libreriaAuthResuelta) actualizarCuenta(window.libreriaSesion);
 
-    // Controla el cierre de sesión.
+    // Cierra la sesión.
     document.querySelectorAll("[data-logout]").forEach(function (button) {
         button.addEventListener("click", async function () {
             button.disabled = true;

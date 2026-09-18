@@ -1,4 +1,4 @@
-/* Estructura del panel administrativo. */
+/* Panel administrativo. */
 .admin-page { background: #f3f5f2; }
 .admin-topbar { z-index: 40; }
 .admin-shell { width: min(100%, 1440px); min-height: calc(100vh - 74px); display: grid; grid-template-columns: 230px minmax(0, 1fr); margin-inline: auto; }
@@ -38,7 +38,7 @@
 .compact-order strong, .compact-order small { display: block; }
 .compact-order small { color: var(--muted); }
 
-/* Herramientas, tablas y estados vacíos. */
+/* Herramientas y tablas. */
 .admin-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
 .compact-toolbar { align-items: end; justify-content: flex-start; margin-bottom: 1rem; padding: 0; border: 0; background: transparent; }
 .compact-toolbar label { min-width: 190px; margin: 0; }

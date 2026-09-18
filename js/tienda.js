@@ -1,4 +1,4 @@
-/** Catálogo y carrito persistente respaldados por Supabase. */
+// Catálogo y carrito.
 document.addEventListener("DOMContentLoaded", async () => {
     const grid = document.getElementById("book-grid");
     const contador = document.getElementById("contador");

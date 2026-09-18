@@ -1,4 +1,4 @@
-/** Carga la sesión opcional y protege únicamente el panel administrativo. */
+// Protege el panel administrativo.
 (async function protegerPagina() {
     const esPaginaAdmin = window.location.pathname.toLowerCase().endsWith("admin.html");
     if (esPaginaAdmin) document.documentElement.style.visibility = "hidden";

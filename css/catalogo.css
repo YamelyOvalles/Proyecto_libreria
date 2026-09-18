@@ -1,4 +1,4 @@
-/* Mejoras visuales locales del catálogo. */
+/* Catálogo. */
 .catalog-page .book-card {
     display: flex;
     flex-direction: column;
@@ -54,7 +54,7 @@
     .catalog-page .button:active { transform: none; }
 }
 
-/* Confirmación y factura del pedido. */
+/* Confirmación del pedido. */
 .catalog-page [hidden] { display: none !important; }
 .catalog-page .invoice-recipient { font-size: .8rem; overflow-wrap: anywhere; margin: 12px 0 6px; }
 .catalog-page .invoice-status { font-size: .85rem; line-height: 1.45; margin: 8px 0; }

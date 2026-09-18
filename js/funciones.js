@@ -1,4 +1,4 @@
-// Funciones reutilizables del catalogo, carrito y panel.
+// Funciones compartidas.
 
 function buscarLibrosPorTexto(libros, texto) {
     if (!Array.isArray(libros)) return [];

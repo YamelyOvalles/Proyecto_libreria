@@ -1,4 +1,4 @@
-/** Cliente único y utilidades compartidas de Supabase. */
+// Cliente de Supabase.
 (function inicializarSupabase() {
     const configuracion = window.LIBRERIA_SUPABASE_CONFIG || {};
 
@@ -7,8 +7,7 @@
         if (clave.startsWith("sb_secret_")) return false;
         if (clave.startsWith("sb_publishable_")) return true;
 
-        // Las claves anon heredadas son JWT públicos. Rechaza cualquier JWT
-        // con otro rol para impedir que service_role llegue al navegador.
+        // Acepta solo claves publicas.
         try {
             const segmento = clave.split(".")[1];
             if (!segmento) return false;
@@ -42,8 +41,7 @@
         if (errorSesion) throw errorSesion;
         if (!datosSesion.session) return null;
 
-        // getUser valida el token con Supabase Auth; no se confía solamente en
-        // los datos que estén guardados en el navegador.
+        // Valida la sesion con Supabase.
         const { data: datosUsuario, error: errorUsuario } = await window.libreriaSupabase.auth.getUser();
         if (errorUsuario) throw errorUsuario;
         if (!datosUsuario.user || datosUsuario.user.id !== datosSesion.session.user.id) return null;

@@ -1,4 +1,4 @@
-/** Panel administrativo modular conectado a Supabase. */
+// Panel administrativo.
 document.addEventListener("DOMContentLoaded", () => {
     const estado = {
         pedidos: [],
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (detalle?.error) return detalle.error;
             }
         } catch {
-            // La respuesta no contenía JSON.
+            // Respuesta sin JSON.
         }
         if (error?.context?.status === 404 || error?.message?.includes("Failed to send a request to the Edge Function")) {
             return alternativo;

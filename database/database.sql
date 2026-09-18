@@ -1,6 +1,4 @@
--- Base de datos de Libreria Quisqueya
-
--- Ejecutar una sola vez en un proyecto nuevo de Supabase.
+-- Base de datos de Libreria Quisqueya.
 
 
 
@@ -39,7 +37,7 @@ insert into public.roles (codigo, nombre)
 values ('cliente', 'Cliente'), ('empleado', 'Empleado'), ('administrador', 'Administrador')
 on conflict (codigo) do update set nombre = excluded.nombre;
 
--- Devuelve true solamente para cuentas con rol administrativo.
+-- Verifica el rol administrador.
 create or replace function private.es_admin()
 returns boolean
 language sql
@@ -58,7 +56,7 @@ as $$
     );
 $$;
 
--- Permite operaciones a administradores y empleados.
+-- Verifica el rol del personal.
 create or replace function private.es_personal()
 returns boolean
 language sql
@@ -77,7 +75,7 @@ as $$
     );
 $$;
 
--- Crea el perfil y asigna el rol cliente al registrar una cuenta.
+-- Crea el perfil del cliente.
 create or replace function private.crear_perfil_usuario()
 returns trigger
 language plpgsql
@@ -572,7 +570,7 @@ begin
         raise exception 'El carrito está vacío.';
     end if;
 
-    -- Bloqueo de las existencias involucradas para evitar compras simultáneas.
+    -- Evita compras simultaneas sin stock.
     perform i.libro_id
       from public.inventarios i
       join public.carrito_detalles cd on cd.libro_id = i.libro_id
@@ -701,7 +699,7 @@ from public, anon;
 grant execute on function public.crear_pedido_desde_carrito(text, text, bigint, jsonb, text)
 to authenticated;
 
--- Cambia el estado y mantiene las reservas del inventario consistentes.
+-- Actualiza el pedido y su inventario.
 create or replace function public.actualizar_estado_pedido(
     p_pedido_id uuid,
     p_estado text
@@ -819,7 +817,7 @@ $$;
 revoke all on function public.actualizar_estado_pedido(uuid, text) from public, anon;
 grant execute on function public.actualizar_estado_pedido(uuid, text) to authenticated;
 
--- Controla los cambios del pago para impedir retrocesos o reaperturas accidentales.
+-- Actualiza el estado del pago.
 create or replace function public.actualizar_pago_pedido(
     p_pedido_id uuid,
     p_estado_pago text
@@ -863,7 +861,7 @@ $$;
 revoke all on function public.actualizar_pago_pedido(uuid, text) from public, anon;
 grant execute on function public.actualizar_pago_pedido(uuid, text) to authenticated;
 
--- Guarda los datos generales del producto y registra el inventario inicial.
+-- Guarda el producto y su inventario.
 create or replace function public.guardar_producto_admin(
     p_producto_id bigint,
     p_isbn text,
@@ -994,7 +992,7 @@ begin
 end;
 $$;
 
--- Elimina productos sin actividad; los demás quedan desactivados para conservar el historial.
+-- Conserva productos con historial.
 create or replace function public.eliminar_producto_admin(p_producto_id bigint)
 returns text
 language plpgsql
@@ -1027,7 +1025,7 @@ begin
 end;
 $$;
 
--- Registra entradas, salidas y conteos físicos sin permitir existencias negativas.
+-- Registra movimientos de inventario.
 create or replace function public.ajustar_inventario_admin(
     p_producto_id bigint,
     p_tipo text,
@@ -1094,7 +1092,7 @@ begin
 end;
 $$;
 
--- Muestra el historial de inventario al personal sin abrir los perfiles de otros usuarios.
+-- Lista los movimientos del inventario.
 create or replace function public.listar_movimientos_inventario(p_limite integer default 40)
 returns table (
     id bigint,
@@ -1133,7 +1131,7 @@ begin
 end;
 $$;
 
--- Devuelve usuarios y roles sin exponer contraseñas ni tokens.
+-- Lista usuarios y roles.
 create or replace function public.listar_usuarios_admin()
 returns table (
     id uuid,
@@ -1449,7 +1447,7 @@ begin
     v_mostrar_itbis := case when p_tipo = 'cotizacion' then v_config.cotizacion_mostrar_itbis else v_config.factura_mostrar_itbis end;
     v_itbis_pct := case when p_tipo = 'cotizacion' then v_config.cotizacion_itbis_pct else v_config.factura_itbis_pct end;
 
-    -- El pedido ya contiene el precio final. El ITBIS se presenta incluido para no alterar su total.
+    -- Muestra el ITBIS incluido en el total.
     v_itbis := case
         when v_mostrar_itbis and v_itbis_pct > 0
         then round((v_pedido.subtotal - v_pedido.descuento) * v_itbis_pct / (100 + v_itbis_pct), 2)
