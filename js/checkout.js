@@ -56,6 +56,28 @@ window.crearCheckout = function ({ obtenerCarrito, vaciarCarrito }) {
         return valores;
     }
 
+    function leerDatosPedido(domicilio) {
+        const comunes = {
+            telefono_cliente: document.getElementById("checkout-customer-phone").value.trim() || null,
+            documento: document.getElementById("checkout-customer-document").value.trim() || null
+        };
+        return domicilio ? { ...leerDireccion(), ...comunes } : comunes;
+    }
+
+    async function buscarCotizacion(pedidoId) {
+        for (let intento = 0; intento < 3; intento += 1) {
+            const { data, error } = await window.libreriaSupabase
+                .from("cotizaciones")
+                .select("id")
+                .eq("pedido_id", pedidoId)
+                .maybeSingle();
+            if (error) throw error;
+            if (data?.id) return data;
+            await new Promise(resolver => setTimeout(resolver, 250));
+        }
+        return null;
+    }
+
     entrega.addEventListener("change", alternarEntrega);
     alternarEntrega();
     cargarSucursales();
@@ -75,13 +97,25 @@ window.crearCheckout = function ({ obtenerCarrito, vaciarCarrito }) {
                 p_metodo_entrega: entrega.value,
                 p_sucursal_id: domicilio ? null : Number(sucursal.value),
                 p_metodo_pago: pago.value,
-                p_direccion: domicilio ? leerDireccion() : null,
+                p_direccion: leerDatosPedido(domicilio),
                 p_notas: null
             });
             if (error) throw error;
 
             vaciarCarrito();
-            informar(`${data.numero} confirmado. Total RD$ ${Number(data.total).toLocaleString("es-DO", { minimumFractionDigits: 2 })}.`, "enviado");
+            informar(`${data.numero} confirmado. Preparando cotización…`, "enviado");
+
+            try {
+                const cotizacion = await buscarCotizacion(data.id);
+                if (cotizacion) {
+                    window.location.assign(`documento.html?tipo=cotizacion&id=${encodeURIComponent(cotizacion.id)}&accion=imprimir`);
+                    return;
+                }
+                informar(`${data.numero} fue confirmado, pero la cotización todavía no está disponible. El administrador podrá consultarla desde el pedido.`, "enviado");
+            } catch (errorCotizacion) {
+                console.error("El pedido se creó, pero no se pudo abrir su cotización:", errorCotizacion);
+                informar(`${data.numero} fue confirmado. No se pudo abrir la cotización automáticamente.`, "enviado");
+            }
         } catch (error) {
             informar(window.mensajeErrorSupabase(error, error.message || "No se pudo crear el pedido."));
         } finally {

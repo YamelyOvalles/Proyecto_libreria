@@ -1,22 +1,41 @@
-/** Protección de páginas mediante Supabase Auth y el rol guardado en PostgreSQL. */
+/** Carga la sesión opcional y protege únicamente el panel administrativo. */
 (async function protegerPagina() {
-    document.documentElement.style.visibility = "hidden";
+    const esPaginaAdmin = window.location.pathname.toLowerCase().endsWith("admin.html");
+    if (esPaginaAdmin) document.documentElement.style.visibility = "hidden";
+
+    function continuarComoInvitado() {
+        window.libreriaSesion = null;
+        window.libreriaUsuario = null;
+        window.libreriaRol = null;
+        window.libreriaAuthResuelta = true;
+        document.documentElement.style.visibility = "";
+        document.dispatchEvent(new CustomEvent("libreria:auth-lista", {
+            detail: { usuario: null, rol: null, nombre: "" }
+        }));
+    }
+
     try {
         if (!window.libreriaSupabaseConfigurado) {
-            window.location.replace("index.html?config=pendiente");
+            if (esPaginaAdmin) window.location.replace("login.html?config=pendiente");
+            else continuarComoInvitado();
             return;
         }
         const sesion = await window.obtenerSesionLibreria();
         if (!sesion?.user) {
-            window.location.replace("index.html");
+            if (esPaginaAdmin) window.location.replace("login.html");
+            else continuarComoInvitado();
             return;
         }
         const [rol, perfil] = await Promise.all([
             window.obtenerRolLibreria(sesion.user.id),
             window.obtenerPerfilLibreria(sesion.user.id).catch(() => null)
         ]);
-        const esPaginaAdmin = window.location.pathname.toLowerCase().endsWith("admin.html");
-        if (esPaginaAdmin && rol !== "administrador") {
+        if (perfil?.activo === false) {
+            await window.libreriaSupabase.auth.signOut({ scope: "local" });
+            window.location.replace("login.html?auth=inactivo");
+            return;
+        }
+        if (esPaginaAdmin && !["administrador", "empleado"].includes(rol)) {
             window.location.replace("tienda.html");
             return;
         }
@@ -32,6 +51,7 @@
         });
         window.libreriaUsuario = sesion.user;
         window.libreriaRol = window.libreriaSesion.rol;
+        window.libreriaAuthResuelta = true;
         sessionStorage.setItem("libreria.usuario", JSON.stringify({
             id: sesion.user.id,
             correo: sesion.user.email,
@@ -44,7 +64,8 @@
         }));
     } catch (error) {
         console.error("No se pudo validar la sesión:", error);
-        window.location.replace("index.html?auth=error");
+        if (esPaginaAdmin) window.location.replace("login.html?auth=error");
+        else continuarComoInvitado();
     }
 }());
 
@@ -54,6 +75,7 @@ window.libreriaSupabase?.auth.onAuthStateChange(evento => {
     window.libreriaSesion = null;
     window.libreriaUsuario = null;
     window.libreriaRol = null;
-    window.location.replace("index.html");
+    const esPaginaAdmin = window.location.pathname.toLowerCase().endsWith("admin.html");
+    window.location.replace(esPaginaAdmin ? "login.html" : "informacion.html");
 });
 

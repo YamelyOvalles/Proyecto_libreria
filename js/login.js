@@ -17,6 +17,10 @@ const etiquetaRol = document.getElementById("login-role-eyebrow");
 
 let rolSeleccionado = "cliente";
 let modo = "login";
+const destinoSolicitado = new URLSearchParams(window.location.search).get("next");
+const destinoDespuesAcceso = ["informacion.html", "tienda.html", "formulario.html"].includes(destinoSolicitado)
+    ? destinoSolicitado
+    : "informacion.html";
 
 function mostrarMensaje(texto, tipo = "error") {
     mensaje.textContent = texto;
@@ -37,9 +41,9 @@ function cambiarRol(rol) {
     botonAdmin.setAttribute("aria-pressed", String(rol === "administrador"));
     pistaAdmin.hidden = rol !== "administrador";
     etiquetaRol.textContent = rol === "administrador" ? "Panel operativo" : "Panel de lectores";
-    titulo.textContent = rol === "administrador" ? "Acceso administrativo" : "Bienvenida de vuelta";
+    titulo.textContent = rol === "administrador" ? "Acceso del personal" : "Bienvenida de vuelta";
     subtitulo.textContent = rol === "administrador"
-        ? "Utiliza tu cuenta administrativa autorizada."
+        ? "Utiliza una cuenta de administrador o empleado autorizada."
         : "Entra para gestionar tus pedidos y lecturas.";
     mostrarMensaje("");
 }
@@ -56,7 +60,6 @@ function cambiarModoRegistro() {
 botonCliente.addEventListener("click", () => cambiarRol("cliente"));
 botonAdmin.addEventListener("click", () => cambiarRol("administrador"));
 botonRegistro.addEventListener("click", cambiarModoRegistro);
-
 botonVerClave.addEventListener("click", () => {
     const oculto = clave.type === "password";
     clave.type = oculto ? "text" : "password";
@@ -84,7 +87,7 @@ botonGoogle.addEventListener("click", async () => {
     if (!window.libreriaSupabase) return mostrarMensaje("Configura Supabase antes de continuar.");
     const { error } = await window.libreriaSupabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: new URL("informacion.html", window.location.href).href }
+        options: { redirectTo: new URL(destinoDespuesAcceso, window.location.href).href }
     });
     if (error) mostrarMensaje(window.mensajeErrorSupabase(error));
 });
@@ -122,16 +125,16 @@ formulario.addEventListener("submit", async evento => {
                 botonRegistro.textContent = "Regístrate";
                 return;
             }
-            window.location.replace("informacion.html");
+            window.location.replace(destinoDespuesAcceso);
         } else {
             const { data, error } = await window.libreriaSupabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
             const rolReal = await window.obtenerRolLibreria(data.user.id);
-            if (rolSeleccionado === "administrador" && rolReal !== "administrador") {
+            if (rolSeleccionado === "administrador" && !["administrador", "empleado"].includes(rolReal)) {
                 await window.libreriaSupabase.auth.signOut();
-                throw new Error("Esta cuenta no tiene permisos administrativos.");
+                throw new Error("Esta cuenta no pertenece al personal autorizado.");
             }
-            window.location.replace(rolReal === "administrador" ? "admin.html" : "informacion.html");
+            window.location.replace(["administrador", "empleado"].includes(rolReal) ? "admin.html" : destinoDespuesAcceso);
         }
     } catch (error) {
         mostrarMensaje(window.mensajeErrorSupabase(error, error.message));
@@ -142,6 +145,7 @@ formulario.addEventListener("submit", async evento => {
 
 (async function prepararAcceso() {
     const parametros = new URLSearchParams(window.location.search);
+    if (parametros.get("registro") === "1") cambiarModoRegistro();
     if (!window.libreriaSupabaseConfigurado || parametros.get("config") === "pendiente") {
         mostrarMensaje("Configura la URL y la clave pública en js/supabase-config.js.");
         return;
@@ -150,7 +154,7 @@ formulario.addEventListener("submit", async evento => {
         const sesion = await window.obtenerSesionLibreria();
         if (sesion?.user && modo !== "recuperacion") {
             const rol = await window.obtenerRolLibreria(sesion.user.id);
-            window.location.replace(rol === "administrador" ? "admin.html" : "informacion.html");
+            window.location.replace(["administrador", "empleado"].includes(rol) ? "admin.html" : destinoDespuesAcceso);
         }
     } catch (error) {
         mostrarMensaje(window.mensajeErrorSupabase(error));

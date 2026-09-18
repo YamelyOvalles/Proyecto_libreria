@@ -62,7 +62,7 @@
     window.obtenerPerfilLibreria = async function (usuarioId) {
         if (!window.libreriaSupabase || !usuarioId) return null;
         const { data, error } = await window.libreriaSupabase
-            .from("perfiles").select("nombres,apellidos")
+            .from("perfiles").select("nombres,apellidos,activo")
             .eq("id", usuarioId).maybeSingle();
         if (error) throw error;
         return data;

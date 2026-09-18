@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let carritoId = null;
     let checkout = null;
     let focoAnterior = null;
+    let usuarioActual = null;
 
     function texto(tag, contenido, clase) {
         const nodo = document.createElement(tag);
@@ -30,19 +31,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         contador.classList.add("form-message");
     }
 
+    function calcularTotalCarrito() {
+        return carrito.reduce((acumulado, item) => {
+            const bruto = Number(item.precio_lista) * Number(item.cantidad);
+            const descuento = Math.round(bruto * Number(item.descuento_pct || 0)) / 100;
+            return acumulado + bruto - descuento;
+        }, 0);
+    }
+
     async function cargarCatalogo() {
-        const { data, error } = await window.libreriaSupabase
+        let resultado = await window.libreriaSupabase
             .from("libros")
-            .select("id,isbn,titulo,descripcion,precio,formato,idioma,imagen_portada,inventarios(cantidad_disponible),libro_autor(autores(nombre))")
+            .select("id,isbn,titulo,descripcion,precio,descuento_pct,formato,idioma,imagen_portada,inventarios(cantidad_disponible),libro_autor(autores(nombre))")
             .eq("activo", true)
             .order("titulo");
-        if (error) throw error;
-        libros = data.map(libro => {
+
+        if (resultado.error) {
+            resultado = await window.libreriaSupabase
+                .from("libros")
+                .select("id,isbn,titulo,descripcion,precio,formato,idioma,imagen_portada,inventarios(cantidad_disponible),libro_autor(autores(nombre))")
+                .eq("activo", true)
+                .order("titulo");
+        }
+
+        if (resultado.error) throw resultado.error;
+        libros = (resultado.data || []).map(libro => {
             const inventario = Array.isArray(libro.inventarios) ? libro.inventarios[0] : libro.inventarios;
+            const descuento = Number(libro.descuento_pct || 0);
             return {
                 ...libro,
-                precio: Number(libro.precio),
-                autor: libro.libro_autor.map(relacion => relacion.autores?.nombre).filter(Boolean).join(", ") || "Autor no indicado",
+                descuento_pct: descuento,
+                precio_lista: Number(libro.precio),
+                precio: Math.round(Number(libro.precio) * (1 - descuento / 100) * 100) / 100,
+                autor: libro.libro_autor?.map(relacion => relacion.autores?.nombre).filter(Boolean).join(", ") || "Autor no indicado",
                 disponible: Number(inventario?.cantidad_disponible || 0)
             };
         });
@@ -99,16 +120,33 @@ document.addEventListener("DOMContentLoaded", async () => {
             marco.appendChild(imagen);
             const info = document.createElement("div");
             info.className = "book-info";
-            info.append(
-                texto("p", libro.autor, "book-author"),
-                texto("h2", libro.titulo),
-                texto("p", formatearMonedaRD(libro.precio), "book-price"),
-                texto("p", libro.disponible > 0 ? `${libro.disponible} disponible(s)` : "Agotado", "book-stock")
+            info.append(texto("p", libro.autor, "book-author"), texto("h2", libro.titulo));
+            if (Number(libro.descuento_pct) > 0) {
+                const precioOferta = document.createElement("div");
+                precioOferta.className = "book-offer";
+                precioOferta.append(
+                    texto("span", formatearMonedaRD(libro.precio_lista), "book-price-old"),
+                    texto("p", formatearMonedaRD(libro.precio), "book-price"),
+                    texto("span", `-${Number(libro.descuento_pct)}%`, "book-discount")
+                );
+                info.appendChild(precioOferta);
+            } else {
+                info.appendChild(texto("p", formatearMonedaRD(libro.precio), "book-price"));
+            }
+            info.appendChild(texto("p", libro.disponible > 0 ? `${libro.disponible} disponible(s)` : "Agotado", "book-stock"));
+            const boton = texto(
+                "button",
+                libro.disponible < 1
+                    ? "Agotado"
+                    : usuarioActual ? "Agregar al carrito" : "Inicia sesión para comprar",
+                "button button-primary button-full btn-add"
             );
-            const boton = texto("button", "Agregar al carrito", "button button-primary button-full btn-add");
             boton.type = "button";
             boton.disabled = libro.disponible < 1;
-            boton.addEventListener("click", () => agregar(libro));
+            boton.addEventListener("click", () => {
+                if (!usuarioActual) window.location.href = "login.html?next=tienda.html";
+                else agregar(libro);
+            });
             info.appendChild(boton);
             tarjeta.append(marco, info);
             grid.appendChild(tarjeta);
@@ -161,7 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function renderizarCarrito() {
         badge.textContent = obtenerCantidadArticulos(carrito);
-        total.textContent = formatearMonedaRD(obtenerMontoTotal(carrito));
+        total.textContent = formatearMonedaRD(calcularTotalCarrito());
         cuerpo.replaceChildren();
         if (!carrito.length) {
             cuerpo.appendChild(texto("p", "Tu carrito está vacío.", "empty-cart-msg"));
@@ -219,11 +257,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     precio.addEventListener("input", renderizarCatalogo);
 
     try {
+        if (!window.libreriaSupabase) throw new Error("Supabase no está configurado.");
         const sesion = await window.obtenerSesionLibreria();
-        if (!sesion?.user) return;
+        usuarioActual = sesion?.user || null;
         await cargarCatalogo();
-        await obtenerCarrito(sesion.user.id);
         renderizarCatalogo();
+        if (!usuarioActual) {
+            abrir.hidden = true;
+            return;
+        }
+        await obtenerCarrito(usuarioActual.id);
         renderizarCarrito();
         checkout = window.crearCheckout({
             obtenerCarrito: () => carrito,

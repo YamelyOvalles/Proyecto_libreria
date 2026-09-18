@@ -1,7 +1,4 @@
-/**
- * Librería Quisqueya - Funcionalidades Globales de Navegación (Fase 2)
- * Maneja el menú responsivo, cierre de sesión y la adaptación del menú según el rol.
- */
+/** Navegación, cuenta y cierre de sesión. */
 
 document.addEventListener("DOMContentLoaded", () => {
     // Control del menú responsivo.
@@ -37,12 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Adapta la navegación al rol autenticado.
     function agregarAccesoAdministrativo(rol) {
         const navList = document.querySelector(".nav-list");
-        if (rol === "administrador" && navList && !navList.querySelector('[href="admin.html"]')) {
+        if (document.body.classList.contains("admin-page")) return;
+        if (["administrador", "empleado"].includes(rol) && navList && !navList.querySelector('[href="admin.html"]')) {
             const item = document.createElement("li");
             const enlace = document.createElement("a");
             enlace.className = "nav-link nav-link-admin";
             enlace.href = "admin.html";
-            enlace.textContent = "Panel Admin";
+            enlace.textContent = "Panel de gestión";
             item.appendChild(enlace);
             navList.insertBefore(item, navList.lastElementChild);
         }
@@ -115,15 +113,36 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        const nombreRol = rol === "administrador" ? "Administrador" : "Cliente";
+        const nombresRol = { administrador: "Administrador", empleado: "Empleado", cliente: "Cliente" };
+        const nombreRol = nombresRol[rol] || "Cliente";
         itemCerrarSesion.querySelector("[data-account-initial]").textContent = nombre.charAt(0).toUpperCase();
         itemCerrarSesion.querySelector("[data-account-name]").textContent = nombre;
         itemCerrarSesion.querySelector("[data-account-full-name]").textContent = `${nombre} · ${nombreRol}`;
         itemCerrarSesion.querySelector("[data-account-email]").textContent = usuario.email;
     }
 
-    document.addEventListener("libreria:auth-lista", evento => mostrarUsuarioAutenticado(evento.detail));
-    mostrarUsuarioAutenticado(window.libreriaSesion);
+    function mostrarNavegacionInvitado() {
+        const itemCuenta = document.querySelector("[data-logout]")?.closest("li");
+        if (!itemCuenta) return;
+        const acceso = document.createElement("a");
+        const registro = document.createElement("a");
+        acceso.className = "nav-link";
+        acceso.href = "login.html";
+        acceso.textContent = "Iniciar sesión";
+        registro.className = "button button-primary nav-register";
+        registro.href = "login.html?registro=1";
+        registro.textContent = "Registrarse";
+        itemCuenta.className = "guest-actions";
+        itemCuenta.replaceChildren(acceso, registro);
+    }
+
+    function actualizarCuenta(sesion) {
+        if (sesion?.usuario) mostrarUsuarioAutenticado(sesion);
+        else mostrarNavegacionInvitado();
+    }
+
+    document.addEventListener("libreria:auth-lista", evento => actualizarCuenta(evento.detail));
+    if (window.libreriaAuthResuelta) actualizarCuenta(window.libreriaSesion);
 
     // Controla el cierre de sesión.
     document.querySelectorAll("[data-logout]").forEach(function (button) {
@@ -137,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.libreriaSesion = null;
                 window.libreriaUsuario = null;
                 window.libreriaRol = null;
-                window.location.replace("index.html");
+                window.location.replace("informacion.html");
             }
         });
     });

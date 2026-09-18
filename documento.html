@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Documento | Librería Quisqueya</title>
+    <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
+    <link rel="stylesheet" href="css/documento.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/documento.js" defer></script>
+</head>
+<body>
+    <div class="document-toolbar no-print">
+        <a id="document-back" href="tienda.html">Volver</a>
+        <p id="document-help">Usa “Guardar como PDF” en el diálogo de impresión para descargarlo.</p>
+        <button id="document-print" type="button">Imprimir o guardar PDF</button>
+    </div>
+
+    <main id="document-page" class="document-page" hidden>
+        <header class="document-brand">
+            <div class="brand-identity">
+                <img id="document-logo" src="assets/logo-quisqueya-profesional.png" alt="Logo de Librería Quisqueya">
+                <div><strong id="business-name">Librería Quisqueya</strong><span id="business-tagline"></span></div>
+            </div>
+            <address id="business-contact"></address>
+        </header>
+
+        <section class="document-heading">
+            <div><span id="document-type">Documento</span><strong id="document-number"></strong></div>
+            <dl id="document-dates"></dl>
+        </section>
+
+        <section class="document-meta">
+            <div class="meta-card"><h2>Cliente</h2><dl id="client-data"></dl></div>
+            <div class="meta-card"><h2>Información</h2><dl id="sale-data"></dl></div>
+        </section>
+
+        <table class="items-table">
+            <thead><tr><th>Cant.</th><th>Descripción</th><th>Precio unitario</th><th>Desc.</th><th>Total</th></tr></thead>
+            <tbody id="document-items"></tbody>
+        </table>
+
+        <section class="document-summary">
+            <div id="document-texts" class="document-texts"></div>
+            <dl id="document-totals" class="totals"></dl>
+        </section>
+
+        <section class="signatures">
+            <div><span></span><strong>Preparado por</strong></div>
+            <div><span></span><strong>Aprobado / recibido por</strong></div>
+        </section>
+
+        <footer><span id="footer-business"></span><span id="footer-contact"></span></footer>
+    </main>
+
+    <section id="document-error" class="document-error no-print" hidden>
+        <h1>No se pudo abrir el documento</h1>
+        <p id="document-error-text">Verifica tu sesión y vuelve a intentarlo.</p>
+        <a id="document-error-back" href="tienda.html">Volver</a>
+    </section>
+</body>
+</html>

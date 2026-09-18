@@ -3,219 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Panel de administración y gestión operativa de pedidos de Librería Quisqueya">
-    <title>Panel Operativo de Pedidos | Librería Quisqueya</title>
-    <!-- Estilos externos principales con selectores de etiqueta, clase e ID -->
+    <meta name="description" content="Panel administrativo de Librería Quisqueya">
+    <title>Administración | Librería Quisqueya</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
     <link rel="icon" type="image/png" href="assets/logo-quisqueya-icono.png">
-    <!-- Protección por rol: solo accesible si el usuario ha iniciado sesión como administrador -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js" defer></script>
     <script src="js/funciones.js" defer></script>
-    <script src="js/admin.js" defer></script>
+    <script src="js/admin.js?v=20260917-3" defer></script>
 </head>
-<body>
-    <!-- Encabezado corporativo institucional -->
-    <header class="site-header">
+<body class="admin-page">
+    <header class="site-header admin-topbar">
         <div class="header-container">
             <a class="brand" href="admin.html">
-                <img class="brand-logo" src="assets/logo-quisqueya-icono.png" alt="Logo de Librería Quisqueya">
+                <img class="brand-logo" src="assets/logo-quisqueya-icono.png" alt="">
                 <span class="brand-name">Librería Quisqueya</span>
             </a>
-
-            <!-- Distintivo de rol operativo -->
-            <span class="admin-badge" title="Sesión con privilegios de gestión">
-                <svg class="svg-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true" style="width: 15px; height: 15px;"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
-                Dueño / Administrador
-            </span>
-
             <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú">
                 <span></span><span></span><span></span>
             </button>
-
-            <!-- Menú de navegación principal con selector de ID (#main-nav) -->
-            <nav id="main-nav" class="site-nav" aria-label="Navegación administrativa">
+            <nav id="main-nav" class="site-nav" aria-label="Opciones de cuenta">
                 <ul class="nav-list">
-                    <li><a class="nav-link active" aria-current="page" href="admin.html">Gestión de Pedidos</a></li>
-                    <li><a class="nav-link" href="tienda.html">Ver Tienda</a></li>
-                    <li><a class="nav-link" href="informacion.html">Información</a></li>
-                    <li><a class="nav-link" href="formulario.html">Contacto</a></li>
+                    <li><a class="nav-link" href="tienda.html">Ver tienda</a></li>
                     <li><button class="logout-button" type="button" data-logout>Cerrar sesión</button></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main class="page-container content-section">
-        <!-- Título principal y descripción de la vista operativa -->
-        <div class="section-heading section-heading-left">
-            <p class="eyebrow">Módulo de Operaciones</p>
-            <h1>Recepción y Control de Pedidos</h1>
-            <p>Monitoreo en tiempo real de las compras efectuadas en la librería, actualización del estado de despacho y resumen financiero.</p>
-        </div>
-        <p id="admin-feedback" class="form-message" role="alert" aria-live="polite"></p>
+    <div class="admin-shell">
+        <aside class="admin-sidebar" aria-label="Módulos administrativos">
+            <p class="admin-sidebar-label">Administración</p>
+            <nav class="admin-module-nav">
+                <button class="admin-module-link active" type="button" data-admin-view="dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3v10Zm0 8h8v-6H3v6Zm10 0h8V11h-8v10Zm0-18v6h8V3h-8Z"/></svg>Dashboard</button>
+                <button class="admin-module-link" type="button" data-admin-view="productos" data-admin-only><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8V7l-3-2-2-3H8L6 5 3 7v1h18ZM5 10v10h14V10h-2v8h-4v-8H5Z"/></svg>Productos</button>
+                <button class="admin-module-link" type="button" data-admin-view="inventario"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 4-9 4-9-4 9-4ZM3 10l9 4 9-4v8l-9 4-9-4v-8Z"/></svg>Inventario</button>
+                <button class="admin-module-link" type="button" data-admin-view="pedidos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10v2h3v18H4V4h3V2Zm2 4H6v14h12V6h-3v2H9V6Zm2-2v2h2V4h-2Z"/></svg>Pedidos</button>
+                <button class="admin-module-link" type="button" data-admin-view="mensajes" data-admin-only><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h16a2 2 0 0 0 2-2V6c0-1.1-.9-2-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z"/></svg>Mensajes <span id="messages-count" class="nav-count" hidden>0</span></button>
+                <button class="admin-module-link" type="button" data-admin-view="usuarios" data-admin-only><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3ZM8 11c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></svg>Usuarios</button>
+                <button class="admin-module-link" type="button" data-admin-view="configuracion" data-admin-only><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.03-.66-.08-.98l2.11-1.65-2-3.46-2.49 1a7.2 7.2 0 0 0-1.69-.98L15 3.27h-4l-.35 2.66c-.61.25-1.17.58-1.69.98l-2.49-1-2 3.46 2.11 1.65c-.05.32-.08.66-.08.98s.03.66.08.98l-2.11 1.65 2 3.46 2.49-1c.52.4 1.08.73 1.69.98L11 20.73h4l.35-2.66c.61-.25 1.17-.58 1.69-.98l2.49 1 2-3.46-2.1-1.65ZM13 15.5A3.5 3.5 0 1 1 13 8a3.5 3.5 0 0 1 0 7.5Z"/></svg>Configuración</button>
+            </nav>
+        </aside>
 
-        <!-- Tarjetas de métricas calculadas en funciones.js. -->
-        <section id="admin-stats" class="stats-grid" aria-label="Métricas del sistema">
-            <article class="stat-card">
-                <span class="stat-label">Total de Pedidos</span>
-                <span id="metric-total-orders" class="stat-value">0</span>
-                <span class="stat-desc">Órdenes registradas</span>
-            </article>
+        <main class="admin-content">
+            <p id="admin-feedback" class="admin-notice" role="status" aria-live="polite" hidden></p>
 
-            <article class="stat-card">
-                <span class="stat-label">Facturación Bruta</span>
-                <span id="metric-total-revenue" class="stat-value">RD$ 0.00</span>
-                <span class="stat-desc">Ventas acumuladas</span>
-            </article>
-
-            <article class="stat-card">
-                <span class="stat-label">Pedidos Pendientes</span>
-                <span id="metric-pending-orders" class="stat-value">0</span>
-                <span class="stat-desc">Por procesar o enviar</span>
-            </article>
-
-            <article class="stat-card">
-                <span class="stat-label">Libros Despachados</span>
-                <span id="metric-total-units" class="stat-value">0</span>
-                <span class="stat-desc">Unidades totales</span>
-            </article>
-        </section>
-
-        <!-- Búsqueda y filtros de pedidos. -->
-        <div class="admin-toolbar">
-            <div class="admin-filter-group">
-                <label for="admin-search-input" style="font-weight: 700; margin-bottom: 0;">Buscar pedido:</label>
-                <input type="search" id="admin-search-input" placeholder="N° de pedido, correo o cliente...">
-            </div>
-
-            <div class="admin-filter-group">
-                <label for="admin-status-filter" style="font-weight: 700; margin-bottom: 0;">Filtrar por estado:</label>
-                <select id="admin-status-filter">
-                    <option value="todos">Todos los estados</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="confirmado">Confirmado</option>
-                    <option value="procesando">Procesando</option>
-                    <option value="listo_retiro">Listo para retiro</option>
-                    <option value="enviado">Enviado</option>
-                    <option value="entregado">Entregado</option>
-                    <option value="cancelado">Cancelado</option>
-                </select>
-                <button type="button" id="admin-refresh-btn" class="icon-button icon-button-refresh" aria-label="Actualizar pedidos" title="Actualizar pedidos">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 16.2 7.8L13 11h8V3l-3.35 3.35Z"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Tabla semántica de pedidos. -->
-        <div class="table-responsive orders-table-wrap">
-            <table id="orders-table" class="data-table">
-                <caption>Registro detallado de órdenes recibidas en la librería</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">N° Pedido</th>
-                        <th scope="col">Fecha y Hora</th>
-                        <th scope="col">Cliente / Correo</th>
-                        <th scope="col">Detalle de Libros</th>
-                        <th scope="col">Total Facturado</th>
-                        <th scope="col">Estados</th>
-                        <th scope="col">Actualizar</th>
-                    </tr>
-                </thead>
-                <tbody id="orders-table-body">
-                    <!-- Los pedidos se renderizan dinámicamente desde js/admin.js -->
-                </tbody>
-            </table>
-        </div>
-
-        <section class="crud-section" aria-labelledby="books-admin-title">
-            <div class="section-heading section-heading-left">
-                <p class="eyebrow">CRUD de entidad principal</p>
-                <h2 id="books-admin-title">Administración de libros</h2>
-                <p>Crea, consulta, actualiza y elimina libros del catálogo.</p>
-            </div>
-
-            <form id="book-form" class="crud-form">
-                <input type="hidden" id="book-id">
-                <div class="crud-form-grid">
-                    <div class="form-group">
-                        <label for="book-isbn">ISBN</label>
-                        <input type="text" id="book-isbn" maxlength="32" placeholder="978-0000000000">
-                    </div>
-                    <div class="form-group">
-                        <label for="book-title">Título *</label>
-                        <input type="text" id="book-title" maxlength="200" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="book-author">Autor *</label>
-                        <input type="text" id="book-author" maxlength="160" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="book-price">Precio (RD$) *</label>
-                        <input type="number" id="book-price" min="0" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="book-stock">Existencia *</label>
-                        <input type="number" id="book-stock" min="0" step="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="book-format">Formato *</label>
-                        <select id="book-format" required>
-                            <option value="fisico">Físico</option>
-                            <option value="digital">Digital</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="book-language">Idioma *</label>
-                        <input type="text" id="book-language" maxlength="80" value="Español" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="book-image">Ruta o URL de portada</label>
-                        <input type="text" id="book-image" maxlength="500" placeholder="assets/portadas/libro.jpg">
-                    </div>
-                    <div class="form-group crud-field-wide">
-                        <label for="book-description">Descripción</label>
-                        <textarea id="book-description" rows="3" maxlength="2000"></textarea>
-                    </div>
+            <section class="admin-view active" data-view="dashboard" aria-labelledby="dashboard-title">
+                <div class="admin-view-heading">
+                    <div><p class="eyebrow">Resumen general</p><h1 id="dashboard-title">Dashboard</h1><p>Estado actual de ventas, pedidos y existencias.</p></div>
+                    <button class="icon-button" id="dashboard-refresh" type="button" aria-label="Actualizar dashboard" title="Actualizar dashboard"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 16.2 7.8L13 11h8V3l-3.35 3.35Z"/></svg></button>
                 </div>
-                <label class="checkbox-row">
-                    <input type="checkbox" id="book-active" checked>
-                    Libro visible y disponible en el catálogo
-                </label>
-                <div class="crud-form-actions">
-                    <button type="submit" id="book-save-btn" class="button button-primary">Guardar libro</button>
-                    <button type="button" id="book-cancel-btn" class="button button-secondary" hidden>Cancelar edición</button>
+                <div class="dashboard-grid" id="admin-stats">
+                    <article class="metric-card"><span>Pedidos</span><strong id="metric-total-orders">0</strong><small>Total registrado</small></article>
+                    <article class="metric-card"><span>Pendientes</span><strong id="metric-pending-orders">0</strong><small>Requieren atención</small></article>
+                    <article class="metric-card"><span>Ventas realizadas</span><strong id="metric-total-sales">0</strong><small>Pedidos entregados</small></article>
+                    <article class="metric-card"><span>Total facturado</span><strong id="metric-total-revenue">RD$ 0.00</strong><small>Pedidos pagados</small></article>
+                    <article class="metric-card"><span>Productos</span><strong id="metric-total-products">0</strong><small>Activos en catálogo</small></article>
+                    <article class="metric-card warning"><span>Stock bajo</span><strong id="metric-low-stock">0</strong><small>En nivel mínimo</small></article>
+                    <article class="metric-card danger"><span>Agotados</span><strong id="metric-out-stock">0</strong><small>Sin disponibilidad</small></article>
+                    <article class="metric-card"><span>Clientes</span><strong id="metric-total-clients">—</strong><small>Cuentas registradas</small></article>
                 </div>
-                <p id="book-feedback" class="form-message" role="status" aria-live="polite"></p>
+                <section class="admin-panel">
+                    <div class="panel-heading"><div><h2>Pedidos recientes</h2><p>Últimas operaciones registradas.</p></div></div>
+                    <div id="dashboard-recent-orders" class="compact-order-list"></div>
+                </section>
+            </section>
+
+            <section class="admin-view" data-view="productos" aria-labelledby="products-title" data-admin-only hidden>
+                <div class="admin-view-heading">
+                    <div><p class="eyebrow">Catálogo</p><h1 id="products-title">Productos</h1><p>Información comercial de los artículos de la librería.</p></div>
+                    <button class="button button-primary" id="new-product-btn" type="button">Nuevo producto</button>
+                </div>
+                <div class="admin-toolbar compact-toolbar">
+                    <label class="search-field"><span>Buscar</span><input id="product-search" type="search" placeholder="Nombre, autor o ISBN"></label>
+                    <label><span>Estado</span><select id="product-status-filter"><option value="todos">Todos</option><option value="activo">Activos</option><option value="inactivo">Inactivos</option><option value="bajo">Stock bajo</option><option value="agotado">Agotados</option></select></label>
+                </div>
+                <div class="admin-panel table-panel"><div class="responsive-table"><table class="admin-table"><thead><tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Inventario</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody id="products-table-body"></tbody></table></div></div>
+            </section>
+
+            <section class="admin-view" data-view="inventario" aria-labelledby="inventory-title" hidden>
+                <div class="admin-view-heading"><div><p class="eyebrow">Control de existencias</p><h1 id="inventory-title">Inventario</h1><p>Entradas, salidas, ajustes y trazabilidad de movimientos.</p></div></div>
+                <div class="inventory-summary">
+                    <article><span>Unidades disponibles</span><strong id="inventory-available">0</strong></article>
+                    <article><span>Unidades reservadas</span><strong id="inventory-reserved">0</strong></article>
+                    <article><span>Alertas de stock</span><strong id="inventory-alerts">0</strong></article>
+                </div>
+                <div class="inventory-layout">
+                    <form id="inventory-form" class="admin-panel admin-form">
+                        <div class="panel-heading"><div><h2>Registrar movimiento</h2><p>Los cambios quedan asociados a tu usuario.</p></div></div>
+                        <label>Producto<select id="inventory-product" required></select></label>
+                        <div class="form-row two-columns">
+                            <label>Movimiento<select id="inventory-type" required><option value="entrada">Entrada</option><option value="salida">Salida</option><option value="ajuste">Conteo físico</option></select></label>
+                            <label><span id="inventory-quantity-label">Cantidad</span><input id="inventory-quantity" type="number" min="1" step="1" required></label>
+                        </div>
+                        <label>Motivo<textarea id="inventory-reason" rows="3" maxlength="300" required></textarea></label>
+                        <button class="button button-primary" type="submit">Guardar movimiento</button>
+                    </form>
+                    <section class="admin-panel table-panel">
+                        <div class="panel-heading"><div><h2>Historial reciente</h2><p>Últimos movimientos de inventario.</p></div></div>
+                        <div class="responsive-table"><table class="admin-table inventory-history-table"><thead><tr><th>Fecha</th><th>Producto</th><th>Tipo</th><th>Cambio</th><th>Motivo</th><th>Responsable</th></tr></thead><tbody id="inventory-history-body"></tbody></table></div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="admin-view" data-view="pedidos" aria-labelledby="orders-title" hidden>
+                <div class="admin-view-heading">
+                    <div><p class="eyebrow">Operaciones</p><h1 id="orders-title">Pedidos</h1><p>Resumen de pedidos y acceso a sus detalles.</p></div>
+                    <button class="icon-button" id="orders-refresh" type="button" aria-label="Actualizar pedidos" title="Actualizar pedidos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 16.2 7.8L13 11h8V3l-3.35 3.35Z"/></svg></button>
+                </div>
+                <div class="admin-toolbar compact-toolbar">
+                    <label class="search-field"><span>Buscar</span><input id="order-search" type="search" placeholder="Número, cliente o correo"></label>
+                    <label><span>Estado</span><select id="order-status-filter"><option value="todos">Todos</option><option value="pendiente">Pendiente</option><option value="confirmado">Confirmado</option><option value="procesando">Procesando</option><option value="listo_retiro">Listo para retiro</option><option value="enviado">Enviado</option><option value="entregado">Entregado</option><option value="cancelado">Cancelado</option><option value="devuelto">Devuelto</option></select></label>
+                </div>
+                <div id="orders-list" class="orders-card-list"></div>
+            </section>
+
+            <section class="admin-view" data-view="mensajes" aria-labelledby="messages-title" data-admin-only hidden>
+                <div class="admin-view-heading">
+                    <div><p class="eyebrow">Atención al cliente</p><h1 id="messages-title">Mensajes</h1><p>Consultas recibidas desde el formulario de contacto.</p></div>
+                    <button class="icon-button" id="messages-refresh" type="button" aria-label="Actualizar mensajes" title="Actualizar mensajes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 16.2 7.8L13 11h8V3l-3.35 3.35Z"/></svg></button>
+                </div>
+                <div class="admin-toolbar compact-toolbar">
+                    <label class="search-field"><span>Buscar</span><input id="message-search" type="search" placeholder="Cliente, correo o asunto"></label>
+                    <label><span>Estado</span><select id="message-status-filter"><option value="todos">Todos</option><option value="pendiente">Pendientes</option><option value="leido">Leídos</option><option value="respondido">Respondidos</option><option value="archivado">Archivados</option></select></label>
+                </div>
+                <div class="admin-panel table-panel"><div class="responsive-table"><table class="admin-table messages-table"><thead><tr><th>Cliente</th><th>Correo</th><th>Asunto</th><th>Fecha</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody id="messages-table-body"></tbody></table></div></div>
+            </section>
+
+            <section class="admin-view" data-view="usuarios" aria-labelledby="users-title" data-admin-only hidden>
+                <div class="admin-view-heading">
+                    <div><p class="eyebrow">Accesos y permisos</p><h1 id="users-title">Usuarios</h1><p>Administra perfiles, estado y rol de acceso.</p></div>
+                    <button class="button button-primary" id="new-user-btn" type="button">Nuevo usuario</button>
+                </div>
+                <div class="admin-toolbar compact-toolbar">
+                    <label class="search-field"><span>Buscar</span><input id="user-search" type="search" placeholder="Nombre o correo"></label>
+                    <label><span>Rol</span><select id="user-role-filter"><option value="todos">Todos</option><option value="administrador">Administradores</option><option value="empleado">Empleados</option><option value="cliente">Clientes</option></select></label>
+                </div>
+                <div class="admin-panel table-panel"><div class="responsive-table"><table class="admin-table"><thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th><th>Registro</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody id="users-table-body"></tbody></table></div></div>
+            </section>
+
+            <section class="admin-view" data-view="configuracion" aria-labelledby="settings-title" data-admin-only hidden>
+                <div class="admin-view-heading"><div><p class="eyebrow">Sistema</p><h1 id="settings-title">Configuración</h1><p>Datos del negocio, documentos y opciones del catálogo.</p></div></div>
+                <form id="business-settings-form" class="document-settings">
+                    <div class="settings-tabs" role="tablist" aria-label="Secciones de configuración">
+                        <button class="active" type="button" role="tab" aria-selected="true" data-settings-tab="empresa">Empresa</button>
+                        <button type="button" role="tab" aria-selected="false" data-settings-tab="cotizaciones">Cotizaciones</button>
+                        <button type="button" role="tab" aria-selected="false" data-settings-tab="facturacion">Facturación</button>
+                    </div>
+                    <section class="admin-panel settings-card" data-settings-panel="empresa">
+                        <div class="panel-heading"><div><h2>Datos del negocio</h2><p>Se copiarán en cada documento al momento de emitirlo.</p></div></div>
+                        <div class="settings-fields">
+                            <label>Nombre comercial *<input id="setting-business-name" type="text" maxlength="160" required></label>
+                            <label>Razón social *<input id="setting-legal-name" type="text" maxlength="160" required></label>
+                            <label>RNC<input id="setting-rnc" type="text" maxlength="30"></label>
+                            <label>Teléfono<input id="setting-phone" type="tel" maxlength="30"></label>
+                            <label>Correo<input id="setting-email" type="email" maxlength="180"></label>
+                            <label>Sitio web<input id="setting-website" type="url" maxlength="240"></label>
+                            <label class="settings-wide">Dirección<input id="setting-address" type="text" maxlength="260"></label>
+                            <label>Ciudad<input id="setting-city" type="text" maxlength="100"></label>
+                            <label>Provincia<input id="setting-province" type="text" maxlength="100"></label>
+                            <label>País<input id="setting-country" type="text" maxlength="100"></label>
+                            <label>Atendido por defecto<input id="setting-attendant" type="text" maxlength="160"></label>
+                            <label class="settings-wide">Eslogan<input id="setting-tagline" type="text" maxlength="220"></label>
+                            <label class="settings-wide">Ruta del logo<input id="setting-logo" type="text" maxlength="300" placeholder="assets/logo-quisqueya-profesional.png"></label>
+                        </div>
+                    </section>
+                    <section class="admin-panel settings-card" data-settings-panel="cotizaciones" hidden>
+                        <div class="panel-heading"><div><h2>Cotizaciones</h2><p>Numeración, vigencia y textos predeterminados.</p></div></div>
+                        <div class="settings-fields">
+                            <label>Prefijo *<input id="setting-quote-prefix" type="text" pattern="[A-Za-z0-9]{2,8}" maxlength="8" required></label>
+                            <label>Validez en días *<input id="setting-quote-validity" type="number" min="1" max="365" required></label>
+                            <label>Tiempo de entrega<input id="setting-quote-delivery" type="text" maxlength="160"></label>
+                            <label>ITBIS (%)<input id="setting-quote-tax" type="number" min="0" max="100" step="0.01"></label>
+                            <label class="checkbox-row settings-wide"><input id="setting-quote-show-tax" type="checkbox"> Mostrar ITBIS incluido</label>
+                            <label class="settings-wide">Condiciones<textarea id="setting-quote-terms" rows="3" maxlength="1200"></textarea></label>
+                            <label class="settings-wide">Notas<textarea id="setting-quote-notes" rows="3" maxlength="1200"></textarea></label>
+                        </div>
+                    </section>
+                    <section class="admin-panel settings-card" data-settings-panel="facturacion" hidden>
+                        <div class="panel-heading"><div><h2>Facturación</h2><p>El NCF se solicita al emitir cada factura y nunca se inventa.</p></div></div>
+                        <div class="settings-fields">
+                            <label>Prefijo *<input id="setting-invoice-prefix" type="text" pattern="[A-Za-z0-9]{2,8}" maxlength="8" required></label>
+                            <label>Condición predeterminada<select id="setting-invoice-condition"><option value="contado">Contado</option><option value="credito">Crédito</option></select></label>
+                            <label>Días de crédito<input id="setting-credit-days" type="number" min="1" max="365"></label>
+                            <label>ITBIS (%)<input id="setting-invoice-tax" type="number" min="0" max="100" step="0.01"></label>
+                            <label class="checkbox-row settings-wide"><input id="setting-invoice-show-tax" type="checkbox"> Mostrar ITBIS incluido</label>
+                            <label class="settings-wide">Condiciones<textarea id="setting-invoice-terms" rows="3" maxlength="1200"></textarea></label>
+                            <label class="settings-wide">Notas<textarea id="setting-invoice-notes" rows="3" maxlength="1200"></textarea></label>
+                        </div>
+                    </section>
+                    <div class="settings-save-bar"><button class="button button-primary" id="business-settings-save" type="submit">Guardar configuración</button></div>
+                </form>
+                <div class="settings-section-heading"><h2>Categorías de productos</h2><p>Opciones disponibles al crear o editar libros.</p></div>
+                <div class="settings-layout">
+                    <form id="category-form" class="admin-panel admin-form">
+                        <div class="panel-heading"><div><h2 id="category-form-title">Nueva categoría</h2><p>Las categorías activas aparecerán al crear productos.</p></div></div>
+                        <input id="category-id" type="hidden">
+                        <label>Nombre<input id="category-name" type="text" maxlength="100" required></label>
+                        <label class="checkbox-row"><input id="category-active" type="checkbox" checked> Categoría activa</label>
+                        <div class="form-actions"><button class="button button-secondary" id="category-cancel" type="button" hidden>Cancelar</button><button class="button button-primary" type="submit">Guardar categoría</button></div>
+                    </form>
+                    <section class="admin-panel table-panel">
+                        <div class="panel-heading"><div><h2>Categorías</h2><p>Listado disponible para organizar el catálogo.</p></div></div>
+                        <div class="responsive-table"><table class="admin-table"><thead><tr><th>Nombre</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody id="categories-table-body"></tbody></table></div>
+                    </section>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <dialog id="product-dialog" class="admin-dialog">
+        <form id="product-form" method="dialog" class="dialog-card">
+            <div class="dialog-heading"><div><p class="eyebrow">Catálogo</p><h2 id="product-dialog-title">Nuevo producto</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Cerrar">×</button></div>
+            <input type="hidden" id="product-id">
+            <div class="dialog-grid">
+                <label>Nombre *<input id="product-title" type="text" maxlength="200" required></label>
+                <label>Autor<input id="product-author" type="text" maxlength="160"></label>
+                <label>ISBN o código<input id="product-isbn" type="text" maxlength="32"></label>
+                <label>Categoría<select id="product-category"><option value="">Sin categoría</option></select></label>
+                <label>Editorial<input id="product-publisher" type="text" maxlength="160"></label>
+                <label>Precio (RD$) *<input id="product-price" type="number" min="0" step="0.01" required></label>
+                <label>Descuento (%)<input id="product-discount" type="number" min="0" max="100" step="0.01" value="0"></label>
+                <label id="initial-stock-field">Inventario inicial *<input id="product-stock" type="number" min="0" step="1" value="0" required></label>
+                <label>Stock mínimo *<input id="product-min-stock" type="number" min="0" step="1" value="5" required></label>
+                <label>Formato *<select id="product-format" required><option value="fisico">Físico</option><option value="digital">Digital</option></select></label>
+                <label>Idioma *<input id="product-language" type="text" value="Español" maxlength="80" required></label>
+                <div class="dialog-field-wide cover-upload-field">
+                    <label>Portada del producto<input id="product-image-file" type="file" accept="image/jpeg,image/png,image/webp"></label>
+                    <input id="product-image" type="hidden">
+                    <div class="cover-preview"><img id="product-image-preview" alt="Vista previa de la portada" hidden><span id="product-image-help">JPG, PNG o WebP. Máximo 5 MB.</span></div>
+                </div>
+                <label class="dialog-field-wide">Descripción<textarea id="product-description" rows="4" maxlength="2000"></textarea></label>
+            </div>
+            <label class="checkbox-row"><input id="product-active" type="checkbox" checked> Visible en el catálogo</label>
+            <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog>Cancelar</button><button class="button button-primary" id="product-save-btn" type="submit">Guardar producto</button></div>
+        </form>
+    </dialog>
+
+    <dialog id="order-dialog" class="admin-dialog wide-dialog">
+        <div class="dialog-card">
+            <div class="dialog-heading"><div><p class="eyebrow">Detalle del pedido</p><h2 id="order-dialog-title">Pedido</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Cerrar">×</button></div>
+            <div id="order-detail-content"></div>
+            <div id="order-document-actions" class="document-actions" aria-label="Documentos del pedido"></div>
+            <form id="order-status-form" class="order-status-form">
+                <input type="hidden" id="order-detail-id">
+                <label>Estado del pedido<select id="order-detail-status"></select></label>
+                <label>Estado del pago<select id="order-detail-payment"></select></label>
+                <button class="button button-primary" type="submit">Guardar cambios</button>
             </form>
+        </div>
+    </dialog>
 
-            <div class="table-responsive">
-                <table id="books-table" class="data-table">
-                    <caption>Libros almacenados en la base de datos</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">ISBN</th>
-                            <th scope="col">Libro / Autor</th>
-                            <th scope="col">Precio</th>
-                            <th scope="col">Inventario</th>
-                            <th scope="col">Estado</th>
-                            <th scope="col">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="books-table-body"></tbody>
-                </table>
+    <dialog id="invoice-dialog" class="admin-dialog">
+        <form id="invoice-form" class="dialog-card">
+            <div class="dialog-heading"><div><p class="eyebrow">Documento fiscal</p><h2>Generar factura</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Cerrar">×</button></div>
+            <p class="dialog-help">La factura conservará una copia de los datos actuales del pedido y del negocio.</p>
+            <label>NCF opcional<input id="invoice-ncf" type="text" maxlength="30" placeholder="Escríbelo solo si corresponde"></label>
+            <div class="dialog-grid">
+                <label>Condición de pago<select id="invoice-condition"><option value="contado">Contado</option><option value="credito">Crédito</option></select></label>
+                <label id="invoice-due-field" hidden>Fecha de vencimiento<input id="invoice-due-date" type="date"></label>
+                <label class="dialog-field-wide">Notas para esta factura<textarea id="invoice-notes" rows="3" maxlength="1200"></textarea></label>
             </div>
-        </section>
-    </main>
+            <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog>Cancelar</button><button class="button button-primary" id="invoice-submit" type="submit">Generar factura</button></div>
+        </form>
+    </dialog>
 
-    <footer class="site-footer">
-        <p>&copy; 2026 Librería Quisqueya · Panel Operativo de Administración</p>
-    </footer>
+    <dialog id="message-dialog" class="admin-dialog">
+        <div class="dialog-card">
+            <div class="dialog-heading"><div><p class="eyebrow">Mensaje de contacto</p><h2 id="message-dialog-title">Detalle</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Cerrar">×</button></div>
+            <div id="message-detail" class="message-detail"></div>
+            <form id="message-status-form" class="message-status-form">
+                <label>Estado<select id="message-detail-status"><option value="pendiente">Pendiente</option><option value="leido">Leído</option><option value="respondido">Respondido</option><option value="archivado">Archivado</option></select></label>
+                <div class="dialog-actions">
+                    <button class="button button-primary" id="message-save-btn" type="submit">Guardar estado</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <dialog id="user-dialog" class="admin-dialog">
+        <form id="user-form" method="dialog" class="dialog-card">
+            <div class="dialog-heading"><div><p class="eyebrow">Cuenta</p><h2 id="user-dialog-title">Editar usuario</h2></div><button class="dialog-close" type="button" data-close-dialog aria-label="Cerrar">×</button></div>
+            <input type="hidden" id="user-id">
+            <div id="new-user-fields"><label>Correo *<input id="user-email" type="email" autocomplete="off"></label><label>Contraseña temporal *<input id="user-password" type="password" minlength="8" autocomplete="new-password"></label></div>
+            <div class="dialog-grid">
+                <label>Nombres *<input id="user-first-name" type="text" maxlength="120" required></label>
+                <label>Apellidos<input id="user-last-name" type="text" maxlength="120"></label>
+                <label>Rol *<select id="user-role" required><option value="cliente">Cliente</option><option value="empleado">Empleado</option><option value="administrador">Administrador</option></select></label>
+            </div>
+            <label class="checkbox-row"><input id="user-active" type="checkbox" checked> Usuario activo</label>
+            <div class="dialog-actions"><button class="button button-secondary" type="button" data-close-dialog>Cancelar</button><button class="button button-primary" id="user-save-btn" type="submit">Guardar usuario</button></div>
+        </form>
+    </dialog>
+
+    <footer class="site-footer"><p>&copy; 2026 Librería Quisqueya · Administración</p></footer>
 </body>
 </html>
-
