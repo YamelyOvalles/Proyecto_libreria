@@ -44,6 +44,61 @@ Deno.serve(async (solicitud) => {
   const datos = await solicitud.json().catch(() => null);
   const accion = String(datos?.accion || "crear");
 
+  if (accion === "eliminar_producto") {
+    const productoId = Number(datos?.producto_id);
+    if (!Number.isSafeInteger(productoId) || productoId <= 0) {
+      return responder({ error: "Producto requerido." }, 400);
+    }
+
+    const { count: ventas, error: errorVentas } = await supabase
+      .from("pedido_detalles")
+      .select("libro_id", { count: "exact", head: true })
+      .eq("libro_id", productoId);
+    if (errorVentas) {
+      console.error("No se pudo verificar el historial del producto:", errorVentas);
+      return responder({
+        error: `No se pudo verificar el historial de ventas del producto: ${errorVentas.message}`
+      }, 500);
+    }
+    if (Number(ventas || 0) > 0) {
+      return responder({
+        error: "Este producto tiene ventas registradas y no se puede eliminar sin dañar el historial. Puedes dejarlo inactivo."
+      }, 409);
+    }
+
+    // Estas relaciones no son historial comercial y algunas instalaciones antiguas
+    // no tienen configurado ON DELETE CASCADE en todas ellas.
+    const dependencias = [
+      "carrito_detalles",
+      "movimientos_inventario",
+      "inventarios",
+      "libro_autor",
+    ];
+    for (const tabla of dependencias) {
+      const { error: errorDependencia } = await supabase
+        .from(tabla)
+        .delete()
+        .eq("libro_id", productoId);
+      if (errorDependencia) {
+        console.error(`No se pudo limpiar ${tabla}:`, errorDependencia);
+        return responder({
+          error: `No se pudo limpiar la información relacionada del producto: ${errorDependencia.message}`
+        }, 500);
+      }
+    }
+
+    const { data: productoEliminado, error: errorProducto } = await supabase
+      .from("libros")
+      .delete()
+      .eq("id", productoId)
+      .select("id")
+      .maybeSingle();
+    if (errorProducto) return responder({ error: errorProducto.message }, 400);
+    if (!productoEliminado) return responder({ error: "Producto no encontrado." }, 404);
+
+    return responder({ id: productoId, eliminado: true });
+  }
+
   if (accion === "eliminar") {
     // Conserva cuentas que ya tienen actividad comercial registrada.
     const usuarioId = String(datos?.usuario_id || "").trim();
@@ -68,7 +123,27 @@ Deno.serve(async (solicitud) => {
     }
 
     const { error: errorEliminacion } = await supabase.auth.admin.deleteUser(usuarioId);
-    if (errorEliminacion) return responder({ error: errorEliminacion.message }, 400);
+    if (errorEliminacion) {
+      const cuentaNoEncontrada = errorEliminacion.status === 404 ||
+        errorEliminacion.code === "user_not_found" ||
+        errorEliminacion.message.toLowerCase().includes("user not found");
+
+      if (!cuentaNoEncontrada) {
+        return responder({ error: errorEliminacion.message }, 400);
+      }
+
+      // La cuenta de Auth ya no existe, pero una instalación desincronizada puede
+      // conservar su perfil. La verificación anterior garantiza que no tenga historial.
+      const { error: errorPerfil } = await supabase
+        .from("perfiles")
+        .delete()
+        .eq("id", usuarioId);
+      if (errorPerfil) {
+        console.error("No se pudo eliminar el perfil residual:", errorPerfil);
+        return responder({ error: "La cuenta no existe en Auth, pero no se pudo limpiar su perfil." }, 500);
+      }
+    }
+
     return responder({ id: usuarioId, eliminado: true });
   }
 

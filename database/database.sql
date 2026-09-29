@@ -1010,7 +1010,7 @@ begin
 end;
 $$;
 
--- Conserva productos con historial.
+-- Elimina productos sin ventas; los movimientos de inventario no son historial comercial.
 create or replace function public.eliminar_producto_admin(p_producto_id bigint)
 returns text
 language plpgsql
@@ -1026,17 +1026,13 @@ begin
 
     select exists (
         select 1 from public.pedido_detalles where libro_id = p_producto_id
-        union all
-        select 1 from public.movimientos_inventario where libro_id = p_producto_id
     ) into v_tiene_historial;
 
     if v_tiene_historial then
-        update public.libros set activo = false, actualizado_en = now()
-         where id = p_producto_id;
-        if not found then raise exception 'Producto no encontrado.'; end if;
-        return 'desactivado';
+        raise exception 'Este producto tiene ventas registradas y no se puede eliminar sin dañar el historial.';
     end if;
 
+    delete from public.movimientos_inventario where libro_id = p_producto_id;
     delete from public.libros where id = p_producto_id;
     if not found then raise exception 'Producto no encontrado.'; end if;
     return 'eliminado';
