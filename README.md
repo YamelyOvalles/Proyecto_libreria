@@ -63,11 +63,6 @@ La función valida internamente el token y el rol del administrador. Supabase ap
 No lo ejecutes completo sobre una base existente sin revisar primero su contenido y hacer
 un respaldo.
 
-Para actualizar una instalación existente al cálculo de precios sin ITBIS incluido,
-ejecuta una sola vez `database/20260929_itbis_adicional.sql` desde **SQL Editor**. La
-migración agrega el ITBIS al total y recalcula los pedidos, cotizaciones y facturas ya
-guardados.
-
 ## Publicación en Vercel
 
 El repositorio incluye `vercel.json`: Vercel sirve el frontend estático y ejecuta
