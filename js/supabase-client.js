@@ -68,6 +68,18 @@
 
     window.mensajeErrorSupabase = function (error, alternativo) {
         console.error(error);
+        const codigo = String(error?.code || "").toLowerCase();
+        const estado = Number(error?.status || 0);
+        const detalle = String(error?.message || "").toLowerCase();
+
+        if (codigo === "over_email_send_rate_limit" ||
+            (estado === 429 && detalle.includes("email")) ||
+            detalle.includes("email rate limit exceeded")) {
+            return "Se alcanzó el límite de correos de Supabase. Espera hasta una hora antes de intentarlo otra vez o configura un servidor SMTP propio en Supabase.";
+        }
+        if (codigo === "over_request_rate_limit" || estado === 429) {
+            return "Se hicieron demasiados intentos. Espera unos minutos antes de volver a probar.";
+        }
         if (error?.message?.includes("Failed to fetch")) {
             return "No se pudo conectar con Supabase. Revisa tu conexión y la configuración.";
         }
