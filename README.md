@@ -61,9 +61,12 @@ La función valida internamente el token y el rol del administrador. Supabase ap
 
 `database/database.sql` es el esquema de instalación para un proyecto Supabase nuevo.
 No lo ejecutes completo sobre una base existente sin revisar primero su contenido y hacer
-un respaldo. Este repositorio no incluye una migración independiente para actualizar una
-instalación existente; por eso los errores de esquema o permisos deben corregirse con una
-migración preparada para la estructura real de esa base.
+un respaldo.
+
+Para actualizar una instalación existente al cálculo de precios sin ITBIS incluido,
+ejecuta una sola vez `database/20260929_itbis_adicional.sql` desde **SQL Editor**. La
+migración agrega el ITBIS al total y recalcula los pedidos, cotizaciones y facturas ya
+guardados.
 
 ## Publicación en Vercel
 

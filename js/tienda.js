@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cerrar = document.getElementById("close-cart");
     const cuerpo = document.getElementById("cart-body");
     const badge = document.getElementById("cart-badge");
+    const subtotal = document.getElementById("cart-subtotal-price");
+    const impuesto = document.getElementById("cart-tax-price");
+    const etiquetaImpuesto = document.getElementById("cart-tax-label");
     const total = document.getElementById("cart-total-price");
 
     let libros = [];
@@ -18,6 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     let checkout = null;
     let focoAnterior = null;
     let usuarioActual = null;
+    let aplicarItbis = true;
+    let itbisPct = 18;
 
     function texto(tag, contenido, clase) {
         const nodo = document.createElement(tag);
@@ -31,12 +36,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         contador.classList.add("form-message");
     }
 
-    function calcularTotalCarrito() {
+    function calcularSubtotalCarrito() {
         return carrito.reduce((acumulado, item) => {
             const bruto = Number(item.precio_lista) * Number(item.cantidad);
             const descuento = Math.round(bruto * Number(item.descuento_pct || 0)) / 100;
             return acumulado + bruto - descuento;
         }, 0);
+    }
+
+    function calcularItbisCarrito(subtotalCarrito) {
+        if (!aplicarItbis || itbisPct <= 0) return 0;
+        return Math.round(subtotalCarrito * itbisPct) / 100;
+    }
+
+    async function cargarConfiguracionImpuestos() {
+        const { data, error } = await window.libreriaSupabase
+            .from("configuracion_negocio")
+            .select("cotizacion_mostrar_itbis,cotizacion_itbis_pct")
+            .eq("id", 1)
+            .single();
+        if (error) throw error;
+        aplicarItbis = Boolean(data.cotizacion_mostrar_itbis);
+        itbisPct = Number(data.cotizacion_itbis_pct) || 0;
     }
 
     async function cargarCatalogo() {
@@ -199,7 +220,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     function renderizarCarrito() {
         badge.textContent = obtenerCantidadArticulos(carrito);
-        total.textContent = formatearMonedaRD(calcularTotalCarrito());
+        const subtotalCarrito = calcularSubtotalCarrito();
+        const itbisCarrito = calcularItbisCarrito(subtotalCarrito);
+        subtotal.textContent = formatearMonedaRD(subtotalCarrito);
+        impuesto.textContent = formatearMonedaRD(itbisCarrito);
+        etiquetaImpuesto.textContent = `ITBIS (${itbisPct}%):`;
+        total.textContent = formatearMonedaRD(subtotalCarrito + itbisCarrito);
         cuerpo.replaceChildren();
         if (!carrito.length) {
             cuerpo.appendChild(texto("p", "Tu carrito está vacío.", "empty-cart-msg"));
@@ -266,6 +292,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             abrir.hidden = true;
             return;
         }
+        await cargarConfiguracionImpuestos();
         await obtenerCarrito(usuarioActual.id);
         renderizarCarrito();
         checkout = window.crearCheckout({
