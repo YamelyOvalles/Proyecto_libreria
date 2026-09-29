@@ -91,6 +91,15 @@ En Supabase, agrega el dominio de producción y los dominios Preview que utiliza
 URL permitidas de autenticación. Si se utiliza Google OAuth, actualiza también sus URLs de
 redirección autorizadas.
 
+### Correos de autenticación
+
+El proveedor de correo integrado de Supabase es solo para pruebas y limita el proyecto a
+2 correos de autenticación por hora. Registro, recuperación de contraseña y reenvío de
+confirmación comparten ese cupo; volver a desplegar Vercel no lo reinicia. Para un sitio
+publicado, configura un proveedor SMTP en **Supabase Dashboard → Authentication →
+Emails → SMTP Settings** y revisa el valor en **Authentication → Rate Limits**. Las
+credenciales SMTP se guardan en Supabase, no en Vercel ni en este repositorio.
+
 ## Estructura principal
 
 ```text
