@@ -473,6 +473,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("product-dialog-title").textContent = producto ? "Editar producto" : "Nuevo producto";
         document.getElementById("initial-stock-field").hidden = Boolean(producto);
         document.getElementById("product-stock").required = !producto;
+        const ayudaInventario = document.getElementById("product-stock-help");
+        ayudaInventario.hidden = !producto;
+        if (producto) {
+            const cantidad = inventarioDe(producto)?.cantidad_existencia ?? 0;
+            ayudaInventario.textContent = `Existencia actual: ${cantidad}. Para modificarla, utiliza el módulo Inventario.`;
+        }
         document.getElementById("product-dialog").showModal();
     }
 
