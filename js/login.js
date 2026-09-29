@@ -100,7 +100,7 @@ formulario.addEventListener("submit", async evento => {
 
     if (modo !== "recuperacion" && (!email || !correo.checkValidity())) return mostrarMensaje("Ingresa un correo electrónico válido.");
     if (password.length < 8) return mostrarMensaje("La contraseña debe contener al menos 8 caracteres.");
-    if (!window.libreriaSupabase) return mostrarMensaje("Completa js/supabase-config.js con los datos públicos de tu proyecto.");
+    if (!window.libreriaSupabase) return mostrarMensaje("No se cargó la configuración pública de Supabase. En Vercel configura SUPABASE_URL y SUPABASE_ANON_KEY; localmente configura server/.env.");
 
     bloquear(true);
     try {
@@ -147,7 +147,7 @@ formulario.addEventListener("submit", async evento => {
     const parametros = new URLSearchParams(window.location.search);
     if (parametros.get("registro") === "1") cambiarModoRegistro();
     if (!window.libreriaSupabaseConfigurado || parametros.get("config") === "pendiente") {
-        mostrarMensaje("Configura la URL y la clave pública en js/supabase-config.js.");
+        mostrarMensaje("No se cargó la configuración pública de Supabase. En Vercel configura SUPABASE_URL y SUPABASE_ANON_KEY; localmente configura server/.env.");
         return;
     }
     try {

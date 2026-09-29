@@ -65,9 +65,33 @@ un respaldo. Este repositorio no incluye una migración independiente para actua
 instalación existente; por eso los errores de esquema o permisos deben corregirse con una
 migración preparada para la estructura real de esa base.
 
-## Publicación
+## Publicación en Vercel
 
-El frontend es estático y puede publicarse con GitHub Pages. Configura en Supabase las URL permitidas de autenticación para el dominio publicado y conserva las credenciales privadas únicamente del lado servidor.
+El repositorio incluye `vercel.json`: Vercel sirve el frontend estático y ejecuta
+`api/supabase-config.js` como función Node para entregar al navegador la configuración
+pública. No hace falta compilar la aplicación. Importa el repositorio en Vercel con la
+carpeta raíz del proyecto como **Root Directory** y el preset **Other** (sin comando de
+build ni carpeta de salida).
+
+En **Project Settings → Environment Variables**, define estas variables para los entornos
+que vayas a desplegar (Production y Preview):
+
+| Variable | Valor |
+| --- | --- |
+| `SUPABASE_URL` | URL HTTPS del proyecto Supabase |
+| `SUPABASE_ANON_KEY` | Clave pública `anon` o `publishable` del mismo proyecto |
+
+No uses `service_role` ni una clave `sb_secret_` en estas variables. Después de guardarlas,
+crea un nuevo deployment para que Vercel las aplique. Comprueba que
+`/js/supabase-config.js` devuelva una asignación de configuración válida sin compartir su
+contenido, y que el login deje de mostrar el aviso de configuración. El uso de funciones
+Node desde `api/` y la lectura de variables con `process.env` siguen el esquema de Vercel
+para [funciones Node.js](https://vercel.com/docs/functions/runtimes/node-js) y
+[variables de entorno](https://vercel.com/docs/environment-variables).
+
+En Supabase, agrega el dominio de producción y los dominios Preview que utilizarás a las
+URL permitidas de autenticación. Si se utiliza Google OAuth, actualiza también sus URLs de
+redirección autorizadas.
 
 ## Estructura principal
 
