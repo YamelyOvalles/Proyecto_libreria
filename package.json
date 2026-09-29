@@ -1,0 +1,20 @@
+{
+  "name": "libreria-quisqueya",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicación de Librería Quisqueya servida con Node.js y Express",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "check": "node --check server/index.js && node --check api/supabase-config.js && node --check server/capture-evidence.js",
+    "evidence": "node server/capture-evidence.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0"
+  }
+}

@@ -42,6 +42,38 @@ Deno.serve(async (solicitud) => {
   if (!acceso || !perfil?.activo) return responder({ error: "Acceso administrativo requerido." }, 403);
 
   const datos = await solicitud.json().catch(() => null);
+  const accion = String(datos?.accion || "crear");
+
+  if (accion === "eliminar") {
+    // Conserva cuentas que ya tienen actividad comercial registrada.
+    const usuarioId = String(datos?.usuario_id || "").trim();
+    if (!usuarioId) return responder({ error: "Usuario requerido." }, 400);
+    if (usuarioId === sesion.user.id) {
+      return responder({ error: "No puedes eliminar tu propia cuenta administrativa." }, 400);
+    }
+
+    const relaciones = ["pedidos", "cotizaciones", "facturas"];
+    const resultados = await Promise.all(relaciones.map(tabla =>
+      supabase.from(tabla).select("id", { count: "exact", head: true }).eq("cliente_id", usuarioId)
+    ));
+    const errorConsulta = resultados.find(resultado => resultado.error)?.error;
+    if (errorConsulta) {
+      console.error("No se pudo verificar el historial del usuario:", errorConsulta);
+      return responder({ error: "No se pudo verificar el historial del usuario." }, 500);
+    }
+    if (resultados.some(resultado => Number(resultado.count || 0) > 0)) {
+      return responder({
+        error: "Este usuario tiene pedidos o documentos asociados y no se puede borrar. Desactívalo para conservar el historial."
+      }, 409);
+    }
+
+    const { error: errorEliminacion } = await supabase.auth.admin.deleteUser(usuarioId);
+    if (errorEliminacion) return responder({ error: errorEliminacion.message }, 400);
+    return responder({ id: usuarioId, eliminado: true });
+  }
+
+  if (accion !== "crear") return responder({ error: "Acción no permitida." }, 400);
+
   const correo = String(datos?.correo || "").trim().toLowerCase();
   const password = String(datos?.password || "");
   const nombres = String(datos?.nombres || "").trim();

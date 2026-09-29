@@ -5,6 +5,7 @@
 .env
 .env.*
 !.env.example
+server/.env
 js/supabase-config.js
 *.pem
 *.p12

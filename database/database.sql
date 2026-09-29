@@ -129,7 +129,7 @@ create table if not exists public.libros (
     descripcion text not null default '',
     precio numeric(12,2) not null check (precio >= 0),
     descuento_pct numeric(5,2) not null default 0 check (descuento_pct between 0 and 100),
-    formato text not null default 'fisico' check (formato in ('fisico', 'digital')),
+    formato text not null default 'fisico',
     idioma text not null default 'Español',
     editorial text,
     categoria_id bigint references public.categorias(id) on delete set null,
@@ -137,8 +137,26 @@ create table if not exists public.libros (
     imagen_portada text,
     activo boolean not null default true,
     creado_en timestamptz not null default now(),
-    actualizado_en timestamptz not null default now()
+    actualizado_en timestamptz not null default now(),
+    constraint libros_formato_valido check (formato in ('fisico', 'digital'))
 );
+
+-- Compatibilidad con instalaciones anteriores que relacionaban una editorial
+-- mediante editorial_id. La versión actual conserva el nombre como texto.
+alter table public.libros add column if not exists editorial text;
+do $$
+begin
+    if exists (
+        select 1
+          from information_schema.columns
+         where table_schema = 'public'
+           and table_name = 'libros'
+           and column_name = 'editorial_id'
+    ) then
+        execute 'alter table public.libros alter column editorial_id drop not null';
+    end if;
+end;
+$$;
 
 create table if not exists public.libro_autor (
     libro_id bigint not null references public.libros(id) on delete cascade,

@@ -60,6 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ver: "M12 5c-5 0-9.27 3.11-11 7 1.73 3.89 6 7 11 7s9.27-3.11 11-7c-1.73-3.89-6-7-11-7Zm0 11.5A4.5 4.5 0 1 1 12 7a4.5 4.5 0 0 1 0 9.5Zm0-7.2A2.7 2.7 0 1 0 12 14.7a2.7 2.7 0 0 0 0-5.4Z",
         editar: "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25ZM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z",
         eliminar: "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12Zm3.46-8.12 1.41-1.41L12 10.59l1.12-1.12 1.41 1.41L13.41 12l1.12 1.12-1.41 1.41L12 13.41l-1.12 1.12-1.41-1.41L10.59 12l-1.13-1.12ZM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5Z",
+        activar: "m9 16.17-3.59-3.58L4 14l5 5L20 8l-1.41-1.42L9 16.17Z",
+        desactivar: "M7.41 6 18 16.59 16.59 18 6 7.41 7.41 6ZM12 2a10 10 0 1 1-7.07 2.93A9.97 9.97 0 0 1 12 2Zm0 2a7.9 7.9 0 0 0-4.19 1.2L18.8 16.19A8 8 0 0 0 12 4ZM5.2 7.81A8 8 0 0 0 16.19 18.8L5.2 7.81Z",
         documento: "M6 2h9l5 5v15H6V2Zm8 2v5h4l-4-5ZM9 13v2h8v-2H9Zm0 4v2h6v-2H9Z",
         factura: "M5 2h14v20l-3-2-4 2-4-2-3 2V2Zm3 5v2h8V7H8Zm0 4v2h8v-2H8Zm0 4v2h5v-2H8Z",
         imprimir: "M7 3h10v4H7V3Zm10 10H7v8h10v-8Zm2-5H5a3 3 0 0 0-3 3v5h3v-5h14v5h3v-5a3 3 0 0 0-3-3Z",
@@ -111,15 +113,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function mensajeError(error, alternativo) {
         console.error(error);
-        if (error?.message?.includes("Failed to fetch")) return "No se pudo conectar con Supabase.";
-        if (error?.message?.includes("libros.editorial") || error?.message?.includes("stock_minimo") || error?.message?.includes("descuento_pct")) {
-            return "La base de datos está desactualizada. Ejecuta database/database.sql en un proyecto nuevo.";
+        const detalle = String(error?.message || error?.error || "").toLowerCase();
+        if (detalle.includes("failed to fetch")) return "No se pudo conectar con Supabase.";
+        if (detalle.includes("libros.editorial") || detalle.includes("stock_minimo") || detalle.includes("descuento_pct")) {
+            return "La estructura de Supabase no coincide con la aplicación. Revisa la tabla indicada y prepara una migración antes de volver a intentarlo.";
         }
-        if (["cotizaciones", "facturas", "configuracion_negocio"].some(tabla => error?.message?.includes(tabla))) {
-            return "Falta instalar el módulo documental incluido en database/database.sql.";
+        if (["cotizaciones", "facturas", "configuracion_negocio"].some(tabla => detalle.includes(tabla))) {
+            return "No se encontró una tabla del módulo documental. Revisa la estructura de Supabase antes de volver a intentarlo.";
         }
-        if (error?.message?.toLowerCase().includes("bucket not found")) {
-            return "No existe el almacenamiento de portadas incluido en database/database.sql.";
+        if (detalle.includes("bucket not found") || detalle.includes("bucket does not exist")) {
+            return "No existe el bucket de portadas en Supabase Storage. Revisa su configuración y permisos.";
+        }
+        if (detalle.includes("row-level security") || detalle.includes("unauthorized") || detalle.includes("permission denied")) {
+            return "Supabase rechazó la operación por falta de permisos. Confirma el rol de administrador y las políticas RLS de esa tabla.";
+        }
+        if (detalle.includes("check constraint") || detalle.includes("not-null constraint")) {
+            return "Supabase rechazó un dato por una regla de la tabla. Revisa el detalle del error y compara sus columnas y restricciones con el formulario.";
+        }
+        if (detalle.includes("mime type") || detalle.includes("content type")) {
+            return "El formato de la portada no está permitido. Utiliza una imagen JPG, PNG o WebP.";
+        }
+        if (detalle.includes("maximum") || detalle.includes("too large") || detalle.includes("payload too large")) {
+            return "La portada supera el tamaño permitido de 5 MB.";
         }
         return error?.message || alternativo;
     }
@@ -1129,7 +1144,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const acciones = nodo("div", undefined, "row-actions");
             const editar = botonIcono("editar", `Editar ${usuario.nombres}`);
             editar.addEventListener("click", () => abrirUsuario(usuario));
-            acciones.appendChild(editar);
+            const cambiarEstado = botonIcono(
+                usuario.activo ? "desactivar" : "activar",
+                `${usuario.activo ? "Desactivar" : "Activar"} ${usuario.nombres}`,
+                usuario.activo
+            );
+            cambiarEstado.addEventListener("click", () => cambiarEstadoUsuario(usuario, !usuario.activo, cambiarEstado));
+            const eliminar = botonIcono("eliminar", `Eliminar ${usuario.nombres}`, true);
+            eliminar.addEventListener("click", () => eliminarUsuario(usuario, eliminar));
+            if (usuario.id === window.libreriaUsuario?.id) {
+                cambiarEstado.disabled = true;
+                cambiarEstado.title = "No puedes desactivar tu propia cuenta";
+                eliminar.disabled = true;
+                eliminar.title = "No puedes eliminar tu propia cuenta";
+            }
+            acciones.append(editar, cambiarEstado, eliminar);
             const fila = nodo("tr");
             fila.append(
                 celda("Usuario", identidad),
@@ -1140,6 +1169,42 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             cuerpo.appendChild(fila);
         });
+    }
+
+    async function cambiarEstadoUsuario(usuario, activo, boton) {
+        // Cambia el estado sin borrar el historial de compras del usuario.
+        const accion = activo ? "activar" : "desactivar";
+        if (!confirm(`¿Deseas ${accion} la cuenta de ${usuario.nombres}?`)) return;
+        boton.disabled = true;
+        const { error } = await window.libreriaSupabase.rpc("actualizar_usuario_admin", {
+            p_usuario_id: usuario.id,
+            p_nombres: usuario.nombres,
+            p_apellidos: usuario.apellidos,
+            p_activo: activo,
+            p_rol: usuario.rol
+        });
+        boton.disabled = false;
+        if (error) return mostrarAviso(mensajeError(error, `No se pudo ${accion} el usuario.`));
+        await cargarUsuarios();
+        mostrarAviso(`Usuario ${activo ? "activado" : "desactivado"}.`, "success");
+    }
+
+    async function eliminarUsuario(usuario, boton) {
+        // La función segura valida el historial antes de borrar la cuenta.
+        if (!confirm(`¿Eliminar definitivamente la cuenta de ${usuario.nombres}? Esta acción no se puede deshacer.`)) return;
+        boton.disabled = true;
+        const { error } = await window.libreriaSupabase.functions.invoke("bright-action", {
+            body: { accion: "eliminar", usuario_id: usuario.id }
+        });
+        boton.disabled = false;
+        if (error) {
+            return mostrarAviso(await mensajeErrorFuncion(
+                error,
+                "No se pudo eliminar el usuario. Si tiene historial comercial, desactívalo."
+            ));
+        }
+        await cargarUsuarios();
+        mostrarAviso("Usuario eliminado definitivamente.", "success");
     }
 
     function abrirUsuario(usuario = null) {
