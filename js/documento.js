@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const listaTotales = document.getElementById("document-totals");
         agregarTotal(listaTotales, "Subtotal", totales.subtotal);
         if (Number(totales.descuento) > 0) agregarTotal(listaTotales, "Descuento", -Number(totales.descuento));
-        if (detalle.mostrar_itbis) agregarTotal(listaTotales, `ITBIS incluido (${Number(detalle.itbis_pct || 0)}%)`, totales.itbis);
+        if (detalle.mostrar_itbis) agregarTotal(listaTotales, `ITBIS (${Number(detalle.itbis_pct || 0)}%)`, totales.itbis);
         if (Number(totales.costo_envio) > 0) agregarTotal(listaTotales, "Envío", totales.costo_envio);
         agregarTotal(listaTotales, "Total", totales.total, "grand-total");
 

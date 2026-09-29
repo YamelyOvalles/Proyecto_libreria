@@ -221,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const [pedidos, cotizaciones, facturas] = await Promise.all([
             window.libreriaSupabase
                 .from("pedidos")
-                .select("id,numero,cliente_nombre,cliente_correo,metodo_entrega,metodo_pago,estado_pago,estado,subtotal,descuento,costo_envio,total,notas,creado_en,pedido_detalles(libro_id,titulo,cantidad,precio_unitario,descuento_pct,descuento,subtotal,total_linea),pedido_direcciones_entrega(destinatario,telefono,linea_1,linea_2,sector,ciudad,provincia,codigo_postal,referencia)")
+                .select("id,numero,cliente_nombre,cliente_correo,metodo_entrega,metodo_pago,estado_pago,estado,subtotal,descuento,itbis,costo_envio,total,notas,creado_en,pedido_detalles(libro_id,titulo,cantidad,precio_unitario,descuento_pct,descuento,subtotal,total_linea),pedido_direcciones_entrega(destinatario,telefono,linea_1,linea_2,sector,ciudad,provincia,codigo_postal,referencia)")
                 .order("creado_en", { ascending: false }),
             window.libreriaSupabase.from("cotizaciones").select("id,numero,pedido_id,fecha_emision,valida_hasta,estado"),
             window.libreriaSupabase.from("facturas").select("id,numero,pedido_id,ncf,fecha_emision,estado")
@@ -915,7 +915,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const contenido = document.getElementById("order-detail-content");
         const resumen = nodo("div", undefined, "order-detail-grid");
-        [["Cliente", pedido.cliente_nombre], ["Correo", pedido.cliente_correo], ["Fecha", fecha(pedido.creado_en)], ["Entrega", pedido.metodo_entrega], ["Pago", pedido.metodo_pago], ["Total", formatearMonedaRD(pedido.total)]].forEach(([titulo, valor]) => {
+        [["Cliente", pedido.cliente_nombre], ["Correo", pedido.cliente_correo], ["Fecha", fecha(pedido.creado_en)], ["Entrega", pedido.metodo_entrega], ["Pago", pedido.metodo_pago], ["Subtotal", formatearMonedaRD(pedido.subtotal)], ["ITBIS", formatearMonedaRD(pedido.itbis)], ["Total", formatearMonedaRD(pedido.total)]].forEach(([titulo, valor]) => {
             const dato = nodo("div");
             dato.append(nodo("span", titulo), nodo("strong", valor));
             resumen.appendChild(dato);

@@ -229,8 +229,9 @@ create table if not exists public.pedidos (
     ),
     subtotal numeric(12,2) not null check (subtotal >= 0),
     descuento numeric(12,2) not null default 0 check (descuento >= 0 and descuento <= subtotal),
+    itbis numeric(12,2) not null default 0 check (itbis >= 0),
     costo_envio numeric(12,2) not null default 0 check (costo_envio >= 0),
-    total numeric(12,2) not null check (total = subtotal - descuento + costo_envio),
+    total numeric(12,2) not null check (total = subtotal - descuento + itbis + costo_envio),
     notas text,
     creado_en timestamptz not null default now(),
     actualizado_en timestamptz not null default now(),
@@ -554,6 +555,9 @@ declare
     v_correo text;
     v_subtotal numeric(12,2);
     v_descuento numeric(12,2);
+    v_itbis numeric(12,2) := 0;
+    v_aplicar_itbis boolean;
+    v_itbis_pct numeric(5,2);
     v_envio numeric(12,2) := 0;
     v_total numeric(12,2);
 begin
@@ -640,18 +644,28 @@ begin
      where cd.carrito_id = v_carrito;
 
     v_descuento := coalesce(v_descuento, 0);
-    v_total := v_subtotal - v_descuento + v_envio;
+    select cotizacion_mostrar_itbis, cotizacion_itbis_pct
+      into v_aplicar_itbis, v_itbis_pct
+      from public.configuracion_negocio
+     where id = 1;
+
+    v_itbis := case
+        when coalesce(v_aplicar_itbis, false) and coalesce(v_itbis_pct, 0) > 0
+        then round((v_subtotal - v_descuento) * v_itbis_pct / 100, 2)
+        else 0
+    end;
+    v_total := v_subtotal - v_descuento + v_itbis + v_envio;
 
     insert into public.pedidos (
         cliente_id, cliente_nombre, cliente_correo, cliente_documento, cliente_telefono,
         metodo_entrega, sucursal_id, metodo_pago,
-        subtotal, descuento, costo_envio, total, notas
+        subtotal, descuento, itbis, costo_envio, total, notas
     ) values (
         v_usuario, v_nombre, v_correo,
         nullif(btrim(p_direccion ->> 'documento'), ''),
         nullif(btrim(p_direccion ->> 'telefono_cliente'), ''),
         p_metodo_entrega, p_sucursal_id, p_metodo_pago,
-        v_subtotal, v_descuento, v_envio, v_total, nullif(btrim(p_notas), '')
+        v_subtotal, v_descuento, v_itbis, v_envio, v_total, nullif(btrim(p_notas), '')
     ) returning id, numero into v_pedido, v_numero;
 
     insert into public.pedido_detalles (
@@ -703,6 +717,7 @@ begin
         'numero', v_numero,
         'subtotal', v_subtotal,
         'descuento', v_descuento,
+        'itbis', v_itbis,
         'costo_envio', v_envio,
         'total', v_total,
         'estado', 'pendiente',
@@ -1401,6 +1416,7 @@ declare
     v_mostrar_itbis boolean;
     v_itbis_pct numeric(5,2);
     v_itbis numeric(12,2);
+    v_total numeric(12,2);
 begin
     if p_tipo not in ('cotizacion', 'factura') then
         raise exception 'Tipo de documento invalido.';
@@ -1461,12 +1477,13 @@ begin
     v_mostrar_itbis := case when p_tipo = 'cotizacion' then v_config.cotizacion_mostrar_itbis else v_config.factura_mostrar_itbis end;
     v_itbis_pct := case when p_tipo = 'cotizacion' then v_config.cotizacion_itbis_pct else v_config.factura_itbis_pct end;
 
-    -- Muestra el ITBIS incluido en el total.
+    -- Los precios del catalogo no incluyen ITBIS; se agrega al total.
     v_itbis := case
         when v_mostrar_itbis and v_itbis_pct > 0
-        then round((v_pedido.subtotal - v_pedido.descuento) * v_itbis_pct / (100 + v_itbis_pct), 2)
+        then round((v_pedido.subtotal - v_pedido.descuento) * v_itbis_pct / 100, 2)
         else 0
     end;
+    v_total := v_pedido.subtotal - v_pedido.descuento + v_itbis + v_pedido.costo_envio;
 
     return jsonb_build_object(
         'version', 1,
@@ -1529,7 +1546,7 @@ begin
             'descuento', v_pedido.descuento,
             'itbis', v_itbis,
             'costo_envio', v_pedido.costo_envio,
-            'total', v_pedido.total
+            'total', v_total
         )
     );
 end;
@@ -1576,7 +1593,7 @@ begin
     ) values (
         v_numero, p_pedido_id, v_pedido.cliente_id, v_fecha, v_valida_hasta,
         v_pedido.subtotal, v_pedido.descuento, (v_snapshot #>> '{totales,itbis}')::numeric,
-        v_pedido.total, v_snapshot, p_creado_por
+        (v_snapshot #>> '{totales,total}')::numeric, v_snapshot, p_creado_por
     ) returning id into v_id;
 
     return v_id;
@@ -1683,7 +1700,7 @@ begin
     ) values (
         v_numero, p_pedido_id, v_pedido.cliente_id, v_ncf, v_fecha, p_fecha_vencimiento,
         v_condicion, v_pedido.subtotal, v_pedido.descuento, (v_snapshot #>> '{totales,itbis}')::numeric,
-        v_pedido.total, v_snapshot, v_usuario
+        (v_snapshot #>> '{totales,total}')::numeric, v_snapshot, v_usuario
     ) returning * into v_factura;
 
     return v_factura;

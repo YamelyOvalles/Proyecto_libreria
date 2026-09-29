@@ -229,13 +229,24 @@
             background-color: var(--bg-light);
         }
 
-        .cart-total {
+        .cart-total,
+        .cart-summary-row {
             display: flex;
             justify-content: space-between;
+            color: #111;
+        }
+
+        .cart-summary-row {
+            margin-bottom: 6px;
+            font-size: .95rem;
+        }
+
+        .cart-total {
             font-size: 1.15rem;
             font-weight: bold;
             margin-bottom: 15px;
-            color: #111;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
         }
 
         .empty-cart-msg {
@@ -299,6 +310,14 @@
         <div id="cart-body" class="cart-body">
         </div>
         <div class="cart-footer">
+            <div class="cart-summary-row">
+                <span>Subtotal:</span>
+                <span id="cart-subtotal-price">RD$ 0.00</span>
+            </div>
+            <div class="cart-summary-row">
+                <span id="cart-tax-label">ITBIS (18%):</span>
+                <span id="cart-tax-price">RD$ 0.00</span>
+            </div>
             <div class="cart-total">
                 <span>Total:</span>
                 <span id="cart-total-price">RD$ 0.00</span>
