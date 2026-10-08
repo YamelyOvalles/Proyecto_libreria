@@ -1,4 +1,9 @@
 -- Base de datos de Libreria Quisqueya.
+-- Instalador consolidado para un proyecto Supabase NUEVO: esquema, RPC, RLS,
+-- triggers, permisos, bucket portadas y datos iniciales del catálogo.
+-- Alcance y configuración fuera de SQL: database/README.md.
+-- Auditoría local: npm run db:audit. Comparación remota: verificar_esquema.sql.
+-- No ejecutar completo sobre la base existente; usar migraciones revisadas.
 
 
 
@@ -74,6 +79,15 @@ as $$
            and p.activo = true
     );
 $$;
+
+-- Rechaza escrituras de cuentas desactivadas incluso con un JWT todavía vigente.
+create or replace function private.es_activo()
+returns boolean language sql stable security definer set search_path = ''
+as $$
+    select exists (select 1 from public.perfiles where id = auth.uid() and activo);
+$$;
+revoke all on function private.es_activo() from public, anon;
+grant execute on function private.es_activo() to authenticated;
 
 -- Crea el perfil del cliente.
 create or replace function private.crear_perfil_usuario()
@@ -428,20 +442,20 @@ create policy inventario_lectura on public.inventarios for select to authenticat
 );
 create policy sucursales_lectura on public.sucursales for select to authenticated using (activo or private.es_admin());
 create policy carritos_lectura on public.carritos for select to authenticated using (perfil_id = auth.uid() or private.es_admin());
-create policy carritos_creacion on public.carritos for insert to authenticated with check (perfil_id = auth.uid());
-create policy carritos_actualizacion on public.carritos for update to authenticated using (perfil_id = auth.uid()) with check (perfil_id = auth.uid());
-create policy carritos_eliminacion on public.carritos for delete to authenticated using (perfil_id = auth.uid());
+create policy carritos_creacion on public.carritos for insert to authenticated with check (perfil_id = auth.uid() and private.es_activo());
+create policy carritos_actualizacion on public.carritos for update to authenticated using (perfil_id = auth.uid() and private.es_activo()) with check (perfil_id = auth.uid() and private.es_activo());
+create policy carritos_eliminacion on public.carritos for delete to authenticated using (perfil_id = auth.uid() and private.es_activo());
 create policy carrito_detalles_lectura on public.carrito_detalles for select to authenticated using (
     exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid()) or private.es_admin()
 );
 create policy carrito_detalles_creacion on public.carrito_detalles for insert to authenticated with check (
-    exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid())
+    private.es_activo() and exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid())
 );
 create policy carrito_detalles_actualizacion on public.carrito_detalles for update to authenticated
-using (exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid()))
-with check (exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid()));
+using (private.es_activo() and exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid()))
+with check (private.es_activo() and exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid()));
 create policy carrito_detalles_eliminacion on public.carrito_detalles for delete to authenticated using (
-    exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid())
+    private.es_activo() and exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid())
 );
 create policy pedidos_lectura on public.pedidos for select to authenticated using (cliente_id = auth.uid() or private.es_personal());
 create policy pedidos_actualizacion_personal on public.pedidos for update to authenticated using (private.es_personal()) with check (private.es_personal());
@@ -592,11 +606,18 @@ begin
         raise exception 'El carrito está vacío.';
     end if;
 
+    -- Serializa dos checkout del mismo usuario; evita dos pedidos con el mismo carrito.
+    perform 1 from public.carritos where id = v_carrito for update;
+    if not exists (select 1 from public.carrito_detalles where carrito_id = v_carrito) then
+        raise exception 'El carrito está vacío.';
+    end if;
+
     -- Evita compras simultaneas sin stock.
     perform i.libro_id
       from public.inventarios i
       join public.carrito_detalles cd on cd.libro_id = i.libro_id
      where cd.carrito_id = v_carrito
+     order by i.libro_id
      for update of i;
 
     if exists (

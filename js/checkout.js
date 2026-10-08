@@ -1,4 +1,4 @@
-// Confirma pedidos en Supabase.
+// Express valida la sesión; la RPC de Supabase confirma el pedido en una transacción.
 window.crearCheckout = function ({ obtenerCarrito, vaciarCarrito }) {
     const boton = document.getElementById("checkout-btn");
     const estado = document.getElementById("checkout-status");
@@ -93,14 +93,21 @@ window.crearCheckout = function ({ obtenerCarrito, vaciarCarrito }) {
             bloquear(true);
             informar("Validando existencias y creando el pedido…");
 
-            const { data, error } = await window.libreriaSupabase.rpc("crear_pedido_desde_carrito", {
+            const sesion = await window.obtenerSesionLibreria();
+            if (!sesion) throw new Error("Debes iniciar sesión para realizar un pedido.");
+            const respuesta = await fetch("/api/pedidos", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${sesion.access_token}` },
+                body: JSON.stringify({
                 p_metodo_entrega: entrega.value,
                 p_sucursal_id: domicilio ? null : Number(sucursal.value),
                 p_metodo_pago: pago.value,
                 p_direccion: leerDatosPedido(domicilio),
                 p_notas: null
+                })
             });
-            if (error) throw error;
+            const data = await respuesta.json();
+            if (!respuesta.ok) throw new Error(data.error || "No se pudo crear el pedido.");
 
             vaciarCarrito();
             informar(`${data.numero} confirmado. Preparando cotización…`, "enviado");

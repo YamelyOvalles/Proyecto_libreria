@@ -1,8 +1,13 @@
 {
+    "functions": {
+        "api/index.js": {
+            "includeFiles": "{*.html,assets/**,css/**,js/**,node_modules/@supabase/supabase-js/dist/umd/**}"
+        }
+    },
     "rewrites": [
         {
-            "source": "/js/supabase-config.js",
-            "destination": "/api/supabase-config"
+            "source": "/(.*)",
+            "destination": "/api/index"
         }
     ]
 }

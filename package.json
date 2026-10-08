@@ -7,14 +7,30 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "check": "node --check server/index.js && node --check api/supabase-config.js && node --check server/capture-evidence.js",
-    "evidence": "node server/capture-evidence.js"
+    "check": "node scripts/check.js",
+    "evidence": "node server/capture-evidence.js",
+    "start:local": "node --env-file=server/.env.local server/index.js",
+    "local:config": "node scripts/local-config.js",
+    "demo:seed": "node scripts/seed-demo.js",
+    "test": "node --test tests/http.test.js tests/database.test.js tests/frontend.test.js tests/schema-audit.test.js tests/remote-policies.test.js",
+    "test:integration": "node --test tests/supabase.integration.test.js",
+    "test:browser": "playwright test",
+    "test:edge": "deno check --config supabase/functions/deno.json supabase/functions/bright-action/index.ts",
+    "verify:install": "node scripts/verify-clean-install.js",
+    "test:browser:local": "playwright test --config playwright.local.config.js",
+    "db:audit": "node scripts/audit-database.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.117.2",
     "dotenv": "^17.2.3",
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@playwright/test": "1.64.0",
+    "supabase": "2.120.0"
   }
 }

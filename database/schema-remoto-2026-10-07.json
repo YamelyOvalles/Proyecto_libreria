@@ -1,0 +1,6304 @@
+{
+  "views": [],
+  "tables": [
+    {
+      "rls": true,
+      "name": "autores",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "nombre",
+          "type": "character varying(180)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "slug",
+          "type": "character varying(200)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "biografia",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "activo",
+          "type": "boolean",
+          "default": "true",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "autores_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "autores_slug_key",
+          "definition": "UNIQUE (slug)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "carrito_detalles",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "carrito_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "libro_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cantidad",
+          "type": "integer",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "agregado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "carrito_cantidad_valida",
+          "definition": "CHECK (((cantidad >= 1) AND (cantidad <= 999)))"
+        },
+        {
+          "name": "carrito_detalles_carrito_id_fkey",
+          "definition": "FOREIGN KEY (carrito_id) REFERENCES carritos(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "carrito_detalles_libro_id_fkey",
+          "definition": "FOREIGN KEY (libro_id) REFERENCES libros(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "carrito_detalles_pkey",
+          "definition": "PRIMARY KEY (carrito_id, libro_id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "carritos",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "perfil_id",
+          "type": "uuid",
+          "default": "auth.uid()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "carritos_perfil_id_fkey",
+          "definition": "FOREIGN KEY (perfil_id) REFERENCES perfiles(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "carritos_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "un_carrito_por_cliente",
+          "definition": "UNIQUE (perfil_id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "categorias",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "nombre",
+          "type": "character varying(120)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "slug",
+          "type": "character varying(140)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "descripcion",
+          "type": "text",
+          "default": "''::text",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "activo",
+          "type": "boolean",
+          "default": "true",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "categorias_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "categorias_slug_key",
+          "definition": "UNIQUE (slug)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "configuracion_negocio",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "smallint",
+          "default": "1",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "nombre_comercial",
+          "type": "text",
+          "default": "'Libreria Quisqueya'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "razon_social",
+          "type": "text",
+          "default": "'Libreria Quisqueya'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "eslogan",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "rnc",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "direccion",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "ciudad",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "provincia",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "pais",
+          "type": "text",
+          "default": "'Republica Dominicana'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "telefono",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "correo",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "sitio_web",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "logo_url",
+          "type": "text",
+          "default": "'assets/logo-quisqueya-profesional.png'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "atendido_por_default",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cotizacion_prefijo",
+          "type": "text",
+          "default": "'COT'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cotizacion_validez_dias",
+          "type": "integer",
+          "default": "15",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cotizacion_tiempo_entrega",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cotizacion_condiciones",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cotizacion_notas",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cotizacion_mostrar_itbis",
+          "type": "boolean",
+          "default": "true",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cotizacion_itbis_pct",
+          "type": "numeric(5,2)",
+          "default": "18",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "factura_prefijo",
+          "type": "text",
+          "default": "'FAC'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "factura_condicion_pago",
+          "type": "text",
+          "default": "'contado'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "factura_dias_credito",
+          "type": "integer",
+          "default": "30",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "factura_condiciones",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "factura_notas",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "factura_mostrar_itbis",
+          "type": "boolean",
+          "default": "true",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "factura_itbis_pct",
+          "type": "numeric(5,2)",
+          "default": "18",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "actualizado_por",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": false,
+        "authenticated_insert": false,
+        "authenticated_select": true,
+        "authenticated_update": false
+      },
+      "constraints": [
+        {
+          "name": "configuracion_negocio_actualizado_por_fkey",
+          "definition": "FOREIGN KEY (actualizado_por) REFERENCES perfiles(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "configuracion_negocio_cotizacion_itbis_pct_check",
+          "definition": "CHECK (((cotizacion_itbis_pct >= (0)::numeric) AND (cotizacion_itbis_pct <= (100)::numeric)))"
+        },
+        {
+          "name": "configuracion_negocio_cotizacion_validez_dias_check",
+          "definition": "CHECK (((cotizacion_validez_dias >= 1) AND (cotizacion_validez_dias <= 365)))"
+        },
+        {
+          "name": "configuracion_negocio_factura_condicion_pago_check",
+          "definition": "CHECK ((factura_condicion_pago = ANY (ARRAY['contado'::text, 'credito'::text])))"
+        },
+        {
+          "name": "configuracion_negocio_factura_dias_credito_check",
+          "definition": "CHECK (((factura_dias_credito >= 1) AND (factura_dias_credito <= 365)))"
+        },
+        {
+          "name": "configuracion_negocio_factura_itbis_pct_check",
+          "definition": "CHECK (((factura_itbis_pct >= (0)::numeric) AND (factura_itbis_pct <= (100)::numeric)))"
+        },
+        {
+          "name": "configuracion_negocio_id_check",
+          "definition": "CHECK ((id = 1))"
+        },
+        {
+          "name": "configuracion_negocio_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "contact_messages",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "legacy_message_id",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "nombre",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "correo",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "telefono",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "asunto",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "mensaje",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "estado",
+          "type": "text",
+          "default": "'pendiente'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": false,
+        "authenticated_insert": false,
+        "authenticated_select": true,
+        "authenticated_update": false
+      },
+      "constraints": [
+        {
+          "name": "contact_messages_asunto_check",
+          "definition": "CHECK ((char_length(btrim(asunto)) >= 3))"
+        },
+        {
+          "name": "contact_messages_correo_check",
+          "definition": "CHECK ((correo ~* '^[^[:space:]@]+@[^[:space:]@]+\\.[^[:space:]@]+$'::text))"
+        },
+        {
+          "name": "contact_messages_estado_check",
+          "definition": "CHECK ((estado = ANY (ARRAY['pendiente'::text, 'leido'::text, 'respondido'::text, 'archivado'::text])))"
+        },
+        {
+          "name": "contact_messages_mensaje_check",
+          "definition": "CHECK ((char_length(btrim(mensaje)) >= 10))"
+        },
+        {
+          "name": "contact_messages_nombre_check",
+          "definition": "CHECK ((char_length(btrim(nombre)) >= 3))"
+        },
+        {
+          "name": "contact_messages_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "contact_messages_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES perfiles(id) ON DELETE SET NULL"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "cotizaciones",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "numero",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "pedido_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cliente_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "fecha_emision",
+          "type": "date",
+          "default": "CURRENT_DATE",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "valida_hasta",
+          "type": "date",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "estado",
+          "type": "text",
+          "default": "'emitida'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "subtotal",
+          "type": "numeric(12,2)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "descuento",
+          "type": "numeric(12,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "itbis",
+          "type": "numeric(12,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "total",
+          "type": "numeric(12,2)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "creado_por",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": false,
+        "authenticated_insert": false,
+        "authenticated_select": true,
+        "authenticated_update": false
+      },
+      "constraints": [
+        {
+          "name": "cotizaciones_cliente_id_fkey",
+          "definition": "FOREIGN KEY (cliente_id) REFERENCES perfiles(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "cotizaciones_creado_por_fkey",
+          "definition": "FOREIGN KEY (creado_por) REFERENCES perfiles(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "cotizaciones_descuento_check",
+          "definition": "CHECK ((descuento >= (0)::numeric))"
+        },
+        {
+          "name": "cotizaciones_estado_check",
+          "definition": "CHECK ((estado = ANY (ARRAY['emitida'::text, 'aceptada'::text, 'vencida'::text, 'anulada'::text])))"
+        },
+        {
+          "name": "cotizaciones_itbis_check",
+          "definition": "CHECK ((itbis >= (0)::numeric))"
+        },
+        {
+          "name": "cotizaciones_numero_key",
+          "definition": "UNIQUE (numero)"
+        },
+        {
+          "name": "cotizaciones_pedido_id_fkey",
+          "definition": "FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "cotizaciones_pedido_id_key",
+          "definition": "UNIQUE (pedido_id)"
+        },
+        {
+          "name": "cotizaciones_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "cotizaciones_subtotal_check",
+          "definition": "CHECK ((subtotal >= (0)::numeric))"
+        },
+        {
+          "name": "cotizaciones_total_check",
+          "definition": "CHECK ((total >= (0)::numeric))"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "direcciones",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "perfil_id",
+          "type": "uuid",
+          "default": "auth.uid()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "alias",
+          "type": "character varying(60)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "destinatario",
+          "type": "character varying(160)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "telefono",
+          "type": "character varying(25)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "linea_1",
+          "type": "character varying(200)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "linea_2",
+          "type": "character varying(200)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "sector",
+          "type": "character varying(120)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "ciudad",
+          "type": "character varying(100)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "provincia",
+          "type": "character varying(100)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "codigo_postal",
+          "type": "character varying(15)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "referencia",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "es_principal",
+          "type": "boolean",
+          "default": "false",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "direcciones_perfil_id_fkey",
+          "definition": "FOREIGN KEY (perfil_id) REFERENCES perfiles(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "direcciones_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "editoriales",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "nombre",
+          "type": "character varying(160)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "slug",
+          "type": "character varying(180)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "sitio_web",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "activo",
+          "type": "boolean",
+          "default": "true",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "editoriales_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "editoriales_slug_key",
+          "definition": "UNIQUE (slug)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "facturas",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "numero",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "pedido_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "cliente_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "ncf",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "fecha_emision",
+          "type": "date",
+          "default": "CURRENT_DATE",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "fecha_vencimiento",
+          "type": "date",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "condicion_pago",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "estado",
+          "type": "text",
+          "default": "'emitida'::text",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "subtotal",
+          "type": "numeric(12,2)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "descuento",
+          "type": "numeric(12,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "itbis",
+          "type": "numeric(12,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "total",
+          "type": "numeric(12,2)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "creado_por",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": false,
+            "authenticated_select": true,
+            "authenticated_update": false
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": false,
+        "authenticated_insert": false,
+        "authenticated_select": true,
+        "authenticated_update": false
+      },
+      "constraints": [
+        {
+          "name": "facturas_cliente_id_fkey",
+          "definition": "FOREIGN KEY (cliente_id) REFERENCES perfiles(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "facturas_condicion_pago_check",
+          "definition": "CHECK ((condicion_pago = ANY (ARRAY['contado'::text, 'credito'::text])))"
+        },
+        {
+          "name": "facturas_creado_por_fkey",
+          "definition": "FOREIGN KEY (creado_por) REFERENCES perfiles(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "facturas_descuento_check",
+          "definition": "CHECK ((descuento >= (0)::numeric))"
+        },
+        {
+          "name": "facturas_estado_check",
+          "definition": "CHECK ((estado = ANY (ARRAY['emitida'::text, 'pagada'::text, 'anulada'::text])))"
+        },
+        {
+          "name": "facturas_itbis_check",
+          "definition": "CHECK ((itbis >= (0)::numeric))"
+        },
+        {
+          "name": "facturas_numero_key",
+          "definition": "UNIQUE (numero)"
+        },
+        {
+          "name": "facturas_pedido_id_fkey",
+          "definition": "FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "facturas_pedido_id_key",
+          "definition": "UNIQUE (pedido_id)"
+        },
+        {
+          "name": "facturas_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "facturas_subtotal_check",
+          "definition": "CHECK ((subtotal >= (0)::numeric))"
+        },
+        {
+          "name": "facturas_total_check",
+          "definition": "CHECK ((total >= (0)::numeric))"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "favoritos",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "perfil_id",
+          "type": "uuid",
+          "default": "auth.uid()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "libro_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "favoritos_libro_id_fkey",
+          "definition": "FOREIGN KEY (libro_id) REFERENCES libros(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "favoritos_perfil_id_fkey",
+          "definition": "FOREIGN KEY (perfil_id) REFERENCES perfiles(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "favoritos_pkey",
+          "definition": "PRIMARY KEY (perfil_id, libro_id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "inventarios",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "libro_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cantidad_existencia",
+          "type": "integer",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cantidad_reservada",
+          "type": "integer",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cantidad_disponible",
+          "type": "integer",
+          "default": "(cantidad_existencia - cantidad_reservada)",
+          "identity": "",
+          "not_null": false,
+          "generated": "s",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "stock_minimo",
+          "type": "integer",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "inventario_existencia_valida",
+          "definition": "CHECK ((cantidad_existencia >= 0))"
+        },
+        {
+          "name": "inventario_minimo_valido",
+          "definition": "CHECK ((stock_minimo >= 0))"
+        },
+        {
+          "name": "inventario_reserva_valida",
+          "definition": "CHECK (((cantidad_reservada >= 0) AND (cantidad_reservada <= cantidad_existencia)))"
+        },
+        {
+          "name": "inventarios_libro_id_fkey",
+          "definition": "FOREIGN KEY (libro_id) REFERENCES libros(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "inventarios_pkey",
+          "definition": "PRIMARY KEY (libro_id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "libro_autor",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "libro_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "autor_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "orden",
+          "type": "smallint",
+          "default": "1",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "libro_autor_autor_id_fkey",
+          "definition": "FOREIGN KEY (autor_id) REFERENCES autores(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "libro_autor_libro_id_fkey",
+          "definition": "FOREIGN KEY (libro_id) REFERENCES libros(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "libro_autor_orden_valido",
+          "definition": "CHECK ((orden > 0))"
+        },
+        {
+          "name": "libro_autor_pkey",
+          "definition": "PRIMARY KEY (libro_id, autor_id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "libro_categoria",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "libro_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "categoria_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "libro_categoria_categoria_id_fkey",
+          "definition": "FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "libro_categoria_libro_id_fkey",
+          "definition": "FOREIGN KEY (libro_id) REFERENCES libros(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "libro_categoria_pkey",
+          "definition": "PRIMARY KEY (libro_id, categoria_id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "libros",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "isbn",
+          "type": "character varying(13)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "titulo",
+          "type": "character varying(250)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "descripcion",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "precio",
+          "type": "numeric(12,2)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "formato",
+          "type": "character varying(30)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "idioma",
+          "type": "character varying(10)",
+          "default": "'es'::character varying",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "imagen_portada",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "editorial_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "anio_publicacion",
+          "type": "smallint",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "activo",
+          "type": "boolean",
+          "default": "true",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "editorial",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "categoria_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": true,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "stock_minimo",
+          "type": "integer",
+          "default": "5",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "descuento_pct",
+          "type": "numeric(5,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "libros_anio_valido",
+          "definition": "CHECK (((anio_publicacion IS NULL) OR ((anio_publicacion >= 1000) AND (anio_publicacion <= 2200))))"
+        },
+        {
+          "name": "libros_categoria_id_fkey",
+          "definition": "FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "libros_descuento_pct_check",
+          "definition": "CHECK (((descuento_pct >= (0)::numeric) AND (descuento_pct <= (100)::numeric)))"
+        },
+        {
+          "name": "libros_editorial_id_fkey",
+          "definition": "FOREIGN KEY (editorial_id) REFERENCES editoriales(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "libros_formato_valido",
+          "definition": "CHECK (((formato)::text = ANY ((ARRAY['fisico'::character varying, 'digital'::character varying])::text[]))) NOT VALID"
+        },
+        {
+          "name": "libros_idioma_no_vacio",
+          "definition": "CHECK ((btrim((idioma)::text) <> ''::text))"
+        },
+        {
+          "name": "libros_isbn_formato",
+          "definition": "CHECK (((isbn)::text ~ '^([0-9]{13}|[0-9]{9}[0-9X])$'::text))"
+        },
+        {
+          "name": "libros_isbn_key",
+          "definition": "UNIQUE (isbn)"
+        },
+        {
+          "name": "libros_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "libros_precio_valido",
+          "definition": "CHECK ((precio >= (0)::numeric))"
+        },
+        {
+          "name": "libros_stock_minimo_check",
+          "definition": "CHECK ((stock_minimo >= 0))"
+        },
+        {
+          "name": "libros_titulo_no_vacio",
+          "definition": "CHECK ((btrim((titulo)::text) <> ''::text))"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "mensajes_contacto",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "perfil_id",
+          "type": "uuid",
+          "default": "auth.uid()",
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "nombre",
+          "type": "character varying(160)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "correo",
+          "type": "character varying(320)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "telefono",
+          "type": "character varying(25)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "motivo",
+          "type": "character varying(30)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "mensaje",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "estado",
+          "type": "character varying(20)",
+          "default": "'nuevo'::character varying",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "respuesta",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "respondido_por",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "mensaje_estado_valido",
+          "definition": "CHECK (((estado)::text = ANY ((ARRAY['nuevo'::character varying, 'en_revision'::character varying, 'respondido'::character varying, 'cerrado'::character varying])::text[])))"
+        },
+        {
+          "name": "mensaje_longitud_valida",
+          "definition": "CHECK (((char_length(btrim(mensaje)) >= 10) AND (char_length(btrim(mensaje)) <= 5000)))"
+        },
+        {
+          "name": "mensaje_motivo_valido",
+          "definition": "CHECK (((motivo)::text = ANY ((ARRAY['encargo'::character varying, 'existencia'::character varying, 'ayuda'::character varying])::text[])))"
+        },
+        {
+          "name": "mensajes_contacto_perfil_id_fkey",
+          "definition": "FOREIGN KEY (perfil_id) REFERENCES perfiles(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "mensajes_contacto_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "mensajes_contacto_respondido_por_fkey",
+          "definition": "FOREIGN KEY (respondido_por) REFERENCES perfiles(id) ON DELETE SET NULL"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "movimientos_inventario",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "libro_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "pedido_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "realizado_por",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "tipo",
+          "type": "character varying(20)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cambio_existencia",
+          "type": "integer",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cambio_reservada",
+          "type": "integer",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "motivo",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "movimiento_no_vacio",
+          "definition": "CHECK (((cambio_existencia <> 0) OR (cambio_reservada <> 0)))"
+        },
+        {
+          "name": "movimiento_tipo_valido",
+          "definition": "CHECK (((tipo)::text = ANY ((ARRAY['entrada'::character varying, 'salida'::character varying, 'reserva'::character varying, 'liberacion'::character varying, 'ajuste'::character varying])::text[])))"
+        },
+        {
+          "name": "movimientos_inventario_libro_id_fkey",
+          "definition": "FOREIGN KEY (libro_id) REFERENCES libros(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "movimientos_inventario_pedido_id_fkey",
+          "definition": "FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "movimientos_inventario_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "movimientos_inventario_realizado_por_fkey",
+          "definition": "FOREIGN KEY (realizado_por) REFERENCES perfiles(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "movimientos_inventario_tipo_check",
+          "definition": "CHECK (((tipo)::text = ANY ((ARRAY['entrada'::character varying, 'ajuste'::character varying, 'reserva'::character varying, 'liberacion'::character varying, 'salida'::character varying, 'devolucion'::character varying])::text[])))"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "pedido_detalles",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "pedido_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "libro_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "isbn",
+          "type": "character varying(13)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "titulo",
+          "type": "character varying(250)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "precio_unitario",
+          "type": "numeric(12,2)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cantidad",
+          "type": "integer",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "subtotal",
+          "type": "numeric(12,2)",
+          "default": "(precio_unitario * (cantidad)::numeric)",
+          "identity": "",
+          "not_null": false,
+          "generated": "s",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "descuento_pct",
+          "type": "numeric(5,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "descuento",
+          "type": "numeric(12,2)",
+          "default": "round((((precio_unitario * (cantidad)::numeric) * descuento_pct) / (100)::numeric), 2)",
+          "identity": "",
+          "not_null": false,
+          "generated": "s",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "total_linea",
+          "type": "numeric(12,2)",
+          "default": "((precio_unitario * (cantidad)::numeric) - round((((precio_unitario * (cantidad)::numeric) * descuento_pct) / (100)::numeric), 2))",
+          "identity": "",
+          "not_null": false,
+          "generated": "s",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "pedido_detalle_cantidad_valida",
+          "definition": "CHECK (((cantidad >= 1) AND (cantidad <= 999)))"
+        },
+        {
+          "name": "pedido_detalle_precio_valido",
+          "definition": "CHECK ((precio_unitario >= (0)::numeric))"
+        },
+        {
+          "name": "pedido_detalles_descuento_pct_check",
+          "definition": "CHECK (((descuento_pct >= (0)::numeric) AND (descuento_pct <= (100)::numeric)))"
+        },
+        {
+          "name": "pedido_detalles_libro_id_fkey",
+          "definition": "FOREIGN KEY (libro_id) REFERENCES libros(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "pedido_detalles_pedido_id_fkey",
+          "definition": "FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "pedido_detalles_pkey",
+          "definition": "PRIMARY KEY (pedido_id, libro_id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "pedido_direcciones_entrega",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "pedido_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "direccion_origen_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "destinatario",
+          "type": "character varying(160)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "telefono",
+          "type": "character varying(25)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "linea_1",
+          "type": "character varying(200)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "linea_2",
+          "type": "character varying(200)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "sector",
+          "type": "character varying(120)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "ciudad",
+          "type": "character varying(100)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "provincia",
+          "type": "character varying(100)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "codigo_postal",
+          "type": "character varying(15)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "referencia",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "pedido_direcciones_entrega_direccion_origen_id_fkey",
+          "definition": "FOREIGN KEY (direccion_origen_id) REFERENCES direcciones(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "pedido_direcciones_entrega_pedido_id_fkey",
+          "definition": "FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "pedido_direcciones_entrega_pkey",
+          "definition": "PRIMARY KEY (pedido_id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "pedidos",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": "gen_random_uuid()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "numero",
+          "type": "character varying(32)",
+          "default": "((('LQ-'::text || to_char(clock_timestamp(), 'YYYYMMDD'::text)) || '-'::text) || upper(substr(replace((gen_random_uuid())::text, '-'::text, ''::text), 1, 8)))",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cliente_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cliente_nombre",
+          "type": "character varying(200)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cliente_correo",
+          "type": "character varying(320)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "metodo_entrega",
+          "type": "character varying(20)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "sucursal_id",
+          "type": "bigint",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "metodo_pago",
+          "type": "character varying(30)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "estado_pago",
+          "type": "character varying(20)",
+          "default": "'pendiente'::character varying",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "referencia_transferencia",
+          "type": "character varying(120)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "estado",
+          "type": "character varying(25)",
+          "default": "'pendiente'::character varying",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "subtotal",
+          "type": "numeric(12,2)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "costo_envio",
+          "type": "numeric(12,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "total",
+          "type": "numeric(12,2)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "notas",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cliente_documento",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "cliente_telefono",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "descuento",
+          "type": "numeric(12,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "itbis",
+          "type": "numeric(12,2)",
+          "default": "0",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "crear_cotizacion_al_confirmar_pedido",
+          "definition": "TRIGGER DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "name": "pedidos_cliente_id_fkey",
+          "definition": "FOREIGN KEY (cliente_id) REFERENCES perfiles(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "pedidos_descuento_check",
+          "definition": "CHECK (((descuento >= (0)::numeric) AND (descuento <= subtotal)))"
+        },
+        {
+          "name": "pedidos_entrega_valida",
+          "definition": "CHECK (((((metodo_entrega)::text = 'domicilio'::text) AND (sucursal_id IS NULL)) OR (((metodo_entrega)::text = 'retiro'::text) AND (sucursal_id IS NOT NULL))))"
+        },
+        {
+          "name": "pedidos_estado_check",
+          "definition": "CHECK (((estado)::text = ANY ((ARRAY['pendiente'::character varying, 'confirmado'::character varying, 'procesando'::character varying, 'listo_retiro'::character varying, 'enviado'::character varying, 'entregado'::character varying, 'cancelado'::character varying, 'devuelto'::character varying])::text[])))"
+        },
+        {
+          "name": "pedidos_estado_pago_valido",
+          "definition": "CHECK (((estado_pago)::text = ANY ((ARRAY['pendiente'::character varying, 'verificando'::character varying, 'pagado'::character varying, 'rechazado'::character varying, 'reembolsado'::character varying])::text[])))"
+        },
+        {
+          "name": "pedidos_estado_valido",
+          "definition": "CHECK (((estado)::text = ANY ((ARRAY['pendiente'::character varying, 'confirmado'::character varying, 'procesando'::character varying, 'listo_retiro'::character varying, 'enviado'::character varying, 'entregado'::character varying, 'cancelado'::character varying])::text[])))"
+        },
+        {
+          "name": "pedidos_importes_validos",
+          "definition": "CHECK (((subtotal >= (0)::numeric) AND (descuento >= (0)::numeric) AND (descuento <= subtotal) AND (itbis >= (0)::numeric) AND (costo_envio >= (0)::numeric) AND (total = (((subtotal - descuento) + itbis) + costo_envio))))"
+        },
+        {
+          "name": "pedidos_itbis_check",
+          "definition": "CHECK ((itbis >= (0)::numeric))"
+        },
+        {
+          "name": "pedidos_metodo_pago_check",
+          "definition": "CHECK (((metodo_pago)::text = ANY ((ARRAY['contra_entrega'::character varying, 'efectivo'::character varying, 'tarjeta'::character varying, 'transferencia'::character varying])::text[])))"
+        },
+        {
+          "name": "pedidos_numero_key",
+          "definition": "UNIQUE (numero)"
+        },
+        {
+          "name": "pedidos_pago_valido",
+          "definition": "CHECK (((metodo_pago)::text = ANY ((ARRAY['contra_entrega'::character varying, 'transferencia'::character varying])::text[])))"
+        },
+        {
+          "name": "pedidos_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "pedidos_sucursal_id_fkey",
+          "definition": "FOREIGN KEY (sucursal_id) REFERENCES sucursales(id) ON DELETE RESTRICT"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "perfiles",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "nombres",
+          "type": "character varying(100)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "apellidos",
+          "type": "character varying(100)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "telefono",
+          "type": "character varying(25)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "avatar_url",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "activo",
+          "type": "boolean",
+          "default": "true",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "perfiles_id_fkey",
+          "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "perfiles_nombres_no_vacio",
+          "definition": "CHECK ((btrim((nombres)::text) <> ''::text))"
+        },
+        {
+          "name": "perfiles_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "roles",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "smallint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "codigo",
+          "type": "character varying(30)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "nombre",
+          "type": "character varying(60)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "descripcion",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "roles_codigo_key",
+          "definition": "UNIQUE (codigo)"
+        },
+        {
+          "name": "roles_codigo_valido",
+          "definition": "CHECK (((codigo)::text = ANY ((ARRAY['cliente'::character varying, 'empleado'::character varying, 'administrador'::character varying])::text[])))"
+        },
+        {
+          "name": "roles_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "sucursales",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "default": null,
+          "identity": "a",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "codigo",
+          "type": "character varying(30)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "nombre",
+          "type": "character varying(120)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "direccion",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "ciudad",
+          "type": "character varying(100)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "provincia",
+          "type": "character varying(100)",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "telefono",
+          "type": "character varying(25)",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "horario",
+          "type": "text",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "activo",
+          "type": "boolean",
+          "default": "true",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "creado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "actualizado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "sucursales_codigo_key",
+          "definition": "UNIQUE (codigo)"
+        },
+        {
+          "name": "sucursales_pkey",
+          "definition": "PRIMARY KEY (id)"
+        }
+      ]
+    },
+    {
+      "rls": true,
+      "name": "usuario_roles",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "usuario_id",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "rol_id",
+          "type": "smallint",
+          "default": null,
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "asignado_por",
+          "type": "uuid",
+          "default": null,
+          "identity": "",
+          "not_null": false,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        },
+        {
+          "name": "asignado_en",
+          "type": "timestamp with time zone",
+          "default": "now()",
+          "identity": "",
+          "not_null": true,
+          "generated": "",
+          "privileges": {
+            "anon_select": false,
+            "authenticated_insert": true,
+            "authenticated_select": true,
+            "authenticated_update": true
+          }
+        }
+      ],
+      "force_rls": false,
+      "privileges": {
+        "anon_delete": false,
+        "anon_insert": false,
+        "anon_select": false,
+        "anon_update": false,
+        "service_delete": true,
+        "service_insert": true,
+        "service_select": true,
+        "service_update": true,
+        "authenticated_delete": true,
+        "authenticated_insert": true,
+        "authenticated_select": true,
+        "authenticated_update": true
+      },
+      "constraints": [
+        {
+          "name": "usuario_roles_asignado_por_fkey",
+          "definition": "FOREIGN KEY (asignado_por) REFERENCES perfiles(id) ON DELETE SET NULL"
+        },
+        {
+          "name": "usuario_roles_pkey",
+          "definition": "PRIMARY KEY (usuario_id)"
+        },
+        {
+          "name": "usuario_roles_rol_id_fkey",
+          "definition": "FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE RESTRICT"
+        },
+        {
+          "name": "usuario_roles_usuario_id_fkey",
+          "definition": "FOREIGN KEY (usuario_id) REFERENCES perfiles(id) ON DELETE CASCADE"
+        }
+      ]
+    }
+  ],
+  "buckets": [
+    {
+      "name": "portadas",
+      "public": true,
+      "file_size_limit": 5242880,
+      "allowed_mime_types": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ]
+    }
+  ],
+  "indexes": [
+    {
+      "name": "autores_pkey",
+      "table": "autores",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX autores_pkey ON public.autores USING btree (id)"
+    },
+    {
+      "name": "autores_slug_key",
+      "table": "autores",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX autores_slug_key ON public.autores USING btree (slug)"
+    },
+    {
+      "name": "carrito_detalles_pkey",
+      "table": "carrito_detalles",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX carrito_detalles_pkey ON public.carrito_detalles USING btree (carrito_id, libro_id)"
+    },
+    {
+      "name": "carritos_pkey",
+      "table": "carritos",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX carritos_pkey ON public.carritos USING btree (id)"
+    },
+    {
+      "name": "un_carrito_por_cliente",
+      "table": "carritos",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX un_carrito_por_cliente ON public.carritos USING btree (perfil_id)"
+    },
+    {
+      "name": "categorias_nombre_unico",
+      "table": "categorias",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX categorias_nombre_unico ON public.categorias USING btree (lower((nombre)::text))"
+    },
+    {
+      "name": "categorias_pkey",
+      "table": "categorias",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX categorias_pkey ON public.categorias USING btree (id)"
+    },
+    {
+      "name": "categorias_slug_key",
+      "table": "categorias",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX categorias_slug_key ON public.categorias USING btree (slug)"
+    },
+    {
+      "name": "configuracion_negocio_pkey",
+      "table": "configuracion_negocio",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX configuracion_negocio_pkey ON public.configuracion_negocio USING btree (id)"
+    },
+    {
+      "name": "contact_messages_estado_fecha_idx",
+      "table": "contact_messages",
+      "schema": "public",
+      "definition": "CREATE INDEX contact_messages_estado_fecha_idx ON public.contact_messages USING btree (estado, created_at DESC)"
+    },
+    {
+      "name": "contact_messages_legacy_message_idx",
+      "table": "contact_messages",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX contact_messages_legacy_message_idx ON public.contact_messages USING btree (legacy_message_id) WHERE (legacy_message_id IS NOT NULL)"
+    },
+    {
+      "name": "contact_messages_pkey",
+      "table": "contact_messages",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX contact_messages_pkey ON public.contact_messages USING btree (id)"
+    },
+    {
+      "name": "contact_messages_user_fecha_idx",
+      "table": "contact_messages",
+      "schema": "public",
+      "definition": "CREATE INDEX contact_messages_user_fecha_idx ON public.contact_messages USING btree (user_id, created_at DESC)"
+    },
+    {
+      "name": "cotizaciones_cliente_fecha",
+      "table": "cotizaciones",
+      "schema": "public",
+      "definition": "CREATE INDEX cotizaciones_cliente_fecha ON public.cotizaciones USING btree (cliente_id, creado_en DESC)"
+    },
+    {
+      "name": "cotizaciones_numero_key",
+      "table": "cotizaciones",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX cotizaciones_numero_key ON public.cotizaciones USING btree (numero)"
+    },
+    {
+      "name": "cotizaciones_pedido_id_key",
+      "table": "cotizaciones",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX cotizaciones_pedido_id_key ON public.cotizaciones USING btree (pedido_id)"
+    },
+    {
+      "name": "cotizaciones_pkey",
+      "table": "cotizaciones",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX cotizaciones_pkey ON public.cotizaciones USING btree (id)"
+    },
+    {
+      "name": "direcciones_perfil_idx",
+      "table": "direcciones",
+      "schema": "public",
+      "definition": "CREATE INDEX direcciones_perfil_idx ON public.direcciones USING btree (perfil_id)"
+    },
+    {
+      "name": "direcciones_pkey",
+      "table": "direcciones",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX direcciones_pkey ON public.direcciones USING btree (id)"
+    },
+    {
+      "name": "una_direccion_principal_por_cliente",
+      "table": "direcciones",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX una_direccion_principal_por_cliente ON public.direcciones USING btree (perfil_id) WHERE (es_principal = true)"
+    },
+    {
+      "name": "editoriales_nombre_unico",
+      "table": "editoriales",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX editoriales_nombre_unico ON public.editoriales USING btree (lower((nombre)::text))"
+    },
+    {
+      "name": "editoriales_pkey",
+      "table": "editoriales",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX editoriales_pkey ON public.editoriales USING btree (id)"
+    },
+    {
+      "name": "editoriales_slug_key",
+      "table": "editoriales",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX editoriales_slug_key ON public.editoriales USING btree (slug)"
+    },
+    {
+      "name": "facturas_cliente_fecha",
+      "table": "facturas",
+      "schema": "public",
+      "definition": "CREATE INDEX facturas_cliente_fecha ON public.facturas USING btree (cliente_id, creado_en DESC)"
+    },
+    {
+      "name": "facturas_ncf_unico",
+      "table": "facturas",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX facturas_ncf_unico ON public.facturas USING btree (ncf) WHERE (ncf IS NOT NULL)"
+    },
+    {
+      "name": "facturas_numero_key",
+      "table": "facturas",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX facturas_numero_key ON public.facturas USING btree (numero)"
+    },
+    {
+      "name": "facturas_pedido_id_key",
+      "table": "facturas",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX facturas_pedido_id_key ON public.facturas USING btree (pedido_id)"
+    },
+    {
+      "name": "facturas_pkey",
+      "table": "facturas",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX facturas_pkey ON public.facturas USING btree (id)"
+    },
+    {
+      "name": "favoritos_libro_idx",
+      "table": "favoritos",
+      "schema": "public",
+      "definition": "CREATE INDEX favoritos_libro_idx ON public.favoritos USING btree (libro_id)"
+    },
+    {
+      "name": "favoritos_pkey",
+      "table": "favoritos",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX favoritos_pkey ON public.favoritos USING btree (perfil_id, libro_id)"
+    },
+    {
+      "name": "inventario_disponible_idx",
+      "table": "inventarios",
+      "schema": "public",
+      "definition": "CREATE INDEX inventario_disponible_idx ON public.inventarios USING btree (cantidad_disponible) WHERE (cantidad_disponible > 0)"
+    },
+    {
+      "name": "inventarios_pkey",
+      "table": "inventarios",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX inventarios_pkey ON public.inventarios USING btree (libro_id)"
+    },
+    {
+      "name": "libro_autor_autor_idx",
+      "table": "libro_autor",
+      "schema": "public",
+      "definition": "CREATE INDEX libro_autor_autor_idx ON public.libro_autor USING btree (autor_id)"
+    },
+    {
+      "name": "libro_autor_pkey",
+      "table": "libro_autor",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX libro_autor_pkey ON public.libro_autor USING btree (libro_id, autor_id)"
+    },
+    {
+      "name": "libro_categoria_categoria_idx",
+      "table": "libro_categoria",
+      "schema": "public",
+      "definition": "CREATE INDEX libro_categoria_categoria_idx ON public.libro_categoria USING btree (categoria_id)"
+    },
+    {
+      "name": "libro_categoria_pkey",
+      "table": "libro_categoria",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX libro_categoria_pkey ON public.libro_categoria USING btree (libro_id, categoria_id)"
+    },
+    {
+      "name": "libros_activos_idx",
+      "table": "libros",
+      "schema": "public",
+      "definition": "CREATE INDEX libros_activos_idx ON public.libros USING btree (activo) WHERE (activo = true)"
+    },
+    {
+      "name": "libros_categoria_idx",
+      "table": "libros",
+      "schema": "public",
+      "definition": "CREATE INDEX libros_categoria_idx ON public.libros USING btree (categoria_id)"
+    },
+    {
+      "name": "libros_editorial_idx",
+      "table": "libros",
+      "schema": "public",
+      "definition": "CREATE INDEX libros_editorial_idx ON public.libros USING btree (editorial_id)"
+    },
+    {
+      "name": "libros_isbn_key",
+      "table": "libros",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX libros_isbn_key ON public.libros USING btree (isbn)"
+    },
+    {
+      "name": "libros_pkey",
+      "table": "libros",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX libros_pkey ON public.libros USING btree (id)"
+    },
+    {
+      "name": "libros_titulo_busqueda",
+      "table": "libros",
+      "schema": "public",
+      "definition": "CREATE INDEX libros_titulo_busqueda ON public.libros USING btree (lower((titulo)::text))"
+    },
+    {
+      "name": "mensajes_contacto_pkey",
+      "table": "mensajes_contacto",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX mensajes_contacto_pkey ON public.mensajes_contacto USING btree (id)"
+    },
+    {
+      "name": "mensajes_estado_idx",
+      "table": "mensajes_contacto",
+      "schema": "public",
+      "definition": "CREATE INDEX mensajes_estado_idx ON public.mensajes_contacto USING btree (estado, creado_en DESC)"
+    },
+    {
+      "name": "mensajes_perfil_fecha_idx",
+      "table": "mensajes_contacto",
+      "schema": "public",
+      "definition": "CREATE INDEX mensajes_perfil_fecha_idx ON public.mensajes_contacto USING btree (perfil_id, creado_en DESC)"
+    },
+    {
+      "name": "movimientos_fecha_idx",
+      "table": "movimientos_inventario",
+      "schema": "public",
+      "definition": "CREATE INDEX movimientos_fecha_idx ON public.movimientos_inventario USING btree (creado_en DESC)"
+    },
+    {
+      "name": "movimientos_inventario_pkey",
+      "table": "movimientos_inventario",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX movimientos_inventario_pkey ON public.movimientos_inventario USING btree (id)"
+    },
+    {
+      "name": "movimientos_libro_fecha_idx",
+      "table": "movimientos_inventario",
+      "schema": "public",
+      "definition": "CREATE INDEX movimientos_libro_fecha_idx ON public.movimientos_inventario USING btree (libro_id, creado_en DESC)"
+    },
+    {
+      "name": "movimientos_pedido_idx",
+      "table": "movimientos_inventario",
+      "schema": "public",
+      "definition": "CREATE INDEX movimientos_pedido_idx ON public.movimientos_inventario USING btree (pedido_id)"
+    },
+    {
+      "name": "pedido_detalles_libro_idx",
+      "table": "pedido_detalles",
+      "schema": "public",
+      "definition": "CREATE INDEX pedido_detalles_libro_idx ON public.pedido_detalles USING btree (libro_id)"
+    },
+    {
+      "name": "pedido_detalles_pkey",
+      "table": "pedido_detalles",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX pedido_detalles_pkey ON public.pedido_detalles USING btree (pedido_id, libro_id)"
+    },
+    {
+      "name": "pedido_direcciones_entrega_pkey",
+      "table": "pedido_direcciones_entrega",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX pedido_direcciones_entrega_pkey ON public.pedido_direcciones_entrega USING btree (pedido_id)"
+    },
+    {
+      "name": "pedidos_cliente_fecha_idx",
+      "table": "pedidos",
+      "schema": "public",
+      "definition": "CREATE INDEX pedidos_cliente_fecha_idx ON public.pedidos USING btree (cliente_id, creado_en DESC)"
+    },
+    {
+      "name": "pedidos_estado_fecha_idx",
+      "table": "pedidos",
+      "schema": "public",
+      "definition": "CREATE INDEX pedidos_estado_fecha_idx ON public.pedidos USING btree (estado, creado_en DESC)"
+    },
+    {
+      "name": "pedidos_estado_pago_idx",
+      "table": "pedidos",
+      "schema": "public",
+      "definition": "CREATE INDEX pedidos_estado_pago_idx ON public.pedidos USING btree (estado_pago)"
+    },
+    {
+      "name": "pedidos_numero_key",
+      "table": "pedidos",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX pedidos_numero_key ON public.pedidos USING btree (numero)"
+    },
+    {
+      "name": "pedidos_pkey",
+      "table": "pedidos",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX pedidos_pkey ON public.pedidos USING btree (id)"
+    },
+    {
+      "name": "perfiles_pkey",
+      "table": "perfiles",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX perfiles_pkey ON public.perfiles USING btree (id)"
+    },
+    {
+      "name": "roles_codigo_key",
+      "table": "roles",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX roles_codigo_key ON public.roles USING btree (codigo)"
+    },
+    {
+      "name": "roles_pkey",
+      "table": "roles",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX roles_pkey ON public.roles USING btree (id)"
+    },
+    {
+      "name": "sucursales_codigo_key",
+      "table": "sucursales",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX sucursales_codigo_key ON public.sucursales USING btree (codigo)"
+    },
+    {
+      "name": "sucursales_pkey",
+      "table": "sucursales",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX sucursales_pkey ON public.sucursales USING btree (id)"
+    },
+    {
+      "name": "usuario_roles_pkey",
+      "table": "usuario_roles",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX usuario_roles_pkey ON public.usuario_roles USING btree (usuario_id)"
+    }
+  ],
+  "policies": [
+    {
+      "name": "autores_activos_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "autores",
+      "using": "(activo OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "autores_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "autores",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "autores_lectura_publica",
+      "roles": [
+        "anon"
+      ],
+      "table": "autores",
+      "using": "true",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "carrito_detalles_propios",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "carrito_detalles",
+      "using": "(EXISTS ( SELECT 1\n   FROM carritos c\n  WHERE ((c.id = carrito_detalles.carrito_id) AND (c.perfil_id = ( SELECT auth.uid() AS uid)))))",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM carritos c\n  WHERE ((c.id = carrito_detalles.carrito_id) AND (c.perfil_id = ( SELECT auth.uid() AS uid)))))"
+    },
+    {
+      "name": "carrito_propio",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "carritos",
+      "using": "(perfil_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "(perfil_id = ( SELECT auth.uid() AS uid))"
+    },
+    {
+      "name": "categorias_activas_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "categorias",
+      "using": "(activo OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "categorias_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "categorias",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "categorias_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "categorias",
+      "using": "(activo OR private.es_personal())",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "categorias_lectura_publica",
+      "roles": [
+        "anon"
+      ],
+      "table": "categorias",
+      "using": "activo",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "Configuracion visible para usuarios autenticados",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "configuracion_negocio",
+      "using": "true",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "contact_messages_actualizar_admin",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "contact_messages",
+      "using": "private.es_admin()",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "with_check": "private.es_admin()"
+    },
+    {
+      "name": "contact_messages_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "contact_messages",
+      "using": "((user_id = auth.uid()) OR private.es_admin())",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "Cotizaciones visibles para propietario o personal",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "cotizaciones",
+      "using": "((cliente_id = auth.uid()) OR private.es_personal())",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "direcciones_propias",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "direcciones",
+      "using": "(perfil_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "(perfil_id = ( SELECT auth.uid() AS uid))"
+    },
+    {
+      "name": "editoriales_activas_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "editoriales",
+      "using": "(activo OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "editoriales_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "editoriales",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "Facturas visibles para propietario o personal",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "facturas",
+      "using": "((cliente_id = auth.uid()) OR private.es_personal())",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "favoritos_propios",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "favoritos",
+      "using": "(perfil_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "(perfil_id = ( SELECT auth.uid() AS uid))"
+    },
+    {
+      "name": "inventario_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "inventarios",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "inventario_catalogo_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "inventarios",
+      "using": "((EXISTS ( SELECT 1\n   FROM libros l\n  WHERE ((l.id = inventarios.libro_id) AND l.activo))) OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "inventario_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "inventarios",
+      "using": "(private.es_personal() OR (EXISTS ( SELECT 1\n   FROM libros l\n  WHERE ((l.id = inventarios.libro_id) AND l.activo))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "inventario_lectura_publica",
+      "roles": [
+        "anon"
+      ],
+      "table": "inventarios",
+      "using": "(EXISTS ( SELECT 1\n   FROM libros\n  WHERE ((libros.id = inventarios.libro_id) AND libros.activo)))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "libro_autor_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "libro_autor",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "libro_autor_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "libro_autor",
+      "using": "((EXISTS ( SELECT 1\n   FROM libros l\n  WHERE ((l.id = libro_autor.libro_id) AND l.activo))) OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "libro_autor_lectura_publica",
+      "roles": [
+        "anon"
+      ],
+      "table": "libro_autor",
+      "using": "(EXISTS ( SELECT 1\n   FROM libros\n  WHERE ((libros.id = libro_autor.libro_id) AND libros.activo)))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "libro_categoria_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "libro_categoria",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "libro_categoria_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "libro_categoria",
+      "using": "((EXISTS ( SELECT 1\n   FROM libros l\n  WHERE ((l.id = libro_categoria.libro_id) AND l.activo))) OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "libros_activos_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "libros",
+      "using": "(activo OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "libros_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "libros",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "libros_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "libros",
+      "using": "(activo OR private.es_personal())",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "libros_lectura_publica",
+      "roles": [
+        "anon"
+      ],
+      "table": "libros",
+      "using": "activo",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "mensajes_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "mensajes_contacto",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "mensajes_propios_creacion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "mensajes_contacto",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE",
+      "with_check": "(perfil_id = ( SELECT auth.uid() AS uid))"
+    },
+    {
+      "name": "mensajes_propios_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "mensajes_contacto",
+      "using": "(perfil_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "movimientos_lectura_admin",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "movimientos_inventario",
+      "using": "private.es_personal()",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "movimientos_solo_admin",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "movimientos_inventario",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "detalles_pedido_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedido_detalles",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "detalles_pedido_propios_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedido_detalles",
+      "using": "(EXISTS ( SELECT 1\n   FROM pedidos p\n  WHERE ((p.id = pedido_detalles.pedido_id) AND (p.cliente_id = ( SELECT auth.uid() AS uid)))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "pedido_detalles_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedido_detalles",
+      "using": "(EXISTS ( SELECT 1\n   FROM pedidos p\n  WHERE ((p.id = pedido_detalles.pedido_id) AND ((p.cliente_id = auth.uid()) OR private.es_personal()))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "direccion_pedido_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedido_direcciones_entrega",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "direccion_pedido_propia_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedido_direcciones_entrega",
+      "using": "(EXISTS ( SELECT 1\n   FROM pedidos p\n  WHERE ((p.id = pedido_direcciones_entrega.pedido_id) AND (p.cliente_id = ( SELECT auth.uid() AS uid)))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "direcciones_pedido_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedido_direcciones_entrega",
+      "using": "(EXISTS ( SELECT 1\n   FROM pedidos p\n  WHERE ((p.id = pedido_direcciones_entrega.pedido_id) AND ((p.cliente_id = auth.uid()) OR private.es_personal()))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "pedidos_actualizacion_admin",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedidos",
+      "using": "private.es_personal()",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "with_check": "private.es_personal()"
+    },
+    {
+      "name": "pedidos_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedidos",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "pedidos_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedidos",
+      "using": "((cliente_id = auth.uid()) OR private.es_personal())",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "pedidos_propios_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "pedidos",
+      "using": "(cliente_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "perfil_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "perfiles",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "perfil_propio_o_admin_actualizacion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "perfiles",
+      "using": "((id = ( SELECT auth.uid() AS uid)) OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "with_check": "((id = ( SELECT auth.uid() AS uid)) OR ( SELECT private.es_admin() AS es_admin))"
+    },
+    {
+      "name": "perfil_propio_o_admin_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "perfiles",
+      "using": "((id = ( SELECT auth.uid() AS uid)) OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "roles_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "roles",
+      "using": "true",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "sucursales_activas_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sucursales",
+      "using": "(activo OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "sucursales_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "sucursales",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "rol_propio_o_admin_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "usuario_roles",
+      "using": "((usuario_id = ( SELECT auth.uid() AS uid)) OR ( SELECT private.es_admin() AS es_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "roles_usuario_admin_gestion",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "usuario_roles",
+      "using": "( SELECT private.es_admin() AS es_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE",
+      "with_check": "( SELECT private.es_admin() AS es_admin)"
+    },
+    {
+      "name": "portadas_admin_actualizar",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": "((bucket_id = 'portadas'::text) AND private.es_admin())",
+      "schema": "storage",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE",
+      "with_check": "((bucket_id = 'portadas'::text) AND private.es_admin())"
+    },
+    {
+      "name": "portadas_admin_eliminar",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": "((bucket_id = 'portadas'::text) AND private.es_admin())",
+      "schema": "storage",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    },
+    {
+      "name": "portadas_admin_insertar",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": null,
+      "schema": "storage",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE",
+      "with_check": "((bucket_id = 'portadas'::text) AND private.es_admin())"
+    },
+    {
+      "name": "portadas_admin_lectura",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "objects",
+      "using": "((bucket_id = 'portadas'::text) AND private.es_admin())",
+      "schema": "storage",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE",
+      "with_check": null
+    }
+  ],
+  "triggers": [
+    {
+      "name": "al_crear_usuario_auth",
+      "table": "users",
+      "schema": "auth",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER al_crear_usuario_auth AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION private.crear_perfil_usuario()"
+    },
+    {
+      "name": "actualizar_autores",
+      "table": "autores",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_autores BEFORE UPDATE ON public.autores FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "actualizar_carritos",
+      "table": "carritos",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_carritos BEFORE UPDATE ON public.carritos FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "actualizar_categorias",
+      "table": "categorias",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_categorias BEFORE UPDATE ON public.categorias FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "calcular_totales_cotizacion",
+      "table": "cotizaciones",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER calcular_totales_cotizacion BEFORE INSERT OR UPDATE OF subtotal, descuento, snapshot ON public.cotizaciones FOR EACH ROW EXECUTE FUNCTION private.calcular_totales_documento()"
+    },
+    {
+      "name": "actualizar_direcciones",
+      "table": "direcciones",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_direcciones BEFORE UPDATE ON public.direcciones FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "actualizar_editoriales",
+      "table": "editoriales",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_editoriales BEFORE UPDATE ON public.editoriales FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "calcular_totales_factura",
+      "table": "facturas",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER calcular_totales_factura BEFORE INSERT OR UPDATE OF subtotal, descuento, snapshot ON public.facturas FOR EACH ROW EXECUTE FUNCTION private.calcular_totales_documento()"
+    },
+    {
+      "name": "actualizar_inventarios",
+      "table": "inventarios",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_inventarios BEFORE UPDATE ON public.inventarios FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "actualizar_libros",
+      "table": "libros",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_libros BEFORE UPDATE ON public.libros FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "actualizar_mensajes_contacto",
+      "table": "mensajes_contacto",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_mensajes_contacto BEFORE UPDATE ON public.mensajes_contacto FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "actualizar_pedidos",
+      "table": "pedidos",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_pedidos BEFORE UPDATE ON public.pedidos FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "calcular_totales_pedido",
+      "table": "pedidos",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER calcular_totales_pedido BEFORE INSERT OR UPDATE OF subtotal, descuento, costo_envio ON public.pedidos FOR EACH ROW EXECUTE FUNCTION private.calcular_totales_pedido()"
+    },
+    {
+      "name": "crear_cotizacion_al_confirmar_pedido",
+      "table": "pedidos",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE CONSTRAINT TRIGGER crear_cotizacion_al_confirmar_pedido AFTER INSERT ON public.pedidos DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION private.cotizar_pedido_al_confirmar()"
+    },
+    {
+      "name": "sincronizar_documentos_al_cambiar_pedido",
+      "table": "pedidos",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER sincronizar_documentos_al_cambiar_pedido AFTER UPDATE OF estado ON public.pedidos FOR EACH ROW EXECUTE FUNCTION private.sincronizar_estado_documentos()"
+    },
+    {
+      "name": "actualizar_perfiles",
+      "table": "perfiles",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_perfiles BEFORE UPDATE ON public.perfiles FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    },
+    {
+      "name": "actualizar_sucursales",
+      "table": "sucursales",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER actualizar_sucursales BEFORE UPDATE ON public.sucursales FOR EACH ROW EXECUTE FUNCTION private.fijar_actualizado_en()"
+    }
+  ],
+  "functions": [
+    {
+      "name": "calcular_totales_documento",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "82602c9e0ee73a385aef78c96c56786a",
+      "language": "plpgsql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [],
+      "security_definer": true,
+      "identity_arguments": ""
+    },
+    {
+      "name": "calcular_totales_pedido",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "d990a575f1308468c177cf182e309a4b",
+      "language": "plpgsql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [],
+      "security_definer": true,
+      "identity_arguments": ""
+    },
+    {
+      "name": "cotizar_pedido_al_confirmar",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "1c72334ad8f117a0cdfcd8abcee05291",
+      "language": "plpgsql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": false,
+        "authenticated_execute": false
+      },
+      "volatility": "v",
+      "parameter_names": [],
+      "security_definer": true,
+      "identity_arguments": ""
+    },
+    {
+      "name": "crear_cotizacion_pedido",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "1542263f86712648d3e548ea4a1820cf",
+      "language": "plpgsql",
+      "arguments": "p_pedido_id uuid, p_creado_por uuid DEFAULT NULL::uuid",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": false,
+        "authenticated_execute": false
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_pedido_id",
+        "p_creado_por"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_pedido_id uuid, p_creado_por uuid"
+    },
+    {
+      "name": "crear_perfil_usuario",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "cc6da0bfc52ef0517ff96f1c4eabe026",
+      "language": "plpgsql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [],
+      "security_definer": true,
+      "identity_arguments": ""
+    },
+    {
+      "name": "es_admin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "boolean",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "73e75c06705beeece070c42a59a3dade",
+      "language": "sql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": false,
+        "authenticated_execute": true
+      },
+      "volatility": "s",
+      "parameter_names": [],
+      "security_definer": true,
+      "identity_arguments": ""
+    },
+    {
+      "name": "es_personal",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "boolean",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "2dce8d6e6a06f8368c651a9164d69cb2",
+      "language": "sql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": false,
+        "authenticated_execute": true
+      },
+      "volatility": "s",
+      "parameter_names": [],
+      "security_definer": true,
+      "identity_arguments": ""
+    },
+    {
+      "name": "fijar_actualizado_en",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "5217d91dbe6c17ec2d8de7cdb7b02c6f",
+      "language": "plpgsql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [],
+      "security_definer": false,
+      "identity_arguments": ""
+    },
+    {
+      "name": "sincronizar_estado_documentos",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "trigger",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "a6fa9610dc20ea9b7f5af76a5f28157c",
+      "language": "plpgsql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": false,
+        "authenticated_execute": false
+      },
+      "volatility": "v",
+      "parameter_names": [],
+      "security_definer": true,
+      "identity_arguments": ""
+    },
+    {
+      "name": "snapshot_documento_pedido",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "schema": "private",
+      "strict": false,
+      "body_md5": "f0ea9f9c1d7e4879a99f174005c57742",
+      "language": "plpgsql",
+      "arguments": "p_pedido_id uuid, p_tipo text, p_numero text, p_fecha_emision date, p_fecha_limite date DEFAULT NULL::date, p_ncf text DEFAULT NULL::text, p_condicion_pago text DEFAULT NULL::text, p_notas text DEFAULT NULL::text, p_creado_por uuid DEFAULT NULL::uuid",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": false,
+        "authenticated_execute": false
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_pedido_id",
+        "p_tipo",
+        "p_numero",
+        "p_fecha_emision",
+        "p_fecha_limite",
+        "p_ncf",
+        "p_condicion_pago",
+        "p_notas",
+        "p_creado_por"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_pedido_id uuid, p_tipo text, p_numero text, p_fecha_emision date, p_fecha_limite date, p_ncf text, p_condicion_pago text, p_notas text, p_creado_por uuid"
+    },
+    {
+      "name": "actualizar_estado_pedido",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "89e05cfa286bb6828dc4b5c05eaee0eb",
+      "language": "plpgsql",
+      "arguments": "p_pedido_id uuid, p_estado text",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_pedido_id",
+        "p_estado"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_pedido_id uuid, p_estado text"
+    },
+    {
+      "name": "actualizar_pago_pedido",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "48d155c212a31fc3e8a0d57ca2025321",
+      "language": "plpgsql",
+      "arguments": "p_pedido_id uuid, p_estado_pago text",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_pedido_id",
+        "p_estado_pago"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_pedido_id uuid, p_estado_pago text"
+    },
+    {
+      "name": "actualizar_usuario_admin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "void",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "e4fc83bf6671a71ec7873b70d0644b85",
+      "language": "plpgsql",
+      "arguments": "p_usuario_id uuid, p_nombres text, p_apellidos text, p_activo boolean, p_rol text",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_usuario_id",
+        "p_nombres",
+        "p_apellidos",
+        "p_activo",
+        "p_rol"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_usuario_id uuid, p_nombres text, p_apellidos text, p_activo boolean, p_rol text"
+    },
+    {
+      "name": "ajustar_inventario_admin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "6286f20cdcb27791e42b2e2c286a9e1b",
+      "language": "plpgsql",
+      "arguments": "p_producto_id bigint, p_tipo text, p_cantidad integer, p_motivo text",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_producto_id",
+        "p_tipo",
+        "p_cantidad",
+        "p_motivo"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_producto_id bigint, p_tipo text, p_cantidad integer, p_motivo text"
+    },
+    {
+      "name": "crear_pedido_desde_carrito",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "jsonb",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "c1eaf74cd9f295726208dc6316ff7c0e",
+      "language": "plpgsql",
+      "arguments": "p_metodo_entrega text, p_metodo_pago text, p_sucursal_id bigint DEFAULT NULL::bigint, p_direccion jsonb DEFAULT NULL::jsonb, p_notas text DEFAULT NULL::text",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_metodo_entrega",
+        "p_metodo_pago",
+        "p_sucursal_id",
+        "p_direccion",
+        "p_notas"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_metodo_entrega text, p_metodo_pago text, p_sucursal_id bigint, p_direccion jsonb, p_notas text"
+    },
+    {
+      "name": "eliminar_categoria_admin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "text",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "9fbff816f34b53db871556d897cf231f",
+      "language": "plpgsql",
+      "arguments": "p_categoria_id bigint",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_categoria_id"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_categoria_id bigint"
+    },
+    {
+      "name": "eliminar_producto_admin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "text",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "3b837477ef72f0d9b14c79c02f6d906a",
+      "language": "plpgsql",
+      "arguments": "p_producto_id bigint",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_producto_id"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_producto_id bigint"
+    },
+    {
+      "name": "enviar_mensaje_contacto",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "uuid",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "f381d0034e5209b445e0b1e92e6ccf88",
+      "language": "plpgsql",
+      "arguments": "p_nombre text, p_correo text, p_asunto text, p_mensaje text, p_telefono text DEFAULT NULL::text",
+      "privileges": {
+        "anon_execute": true,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_nombre",
+        "p_correo",
+        "p_asunto",
+        "p_mensaje",
+        "p_telefono"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_nombre text, p_correo text, p_asunto text, p_mensaje text, p_telefono text"
+    },
+    {
+      "name": "generar_factura_pedido",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "facturas",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "0592f429bdb9b8f2b87b9ff569c3f782",
+      "language": "plpgsql",
+      "arguments": "p_pedido_id uuid, p_ncf text DEFAULT NULL::text, p_condicion_pago text DEFAULT NULL::text, p_fecha_vencimiento date DEFAULT NULL::date, p_notas text DEFAULT NULL::text",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_pedido_id",
+        "p_ncf",
+        "p_condicion_pago",
+        "p_fecha_vencimiento",
+        "p_notas"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_pedido_id uuid, p_ncf text, p_condicion_pago text, p_fecha_vencimiento date, p_notas text"
+    },
+    {
+      "name": "guardar_categoria_admin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "bigint",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "f532d346155408982fc6d6fb422ad2d3",
+      "language": "plpgsql",
+      "arguments": "p_categoria_id bigint, p_nombre text, p_activo boolean",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_categoria_id",
+        "p_nombre",
+        "p_activo"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_categoria_id bigint, p_nombre text, p_activo boolean"
+    },
+    {
+      "name": "guardar_configuracion_negocio",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "configuracion_negocio",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "00ee6542d49f215b4f14237ac30f2b8a",
+      "language": "plpgsql",
+      "arguments": "p_datos jsonb",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_datos"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_datos jsonb"
+    },
+    {
+      "name": "guardar_producto_admin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "bigint",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "9b83f6bd7a3010fb371eac10fec8f9f0",
+      "language": "plpgsql",
+      "arguments": "p_producto_id bigint, p_isbn text, p_titulo text, p_autor text, p_categoria text, p_editorial text, p_descripcion text, p_precio numeric, p_descuento_pct numeric, p_formato text, p_idioma text, p_imagen_portada text, p_stock_inicial integer, p_stock_minimo integer, p_activo boolean",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "v",
+      "parameter_names": [
+        "p_producto_id",
+        "p_isbn",
+        "p_titulo",
+        "p_autor",
+        "p_categoria",
+        "p_editorial",
+        "p_descripcion",
+        "p_precio",
+        "p_descuento_pct",
+        "p_formato",
+        "p_idioma",
+        "p_imagen_portada",
+        "p_stock_inicial",
+        "p_stock_minimo",
+        "p_activo"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_producto_id bigint, p_isbn text, p_titulo text, p_autor text, p_categoria text, p_editorial text, p_descripcion text, p_precio numeric, p_descuento_pct numeric, p_formato text, p_idioma text, p_imagen_portada text, p_stock_inicial integer, p_stock_minimo integer, p_activo boolean"
+    },
+    {
+      "name": "listar_movimientos_inventario",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "TABLE(id bigint, producto text, tipo text, cambio_existencia integer, cambio_reservada integer, motivo text, responsable text, creado_en timestamp with time zone)",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "00bf5cfd533c5fd4d655616e92ecbb40",
+      "language": "plpgsql",
+      "arguments": "p_limite integer DEFAULT 40",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "s",
+      "parameter_names": [
+        "p_limite",
+        "id",
+        "producto",
+        "tipo",
+        "cambio_existencia",
+        "cambio_reservada",
+        "motivo",
+        "responsable",
+        "creado_en"
+      ],
+      "security_definer": true,
+      "identity_arguments": "p_limite integer"
+    },
+    {
+      "name": "listar_usuarios_admin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "result": "TABLE(id uuid, correo text, nombres text, apellidos text, activo boolean, rol text, creado_en timestamp with time zone)",
+      "schema": "public",
+      "strict": false,
+      "body_md5": "97fccc505fd00ae6b52a9a14fda4e829",
+      "language": "plpgsql",
+      "arguments": "",
+      "privileges": {
+        "anon_execute": false,
+        "service_execute": true,
+        "authenticated_execute": true
+      },
+      "volatility": "s",
+      "parameter_names": [
+        "id",
+        "correo",
+        "nombres",
+        "apellidos",
+        "activo",
+        "rol",
+        "creado_en"
+      ],
+      "security_definer": true,
+      "identity_arguments": ""
+    }
+  ],
+  "sequences": [
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "autores_id_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "categorias_id_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "cotizaciones_numero_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "direcciones_id_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "editoriales_id_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "facturas_numero_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "libros_id_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "mensajes_contacto_id_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "movimientos_inventario_id_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 32767,
+      "min": 1,
+      "name": "roles_id_seq",
+      "type": "smallint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    },
+    {
+      "max": 9223372036854776000,
+      "min": 1,
+      "name": "sucursales_id_seq",
+      "type": "bigint",
+      "cycle": false,
+      "start": 1,
+      "schema": "public",
+      "increment": 1
+    }
+  ]
+}

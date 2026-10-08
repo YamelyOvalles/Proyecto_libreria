@@ -40,7 +40,7 @@ async function main() {
         "|---|---:|---|---|",
         ...results.map(item => `| ${item.route} | ${item.status} | ${item.contentType} | ${item.detail} |`),
         "",
-        "Las capturas visuales están en `servidor-express-home.png` y `servidor-express-health.png`."
+        "Esta comprobación HTTP no verifica login, CRUD ni genera capturas visuales."
     ];
 
     await fs.writeFile(evidencePath, `${lines.join("\n")}\n`, "utf8");

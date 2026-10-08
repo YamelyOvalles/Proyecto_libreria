@@ -1,6 +1,6 @@
 // Protege el panel administrativo.
 (async function protegerPagina() {
-    const esPaginaAdmin = window.location.pathname.toLowerCase().endsWith("admin.html");
+    const esPaginaAdmin = /\/admin(?:\.html)?$/i.test(window.location.pathname);
     if (esPaginaAdmin) document.documentElement.style.visibility = "hidden";
 
     function continuarComoInvitado() {
@@ -30,7 +30,7 @@
             window.obtenerRolLibreria(sesion.user.id),
             window.obtenerPerfilLibreria(sesion.user.id).catch(() => null)
         ]);
-        if (perfil?.activo === false) {
+        if (!perfil?.activo) {
             await window.libreriaSupabase.auth.signOut({ scope: "local" });
             window.location.replace("login.html?auth=inactivo");
             return;
@@ -75,7 +75,7 @@ window.libreriaSupabase?.auth.onAuthStateChange(evento => {
     window.libreriaSesion = null;
     window.libreriaUsuario = null;
     window.libreriaRol = null;
-    const esPaginaAdmin = window.location.pathname.toLowerCase().endsWith("admin.html");
+    const esPaginaAdmin = /\/admin(?:\.html)?$/i.test(window.location.pathname);
     window.location.replace(esPaginaAdmin ? "login.html" : "informacion.html");
 });
 

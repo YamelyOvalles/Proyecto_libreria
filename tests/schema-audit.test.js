@@ -1,0 +1,28 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const { localSnapshot, checkCoverage, compareSnapshots, unwrapSnapshot } = require('../scripts/audit-database');
+test('el instalador SQL cubre todas las tablas/RPC/parámetros/buckets usados por la aplicación', async () => {
+    const snapshot = await localSnapshot();
+    const coverage = checkCoverage(snapshot);
+    assert.deepEqual(coverage.errors, []);
+    assert.equal(snapshot.tables.length, 19);
+    assert.equal(snapshot.functions.filter(fn => fn.schema === 'public').length, 14);
+    assert.equal(snapshot.triggers.length, 3);
+    assert.ok(snapshot.policies.length >= 35);
+    assert.deepEqual(compareSnapshots(snapshot, unwrapSnapshot([{ schema_snapshot: snapshot }])), []);
+    const changed = structuredClone(snapshot);
+    changed.functions[0].body_md5 = 'modificado';
+    changed.tables.shift();
+    changed.buckets.push({ name: 'bucket_que_falta_documentar' });
+    const diffs = compareSnapshots(snapshot, changed);
+    assert.ok(diffs.some(item => item.section === 'functions' && item.status === 'diferente'));
+    assert.ok(diffs.some(item => item.section === 'tables' && item.status === 'solo_local'));
+    assert.ok(diffs.some(item => item.section === 'buckets' && item.status === 'solo_remoto'));
+    const olderExport = structuredClone(snapshot);
+    delete olderExport.functions[0].language;
+    delete olderExport.functions[0].volatility;
+    delete olderExport.functions[0].strict;
+    const unavailable = compareSnapshots(snapshot, olderExport);
+    assert.equal(unavailable[0].status, 'metadatos_no_exportados');
+    assert.deepEqual(unavailable[0].fields_changed, []);
+});

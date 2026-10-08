@@ -5,6 +5,7 @@
 .env
 .env.*
 !.env.example
+!.env.demo.example
 server/.env
 js/supabase-config.js
 *.pem
@@ -22,6 +23,10 @@ supabase/.temp/
 node_modules/
 dist/
 coverage/
+test-results/
+playwright-report/
+.tmp/
+database/.schema.remote.json
 *.log
 .DS_Store
 Thumbs.db

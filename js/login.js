@@ -21,6 +21,17 @@ const destinoSolicitado = new URLSearchParams(window.location.search).get("next"
 const destinoDespuesAcceso = ["informacion.html", "tienda.html", "formulario.html"].includes(destinoSolicitado)
     ? destinoSolicitado
     : "informacion.html";
+// Conserva enlaces documentales tras login sin permitir redirecciones externas.
+function destinoSeguroDocumento(valor) {
+    try {
+        const url = new URL(valor, window.location.href);
+        return valor && url.origin === window.location.origin && /\/documento(?:\.html)?$/.test(url.pathname) &&
+            ["cotizacion", "factura"].includes(url.searchParams.get("tipo")) &&
+            /^[0-9a-f-]{36}$/i.test(url.searchParams.get("id") || "")
+            ? url.pathname + url.search : null;
+    } catch { return null; }
+}
+const documentoSolicitado = destinoSeguroDocumento(new URLSearchParams(window.location.search).get("returnTo"));
 
 function mostrarMensaje(texto, tipo = "error") {
     mensaje.textContent = texto;
@@ -129,12 +140,17 @@ formulario.addEventListener("submit", async evento => {
         } else {
             const { data, error } = await window.libreriaSupabase.auth.signInWithPassword({ email, password });
             if (error) throw error;
+            const perfil = await window.obtenerPerfilLibreria(data.user.id);
+            if (!perfil?.activo) {
+                await window.libreriaSupabase.auth.signOut({ scope: "local" });
+                throw new Error("La cuenta no está activa.");
+            }
             const rolReal = await window.obtenerRolLibreria(data.user.id);
             if (rolSeleccionado === "administrador" && !["administrador", "empleado"].includes(rolReal)) {
                 await window.libreriaSupabase.auth.signOut();
                 throw new Error("Esta cuenta no pertenece al personal autorizado.");
             }
-            window.location.replace(["administrador", "empleado"].includes(rolReal) ? "admin.html" : destinoDespuesAcceso);
+            window.location.replace(documentoSolicitado || (["administrador", "empleado"].includes(rolReal) ? "admin.html" : destinoDespuesAcceso));
         }
     } catch (error) {
         mostrarMensaje(window.mensajeErrorSupabase(error, error.message));
@@ -145,6 +161,7 @@ formulario.addEventListener("submit", async evento => {
 
 (async function prepararAcceso() {
     const parametros = new URLSearchParams(window.location.search);
+    if (parametros.get("auth") === "inactivo") mostrarMensaje("La cuenta no está activa.");
     if (parametros.get("registro") === "1") cambiarModoRegistro();
     if (!window.libreriaSupabaseConfigurado || parametros.get("config") === "pendiente") {
         mostrarMensaje("No se cargó la configuración pública de Supabase. En Vercel configura SUPABASE_URL y SUPABASE_ANON_KEY; localmente configura server/.env.");
@@ -153,8 +170,14 @@ formulario.addEventListener("submit", async evento => {
     try {
         const sesion = await window.obtenerSesionLibreria();
         if (sesion?.user && modo !== "recuperacion") {
+            const perfil = await window.obtenerPerfilLibreria(sesion.user.id);
+            if (!perfil?.activo) {
+                await window.libreriaSupabase.auth.signOut({ scope: "local" });
+                mostrarMensaje("La cuenta no está activa.");
+                return;
+            }
             const rol = await window.obtenerRolLibreria(sesion.user.id);
-            window.location.replace(["administrador", "empleado"].includes(rol) ? "admin.html" : destinoDespuesAcceso);
+            window.location.replace(documentoSolicitado || (["administrador", "empleado"].includes(rol) ? "admin.html" : destinoDespuesAcceso));
         }
     } catch (error) {
         mostrarMensaje(window.mensajeErrorSupabase(error));

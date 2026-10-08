@@ -1,0 +1,41 @@
+name: Fase 4 - pruebas aisladas
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check && npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - name: Iniciar Supabase exclusivamente local
+        run: |
+          mkdir -p .tmp
+          npx supabase start > .tmp/supabase-start.log 2>&1
+          npm run local:config
+          npm run demo:seed
+      - name: Ejecutar Edge Function e integración real
+        run: |
+          npx supabase functions serve bright-action --no-verify-jwt > .tmp/edge.log 2>&1 &
+          edge_pid=$!
+          trap 'kill "$edge_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:54321/functions/v1/bright-action)
+            if [ "$status" = "401" ]; then break; fi
+            sleep 2
+          done
+          npm run test:integration
+          npm run test:browser:local
+      - name: Detener pila local
+        if: always()
+        run: npx supabase stop --no-backup

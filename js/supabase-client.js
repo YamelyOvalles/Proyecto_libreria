@@ -19,7 +19,8 @@
         }
     }
 
-    const configurado = /^https:\/\/.+\.supabase\.co$/i.test(configuracion.url || "") &&
+    const configurado = (/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(configuracion.url || "") ||
+        /^http:\/\/(localhost|127\.0\.0\.1):\d{1,5}$/.test(configuracion.url || "")) &&
         esClavePublica(configuracion.anonKey);
 
     window.libreriaSupabaseConfigurado = Boolean(configurado && window.supabase?.createClient);

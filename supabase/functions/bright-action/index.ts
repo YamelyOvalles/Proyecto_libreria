@@ -1,8 +1,9 @@
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 
 const headersCors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 function responder(cuerpo: Record<string, unknown>, estado = 200) {
@@ -50,52 +51,13 @@ Deno.serve(async (solicitud) => {
       return responder({ error: "Producto requerido." }, 400);
     }
 
-    const { count: ventas, error: errorVentas } = await supabase
-      .from("pedido_detalles")
-      .select("libro_id", { count: "exact", head: true })
-      .eq("libro_id", productoId);
-    if (errorVentas) {
-      console.error("No se pudo verificar el historial del producto:", errorVentas);
-      return responder({
-        error: `No se pudo verificar el historial de ventas del producto: ${errorVentas.message}`
-      }, 500);
-    }
-    if (Number(ventas || 0) > 0) {
-      return responder({
-        error: "Este producto tiene ventas registradas y no se puede eliminar sin dañar el historial. Puedes dejarlo inactivo."
-      }, 409);
-    }
-
-    // Estas relaciones no son historial comercial y algunas instalaciones antiguas
-    // no tienen configurado ON DELETE CASCADE en todas ellas.
-    const dependencias = [
-      "carrito_detalles",
-      "movimientos_inventario",
-      "inventarios",
-      "libro_autor",
-    ];
-    for (const tabla of dependencias) {
-      const { error: errorDependencia } = await supabase
-        .from(tabla)
-        .delete()
-        .eq("libro_id", productoId);
-      if (errorDependencia) {
-        console.error(`No se pudo limpiar ${tabla}:`, errorDependencia);
-        return responder({
-          error: `No se pudo limpiar la información relacionada del producto: ${errorDependencia.message}`
-        }, 500);
-      }
-    }
-
-    const { data: productoEliminado, error: errorProducto } = await supabase
-      .from("libros")
-      .delete()
-      .eq("id", productoId)
-      .select("id")
-      .maybeSingle();
-    if (errorProducto) return responder({ error: errorProducto.message }, 400);
-    if (!productoEliminado) return responder({ error: "Producto no encontrado." }, 404);
-
+    // Usa la RPC transaccional y el JWT del administrador; no duplica los borrados.
+    const clienteUsuario = createClient(url, Deno.env.get("SUPABASE_ANON_KEY") || "", {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { error } = await clienteUsuario.rpc("eliminar_producto_admin", { p_producto_id: productoId });
+    if (error) return responder({ error: error.message }, 400);
     return responder({ id: productoId, eliminado: true });
   }
 

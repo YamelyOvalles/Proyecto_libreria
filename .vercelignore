@@ -1,0 +1,14 @@
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.demo.example
+.git
+.tmp
+.vscode
+*.log
+tests
+test-results
+playwright-report
+evidencias
+database
+supabase
