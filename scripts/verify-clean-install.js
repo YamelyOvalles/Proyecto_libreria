@@ -10,7 +10,7 @@ for (const name of ['package.json', 'package-lock.json', 'playwright.config.js',
     'server', 'api', 'js', 'css', 'assets', 'database', 'supabase', 'scripts', 'tests']) {
     fs.cpSync(path.join(workspace, name), path.join(target, name), { recursive: true, filter: file => {
         const base = path.basename(file);
-        return !base.startsWith('.env') && base !== 'node_modules' && base !== '.temp' && base !== 'supabase-config.js';
+        return !base.startsWith('.env') && base !== 'node_modules' && base !== '.temp' && base !== '.branches' && base !== 'supabase-config.js';
     } });
 }
 // api/supabase-config.js es código público; js/supabase-config.js ignorado no se copia.

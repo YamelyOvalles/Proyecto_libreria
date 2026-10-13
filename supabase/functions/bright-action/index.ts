@@ -56,9 +56,9 @@ Deno.serve(async (solicitud) => {
       global: { headers: { Authorization: `Bearer ${token}` } },
       auth: { autoRefreshToken: false, persistSession: false },
     });
-    const { error } = await clienteUsuario.rpc("eliminar_producto_admin", { p_producto_id: productoId });
+    const { data, error } = await clienteUsuario.rpc("eliminar_producto_admin", { p_producto_id: productoId });
     if (error) return responder({ error: error.message }, 400);
-    return responder({ id: productoId, eliminado: true });
+    return responder({ id: productoId, resultado: data, eliminado: data === "eliminado", desactivado: data === "desactivado" });
   }
 
   if (accion === "eliminar") {

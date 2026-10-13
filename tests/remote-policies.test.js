@@ -30,7 +30,7 @@ test('migración retira políticas remotas antiguas y permisos para reactivar la
             await db.query('insert into carrito_detalles(carrito_id,libro_id,cantidad) select id,1,1 from carritos');
             await assert.rejects(db.query("select crear_pedido_desde_carrito('retiro','efectivo',1,null,null)"), /pedidos_pago_valido/);
         });
-        await db.exec(fs.readFileSync('database/migrations/004_security_checkout.sql','utf8'));
+        await db.exec(fs.readFileSync('tests/fixtures/004_security_checkout.sql','utf8'));
         await asUser(db, ids.inactivo, async () => {
             await assert.rejects(db.query('update perfiles set activo=true where id=$1', [ids.inactivo]), /permission denied/);
             assert.equal((await db.query('update carrito_detalles set cantidad=2')).affectedRows, 0);

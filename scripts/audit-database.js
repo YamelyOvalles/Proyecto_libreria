@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { freshDatabase } = require('../tests/helpers/database');
+const schemaQuery = require('./schema-query');
 
 function sourceFiles(directory) {
     return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
@@ -60,7 +61,7 @@ function applicationReferences() {
 }
 async function localSnapshot() {
     const db = await freshDatabase();
-    try { return (await db.query(fs.readFileSync('database/verificar_esquema.sql', 'utf8'))).rows[0].schema_snapshot; }
+    try { return (await db.query(schemaQuery)).rows[0].schema_snapshot; }
     finally { await db.close(); }
 }
 function checkCoverage(snapshot) {
@@ -90,7 +91,7 @@ function unwrapSnapshot(data) {
     if (data?.schema_snapshot) data = data.schema_snapshot;
     if (typeof data === 'string') data = JSON.parse(data);
     for (const section of ['tables', 'functions', 'policies', 'triggers', 'indexes', 'sequences', 'views', 'buckets']) {
-        if (!Array.isArray(data?.[section])) throw new Error(`Exportación incompleta: falta ${section}. Usa database/verificar_esquema.sql.`);
+        if (!Array.isArray(data?.[section])) throw new Error(`Exportación incompleta: falta ${section}. Usa la consulta de scripts/schema-query.js.`);
     }
     return data;
 }
@@ -130,7 +131,7 @@ async function main() {
         const differences = compareSnapshots(local, remote);
         console.log(JSON.stringify({ diferencias_con_exportacion_remota: differences }, null, 2));
         if (differences.length) process.exitCode = 1;
-    } else console.log('Esquema remoto no comparado: falta exportación de solo lectura del proyecto.');
+    } else console.log('Esquema remoto no comparado en esta ejecución: no se proporcionó archivo de exportación.');
 }
 if (require.main === module) main().catch(error => { console.error(error.message); process.exitCode = 1; });
 module.exports = { applicationReferences, localSnapshot, checkCoverage, unwrapSnapshot, compareSnapshots };

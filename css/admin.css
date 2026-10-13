@@ -5,6 +5,7 @@
 .admin-sidebar { position: sticky; top: 74px; height: calc(100vh - 74px); padding: 1.5rem 1rem; border-right: 1px solid var(--border); background: #fff; }
 .admin-sidebar-label { margin: 0 0 0.7rem 0.75rem; color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
 .admin-module-nav { display: grid; gap: 0.3rem; }
+.admin-module-link[hidden] { display: none !important; }
 .admin-module-link { width: 100%; min-height: 45px; display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.8rem; border: 0; border-radius: 10px; background: transparent; color: #4d5459; font-weight: 700; text-align: left; cursor: pointer; }
 .admin-module-link svg { width: 19px; height: 19px; flex: 0 0 19px; fill: currentColor; }
 .admin-module-link:hover { background: #f2f5ef; color: var(--primary-dark); }

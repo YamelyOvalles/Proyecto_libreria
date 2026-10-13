@@ -223,7 +223,7 @@
             <div class="dialog-grid">
                 <label>Nombre *<input id="product-title" type="text" maxlength="200" required></label>
                 <label>Autor<input id="product-author" type="text" maxlength="160"></label>
-                <label>ISBN o código<input id="product-isbn" type="text" maxlength="32"></label>
+                <label>ISBN<input id="product-isbn" type="text" minlength="10" maxlength="13" pattern="([0-9]{13}|[0-9]{9}[0-9X])" required title="ISBN de 13 dígitos o 10 caracteres (último dígito o X)"></label>
                 <label>Categoría<select id="product-category"><option value="">Sin categoría</option></select></label>
                 <label>Editorial<input id="product-publisher" type="text" maxlength="160"></label>
                 <label>Precio (RD$) *<input id="product-price" type="number" min="0" step="0.01" required></label>

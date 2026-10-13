@@ -9,7 +9,7 @@ const config = { url: process.env.SUPABASE_URL, anonKey: process.env.SUPABASE_AN
 const checked = async promise => { const result = await promise; assert.equal(result.error, null, result.error?.message); return result.data; };
 const sdk = () => createClient(config.url, config.anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
 const productArgs = title => ({
-    p_producto_id: null, p_isbn: null, p_titulo: title, p_autor: 'Autor ficticio', p_categoria: 'Pruebas locales',
+    p_producto_id: null, p_isbn: `${Date.now()}`, p_titulo: title, p_autor: 'Autor ficticio', p_categoria: 'Pruebas locales',
     p_editorial: 'Editorial demo', p_descripcion: 'Producto ficticio de integración', p_precio: 100,
     p_descuento_pct: 10, p_formato: 'fisico', p_idioma: 'Español', p_imagen_portada: null,
     p_stock_inicial: 10, p_stock_minimo: 1, p_activo: true
@@ -75,9 +75,10 @@ test('flujos reales con Auth/PostgREST/Storage/bright-action y Express en Supaba
         await checked(admin.rpc('guardar_producto_admin', { ...productArgs('Libro integración editado'), p_producto_id: product }));
         await checked(admin.rpc('ajustar_inventario_admin', { p_producto_id: product, p_tipo: 'entrada', p_cantidad: 2, p_motivo: 'Prueba integración' }));
         assert.ok((await customer.rpc('guardar_producto_admin', productArgs('Ataque'))).error);
-        const disposable = await checked(admin.rpc('guardar_producto_admin', productArgs('Producto a eliminar')));
+        const disposable = await checked(admin.rpc('guardar_producto_admin', {...productArgs('Producto a eliminar'),p_stock_inicial:0}));
         const deleted = await edge(clients.admin.session.access_token, { accion: 'eliminar_producto', producto_id: disposable });
-        assert.equal(deleted.status, 200); await deleted.body.cancel();
+        assert.equal(deleted.status, 200); assert.equal((await deleted.json()).eliminado,true);
+        assert.deepEqual(await checked(admin.from('libros').select('id').eq('id',disposable)),[]);
     });
     await t.test('Storage sube, descarga y elimina una portada; cliente no puede escribir', async () => {
         const file = `test-${Date.now()}.png`;
@@ -115,7 +116,8 @@ test('flujos reales con Auth/PostgREST/Storage/bright-action y Express en Supaba
         assert.deepEqual(await checked(other.from('facturas').select('id').eq('pedido_id', order.id)), []);
         await checked(staff.rpc('actualizar_estado_pedido', { p_pedido_id: order.id, p_estado: 'listo_retiro' }));
         await checked(staff.rpc('actualizar_estado_pedido', { p_pedido_id: order.id, p_estado: 'entregado' }));
-        const denied = await edge(clients.admin.session.access_token, { accion: 'eliminar_producto', producto_id: product }); assert.equal(denied.status, 400); await denied.body.cancel();
+        const archived = await edge(clients.admin.session.access_token, { accion: 'eliminar_producto', producto_id: product }); assert.equal(archived.status, 200); assert.equal((await archived.json()).desactivado,true);
+        assert.equal((await checked(admin.from('libros').select('activo').eq('id',product).single())).activo, false);
         const history = await edge(clients.admin.session.access_token, { accion: 'eliminar', usuario_id: clients.cliente.user.id }); assert.equal(history.status, 409); await history.body.cancel();
     });
     await t.test('contacto, lectura administrativa y actualización del estado', async () => {
@@ -124,6 +126,30 @@ test('flujos reales con Auth/PostgREST/Storage/bright-action y Express en Supaba
         assert.deepEqual(await checked(other.from('contact_messages').select('id').eq('id', id)), []);
         await checked(admin.from('contact_messages').update({ estado: 'leido' }).eq('id', id));
         assert.equal((await checked(customer.from('contact_messages').select('estado').eq('id', id).single())).estado, 'leido');
+    });
+    await t.test('checkout simultáneo del mismo carrito crea un solo pedido y cancelación libera la reserva', async () => {
+        const book = await checked(other.from('libros').select('id').eq('isbn','9780451524935').single());
+        const inventory = await checked(other.from('inventarios').select('cantidad_existencia,cantidad_reservada').eq('libro_id',book.id).single());
+        const cart = await checked(other.from('carritos').upsert({perfil_id:clients.otro.user.id},{onConflict:'perfil_id'}).select('id').single());
+        await checked(other.from('carrito_detalles').delete().eq('carrito_id',cart.id));
+        await checked(other.from('carrito_detalles').insert({carrito_id:cart.id,libro_id:book.id,cantidad:1}));
+        const branch = (await checked(other.from('sucursales').select('id').eq('activo',true).limit(1)))[0];
+        const responses = await Promise.all([1,2].map(()=>orderRequest(clients.otro.session.access_token,
+            {p_metodo_entrega:'retiro',p_metodo_pago:'efectivo',p_sucursal_id:branch.id})));
+        assert.deepEqual(responses.map(r=>r.status).sort(),[201,400]);
+        const pending = await responses.find(r=>r.status===201).json();
+        await responses.find(r=>r.status!==201).body.cancel();
+        await checked(clients.empleado.client.rpc('actualizar_estado_pedido',{p_pedido_id:pending.id,p_estado:'cancelado'}));
+        const after = await checked(other.from('inventarios').select('cantidad_existencia,cantidad_reservada').eq('libro_id',book.id).single());
+        assert.deepEqual(after,inventory);
+    });
+    await t.test('devolución restaura inventario una sola vez y documentos preservan historial', async () => {
+        const invoice = await checked(customer.from('facturas').select('id,estado,total,snapshot').eq('pedido_id',order.id).single());
+        const before = await checked(admin.from('inventarios').select('cantidad_existencia').eq('libro_id',product).single());
+        for (let attempt=0;attempt<2;attempt++) await checked(clients.empleado.client.rpc('actualizar_estado_pedido',{p_pedido_id:order.id,p_estado:'devuelto'}));
+        const after = await checked(admin.from('inventarios').select('cantidad_existencia').eq('libro_id',product).single());
+        assert.equal(after.cantidad_existencia,before.cantidad_existencia+2);
+        assert.deepEqual(await checked(customer.from('facturas').select('id,estado,total,snapshot').eq('pedido_id',order.id).single()),invoice);
     });
     await t.test('logout borra la sesión del SDK y Express deniega nuevas solicitudes sin token', async () => {
         await checked(customer.auth.signOut({ scope: 'local' }));

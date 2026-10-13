@@ -5,9 +5,9 @@ test('el instalador SQL cubre todas las tablas/RPC/parámetros/buckets usados po
     const snapshot = await localSnapshot();
     const coverage = checkCoverage(snapshot);
     assert.deepEqual(coverage.errors, []);
-    assert.equal(snapshot.tables.length, 19);
+    assert.equal(snapshot.tables.length, 24);
     assert.equal(snapshot.functions.filter(fn => fn.schema === 'public').length, 14);
-    assert.equal(snapshot.triggers.length, 3);
+    assert.equal(snapshot.triggers.length, 17);
     assert.ok(snapshot.policies.length >= 35);
     assert.deepEqual(compareSnapshots(snapshot, unwrapSnapshot([{ schema_snapshot: snapshot }])), []);
     const changed = structuredClone(snapshot);

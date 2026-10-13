@@ -1,10 +1,14 @@
 -- Migración incremental Fase 4. Revisar y respaldar antes de aplicar en un proyecto existente.
--- Exportación remota recibida: conciliar cuerpos de RPC/triggers antes de aplicarla.
--- Ver database/conciliacion-remota.md. No se ha aplicado al remoto.
+-- Actualiza permisos/carrito/checkout; no instala toda la estructura ni todas las
+-- correcciones del instalador consolidado. Revisar compatibilidad antes de aplicarla.
+-- Fixture de regresión; el instalador para la evaluación es database/database.sql.
+-- No se ha aplicado al remoto y no es un paso de instalación.
 
 -- No crea demos, no reinicia tablas y no cambia la información comercial.
 
 begin;
+-- El CHECK antiguo también excluye devolucion y se combina con el más reciente.
+alter table public.movimientos_inventario drop constraint if exists movimiento_tipo_valido;
 
 -- Restricciones antiguas de la exportación remota contradicen los CHECK actuales:
 -- pedidos_metodo_pago_check permite efectivo/tarjeta y pedidos_estado_check permite devuelto.
@@ -64,18 +68,12 @@ create policy carrito_detalles_eliminacion on public.carrito_detalles for delete
     private.es_activo() and exists (select 1 from public.carritos c where c.id = carrito_id and c.perfil_id = auth.uid())
 );
 
-create or replace function public.crear_pedido_desde_carrito(
-    p_metodo_entrega text,
-    p_metodo_pago text,
-    p_sucursal_id bigint default null,
-    p_direccion jsonb default null,
-    p_notas text default null
-)
-returns jsonb
-language plpgsql
-security definer
-set search_path = ''
-as $$
+CREATE OR REPLACE FUNCTION public.crear_pedido_desde_carrito(p_metodo_entrega text, p_metodo_pago text, p_sucursal_id bigint DEFAULT NULL::bigint, p_direccion jsonb DEFAULT NULL::jsonb, p_notas text DEFAULT NULL::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
 declare
     v_usuario uuid := auth.uid();
     v_carrito uuid;
@@ -85,9 +83,6 @@ declare
     v_correo text;
     v_subtotal numeric(12,2);
     v_descuento numeric(12,2);
-    v_itbis numeric(12,2) := 0;
-    v_aplicar_itbis boolean;
-    v_itbis_pct numeric(5,2);
     v_envio numeric(12,2) := 0;
     v_total numeric(12,2);
 begin
@@ -114,7 +109,8 @@ begin
 
     select c.id into v_carrito
       from public.carritos c
-     where c.perfil_id = v_usuario;
+     where c.perfil_id = v_usuario
+     for update;
 
     if v_carrito is null or not exists (
         select 1 from public.carrito_detalles where carrito_id = v_carrito
@@ -122,13 +118,7 @@ begin
         raise exception 'El carrito está vacío.';
     end if;
 
-    -- Serializa dos checkout del mismo usuario; evita dos pedidos con el mismo carrito.
-    perform 1 from public.carritos where id = v_carrito for update;
-    if not exists (select 1 from public.carrito_detalles where carrito_id = v_carrito) then
-        raise exception 'El carrito está vacío.';
-    end if;
-
-    -- Evita compras simultaneas sin stock.
+    -- Bloqueo de las existencias involucradas para evitar compras simultáneas.
     perform i.libro_id
       from public.inventarios i
       join public.carrito_detalles cd on cd.libro_id = i.libro_id
@@ -181,29 +171,19 @@ begin
      where cd.carrito_id = v_carrito;
 
     v_descuento := coalesce(v_descuento, 0);
-    select cotizacion_mostrar_itbis, cotizacion_itbis_pct
-      into v_aplicar_itbis, v_itbis_pct
-      from public.configuracion_negocio
-     where id = 1;
-
-    v_itbis := case
-        when coalesce(v_aplicar_itbis, false) and coalesce(v_itbis_pct, 0) > 0
-        then round((v_subtotal - v_descuento) * v_itbis_pct / 100, 2)
-        else 0
-    end;
-    v_total := v_subtotal - v_descuento + v_itbis + v_envio;
+    v_total := v_subtotal - v_descuento + v_envio;
 
     insert into public.pedidos (
         cliente_id, cliente_nombre, cliente_correo, cliente_documento, cliente_telefono,
         metodo_entrega, sucursal_id, metodo_pago,
-        subtotal, descuento, itbis, costo_envio, total, notas
+        subtotal, descuento, costo_envio, total, notas
     ) values (
         v_usuario, v_nombre, v_correo,
         nullif(btrim(p_direccion ->> 'documento'), ''),
         nullif(btrim(p_direccion ->> 'telefono_cliente'), ''),
         p_metodo_entrega, p_sucursal_id, p_metodo_pago,
-        v_subtotal, v_descuento, v_itbis, v_envio, v_total, nullif(btrim(p_notas), '')
-    ) returning id, numero into v_pedido, v_numero;
+        v_subtotal, v_descuento, v_envio, v_total, nullif(btrim(p_notas), '')
+    ) returning id, numero, total into v_pedido, v_numero, v_total;
 
     insert into public.pedido_detalles (
         pedido_id, libro_id, isbn, titulo, precio_unitario, cantidad, descuento_pct
@@ -254,14 +234,13 @@ begin
         'numero', v_numero,
         'subtotal', v_subtotal,
         'descuento', v_descuento,
-        'itbis', v_itbis,
         'costo_envio', v_envio,
         'total', v_total,
         'estado', 'pendiente',
         'estado_pago', 'pendiente'
     );
 end;
-$$;
+$function$;
 
 notify pgrst, 'reload schema';
 

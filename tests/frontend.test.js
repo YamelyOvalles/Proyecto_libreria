@@ -4,9 +4,9 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 function clientContext(config, auth) {
     const storage = new Map();
-    const window = { LIBRERIA_SUPABASE_CONFIG: config, sessionStorage: storage,
+    const window = { LIBRERIA_SUPABASE_CONFIG: config, sessionStorage: storage, location: { hash: '' },
         supabase: { createClient: (_url, _key, options) => { window.options = options; return { auth }; } } };
-    vm.runInNewContext(fs.readFileSync('js/supabase-client.js', 'utf8'), { window, atob, console });
+    vm.runInNewContext(fs.readFileSync('js/supabase-client.js', 'utf8'), { window, atob, console, URLSearchParams });
     return window;
 }
 test('cliente acepta Supabase local y mantiene sesión en sessionStorage', () => {

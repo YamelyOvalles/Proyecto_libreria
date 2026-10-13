@@ -25,6 +25,10 @@ api_url = "http://127.0.0.1"
 enabled = true
 port = 54324
 
+# Opcional: evita depender del puerto TCP 2375 de Docker Desktop para recolectar logs.
+[analytics]
+enabled = false
+
 [storage]
 enabled = true
 file_size_limit = "5MiB"

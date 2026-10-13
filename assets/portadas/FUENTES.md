@@ -1,7 +1,7 @@
 # Portadas del catálogo
 
 Imágenes descargadas de Open Library el 6 de septiembre de 2026 y guardadas localmente para que el catálogo no dependa de solicitudes externas.
-Son portadas de ediciones de referencia; el proyecto no registra un ISBN de inventario.
+Son portadas de ediciones de referencia; pueden diferir de la edición indicada por el ISBN del catálogo ficticio.
 
 | Archivo | Fuente |
 | --- | --- |

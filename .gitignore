@@ -1,5 +1,6 @@
 # Archivos de Visual Studio.
 /.vs
+/.vscode/
 
 # Configuración local y secretos. Nunca deben versionarse.
 .env
@@ -20,6 +21,7 @@ datos/
 __pycache__/
 .venv/
 supabase/.temp/
+supabase/.branches/
 node_modules/
 dist/
 coverage/

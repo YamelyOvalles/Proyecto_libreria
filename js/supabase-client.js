@@ -1,6 +1,9 @@
 // Cliente de Supabase.
 (function inicializarSupabase() {
     const configuracion = window.LIBRERIA_SUPABASE_CONFIG || {};
+    // El SDK puede consumir el fragmento antes de cargar el formulario de login.
+    // Esta señal solo conserva la intención; obtenerSesionLibreria valida el JWT.
+    window.libreriaRecuperacionSolicitada = new URLSearchParams(window.location.hash.slice(1)).get("type") === "recovery";
 
     function esClavePublica(clave) {
         if (typeof clave !== "string" || !clave || clave.startsWith("TU_")) return false;

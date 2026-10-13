@@ -159,6 +159,19 @@ formulario.addEventListener("submit", async evento => {
     }
 });
 
+function activarRecuperacion() {
+    modo = "recuperacion";
+    correo.disabled = true;
+    titulo.textContent = "Crea una nueva contraseña";
+    subtitulo.textContent = "Escribe una contraseña segura de al menos 8 caracteres.";
+    botonEnviar.textContent = "Actualizar contraseña";
+    mostrarMensaje("El enlace de recuperación fue validado.", "exito");
+}
+
+window.libreriaSupabase?.auth.onAuthStateChange(evento => {
+    if (evento === "PASSWORD_RECOVERY") activarRecuperacion();
+});
+
 (async function prepararAcceso() {
     const parametros = new URLSearchParams(window.location.search);
     if (parametros.get("auth") === "inactivo") mostrarMensaje("La cuenta no está activa.");
@@ -169,6 +182,7 @@ formulario.addEventListener("submit", async evento => {
     }
     try {
         const sesion = await window.obtenerSesionLibreria();
+        if (sesion?.user && window.libreriaRecuperacionSolicitada) activarRecuperacion();
         if (sesion?.user && modo !== "recuperacion") {
             const perfil = await window.obtenerPerfilLibreria(sesion.user.id);
             if (!perfil?.activo) {
@@ -183,14 +197,3 @@ formulario.addEventListener("submit", async evento => {
         mostrarMensaje(window.mensajeErrorSupabase(error));
     }
 }());
-
-window.libreriaSupabase?.auth.onAuthStateChange(evento => {
-    if (evento === "PASSWORD_RECOVERY") {
-        modo = "recuperacion";
-        correo.disabled = true;
-        titulo.textContent = "Crea una nueva contraseña";
-        subtitulo.textContent = "Escribe una contraseña segura de al menos 8 caracteres.";
-        botonEnviar.textContent = "Actualizar contraseña";
-        mostrarMensaje("El enlace de recuperación fue validado.", "exito");
-    }
-});

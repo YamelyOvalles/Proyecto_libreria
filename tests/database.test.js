@@ -97,20 +97,32 @@ test('personal procesa pedido, pago, factura única, despacho y devolución sin 
     await run('empleado', () => q("select actualizar_estado_pedido($1,'devuelto')", [order.id]));
     assert.equal((await q('select cantidad_existencia from inventarios where libro_id=$1', [bookId])).rows[0].cantidad_existencia, 12);
     await run('otro', () => q('select * from facturas').then(result => assert.equal(result.rows.length, 0)));
-    await run('administrador', () => assert.rejects(q('select eliminar_producto_admin($1)', [bookId]), /ventas/));
+    await run('administrador', async () => {
+        assert.equal((await q('select eliminar_producto_admin($1) resultado', [bookId])).rows[0].resultado, 'desactivado');
+        assert.equal((await q('select activo from libros where id=$1', [bookId])).rows[0].activo, false);
+        assert.ok((await q('select * from pedido_detalles where libro_id=$1', [bookId])).rows.length);
+    });
 });
 test('administrador ejecuta CRUD categorías/productos e inventario con trazabilidad', async () => {
     await run('administrador', async () => {
         const category = (await q("select guardar_categoria_admin(null,'Demo CRUD',true) id")).rows[0].id;
         await q("select guardar_categoria_admin($1,'Demo CRUD editada',true)", [category]);
-        const product = (await q(`select guardar_producto_admin(null,'DEMO-CRUD','Libro demo','Autor demo','Demo CRUD editada',
+        const product = (await q(`select guardar_producto_admin(null,'9780000000001','Libro demo','Autor demo','Demo CRUD editada',
             'Editorial demo','Descripción',100,10,'fisico','Español',null,5,1,true) id`)).rows[0].id;
         await q("select ajustar_inventario_admin($1,'entrada',2,'Compra demo')", [product]);
         await assert.rejects(q("select ajustar_inventario_admin($1,'salida',999,'Imposible')", [product]), /reservada/);
         assert.ok((await q('select * from listar_movimientos_inventario(40)')).rows.length);
-        await q('select eliminar_producto_admin($1)', [product]);
-        assert.equal((await q('select * from libros where id=$1', [product])).rows.length, 0);
-        await q('select eliminar_categoria_admin($1)', [category]);
+        assert.equal((await q('select eliminar_producto_admin($1) resultado', [product])).rows[0].resultado, 'desactivado');
+        assert.equal((await q('select activo from libros where id=$1', [product])).rows[0].activo, false);
+        assert.equal((await q('select eliminar_categoria_admin($1) resultado', [category])).rows[0].resultado, 'desactivada');
+        const disposable = (await q(`select guardar_producto_admin(null,'9780000000002','Temporal','Autor demo',null,
+            null,'Descripción',100,0,'fisico','Español',null,0,1,true) id`)).rows[0].id;
+        await q('insert into carritos(perfil_id) values($1)', [ids.administrador]);
+        await q('insert into carrito_detalles(carrito_id,libro_id,cantidad) select id,$1,1 from carritos where perfil_id=$2', [disposable,ids.administrador]);
+        assert.equal((await q('select eliminar_producto_admin($1) resultado', [disposable])).rows[0].resultado, 'eliminado');
+        assert.equal((await q('select * from libros where id=$1', [disposable])).rows.length, 0);
+        const empty = (await q("select guardar_categoria_admin(null,'Categoría temporal',true) id")).rows[0].id;
+        await q('select eliminar_categoria_admin($1)', [empty]);
     });
 });
 test('administrador gestiona usuarios y configuración, no puede quitarse su acceso', async () => {
@@ -150,10 +162,11 @@ test('Storage impide escrituras a cliente/empleado y permite CRUD de administrad
 });
 test('migración incremental se aplica sin perder libros, usuarios ni historial', async () => {
     const before = (await q('select count(*)::int n from pedidos')).rows[0].n;
-    await db.exec(fs.readFileSync('database/migrations/004_security_checkout.sql', 'utf8'));
+    const books = (await q('select count(*)::int n from libros')).rows[0].n;
+    await db.exec(fs.readFileSync('tests/fixtures/004_security_checkout.sql', 'utf8'));
     assert.equal((await q('select count(*)::int n from pedidos')).rows[0].n, before);
     assert.equal((await q('select count(*)::int n from perfiles')).rows[0].n, 5);
-    assert.equal((await q('select count(*)::int n from libros')).rows[0].n, 4);
+    assert.equal((await q('select count(*)::int n from libros')).rows[0].n, books);
 });
 test('todas las RPC privilegiadas rechazan llamadas directas de cliente/empleado según su rol', async () => {
     const adminOnly = [

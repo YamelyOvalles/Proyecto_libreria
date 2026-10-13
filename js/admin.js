@@ -483,15 +483,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function eliminarProducto(producto) {
-        if (!confirm(`¿Eliminar definitivamente “${producto.titulo}”? Esta acción no se puede deshacer.`)) return;
-        const { error } = await window.libreriaSupabase.functions.invoke("bright-action", {
+        if (!confirm(`¿Retirar “${producto.titulo}”? Si tiene historial se desactivará; si no, se eliminará definitivamente.`)) return;
+        const { data, error } = await window.libreriaSupabase.functions.invoke("bright-action", {
             body: { accion: "eliminar_producto", producto_id: producto.id }
         });
         if (error) {
             return mostrarAviso(await mensajeErrorFuncion(error, "No se pudo eliminar el producto."));
         }
         await cargarProductos();
-        mostrarAviso("Producto eliminado definitivamente.", "success");
+        mostrarAviso(data?.desactivado ? "Producto desactivado. Se conserva su historial." : "Producto eliminado definitivamente.", "success");
     }
 
     document.getElementById("new-product-btn").addEventListener("click", () => abrirProducto());
