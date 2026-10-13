@@ -155,4 +155,15 @@ Para un host Node configura las variables públicas, ejecuta `npm ci --omit=dev`
 - **No encuentras el correo de recuperación:** abre el buzón local indicado arriba y usa localhost:3000 para la web.
 - **Playwright no encuentra el navegador:** ejecuta `npx.cmd playwright install chromium`.
 
-Integrantes y matrículas: pendientes de confirmación. No se atribuyen aportes individuales en este documento.
+## Integrantes del equipo
+
+| Nombre completo | Matrícula |
+| --- | --- |
+| Yamely Mercedes Ovalles | 100077467 |
+| Ezequiel Vicente Medina | 100044311 |
+| Adaury Ramón Cerda Morrobel | 100070698 |
+| José Alfredo Fortuna Taveras | 100055564 |
+| Eudy Rafael Gómez Martínez | 100078755 |
+| Erwin Enrique Tavárez Torres | 100020186 |
+| Adams Osvaldo De León Peña | 100076562 |
+| Melvin José Luis Peña Rodríguez | 100080338 |
