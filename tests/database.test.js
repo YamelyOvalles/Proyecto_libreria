@@ -13,6 +13,16 @@ after(async () => { await db?.close(); });
 const q = (sql, values) => db.query(sql, values);
 const run = (role, action) => asUser(db, ids[role], action);
 
+test('migración de sesiones es repetible, conserva libros y bloquea acceso por API pública', async () => {
+    const migration = fs.readFileSync('database/migrations/20261021_application_sessions.sql', 'utf8');
+    await db.exec(migration); await db.exec(migration);
+    await q("insert into application_sessions(sid,sess,expire) values ('test','{}',now()+interval '1 hour')");
+    for (const role of ['cliente', 'administrador']) {
+        await assert.rejects(run(role, () => q('select * from application_sessions')), /permission denied/);
+    }
+    assert.equal((await q('select count(*)::int as n from libros')).rows[0].n, 4);
+});
+
 test('instalación SQL desde cero, datos, bucket y RLS en todas las tablas públicas', async () => {
     assert.equal((await q('select count(*)::int as n from libros')).rows[0].n, 4);
     assert.equal((await q("select file_size_limit from storage.buckets where id='portadas'")).rows[0].file_size_limit, 5242880);

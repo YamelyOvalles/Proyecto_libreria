@@ -149,8 +149,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    const { data: sesion } = await window.libreriaSupabase.auth.getSession();
-    if (!sesion.session) {
+    const sesion = await window.obtenerSesionLibreria();
+    if (!sesion) {
         location.replace(`login.html?returnTo=${encodeURIComponent(location.pathname + location.search)}`);
         return;
     }

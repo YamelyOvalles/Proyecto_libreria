@@ -7,7 +7,8 @@ if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(url || '')) {
 }
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) throw new Error('Falta la clave administrativa LOCAL en scripts/.env.demo.');
 const admin = createClient(url, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
-const password = 'DemoLocal-306!';
+const password = process.env.DEMO_PASSWORD;
+if (!password || password.length < 12) throw new Error('Configura DEMO_PASSWORD (mínimo 12 caracteres) en scripts/.env.demo.');
 const demos = [
     ['admin@demo.local', 'administrador', 'Ana'],
     ['empleado@demo.local', 'empleado', 'Emilio'],
@@ -87,7 +88,7 @@ async function main() {
         await customer.auth.signOut({ scope: 'local' });
         await staff.auth.signOut({ scope: 'local' });
     }
-    console.log('Cinco cuentas y ejemplos comerciales locales preparados. Credenciales en README.');
+    console.log('Cinco cuentas y ejemplos comerciales locales preparados. Contraseña en scripts/.env.demo (archivo privado).');
 }
 main().catch(error => {
     // Los mensajes de negocio P0001 no incluyen claves; evita imprimir objetos de petición/Auth.

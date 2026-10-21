@@ -22,6 +22,7 @@ function createSupabaseGateway(config, fetchImpl = fetch) {
     return {
         getUser: token => request('/auth/v1/user', token),
         getProfile: async (token, id) => (await request(`/rest/v1/perfiles?id=eq.${encodeURIComponent(id)}&select=activo`, token))?.[0],
+        getRole: async (token, id) => (await request(`/rest/v1/usuario_roles?usuario_id=eq.${encodeURIComponent(id)}&select=roles(codigo)`, token))?.[0]?.roles?.codigo,
         createOrder: (token, args) => request('/rest/v1/rpc/crear_pedido_desde_carrito', token,
             { method: 'POST', body: JSON.stringify(args) })
     };

@@ -2,6 +2,8 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const dotenv = require('dotenv');
 const { createClient } = require('@supabase/supabase-js');
+dotenv.config({ path: 'scripts/.env.demo', quiet: true });
+const demoPassword = process.env.DEMO_PASSWORD;
 const { createApp } = require('../server/app');
 const { validPublicConfig } = require('../server/public-config');
 dotenv.config({ path: 'server/.env.local', quiet: true });
@@ -22,7 +24,7 @@ test('flujos reales con Auth/PostgREST/Storage/bright-action y Express en Supaba
     const clients = {};
     for (const role of ['admin', 'empleado', 'cliente', 'otro', 'inactivo']) {
         const client = sdk();
-        const session = await checked(client.auth.signInWithPassword({ email: `${role}@demo.local`, password: 'DemoLocal-306!' }));
+        const session = await checked(client.auth.signInWithPassword({ email: `${role}@demo.local`, password: demoPassword }));
         clients[role] = { client, ...session };
     }
     const admin = clients.admin.client, customer = clients.cliente.client, other = clients.otro.client;
@@ -34,8 +36,19 @@ test('flujos reales con Auth/PostgREST/Storage/bright-action y Express en Supaba
         method: 'POST', headers: { apikey: config.anonKey, 'Content-Type': 'application/json',
             ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body)
     });
-    const orderRequest = (token, body) => fetch(`${base}/api/pedidos`, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body) });
+    const cookies = new Map();
+    const orderRequest = async (token, body) => {
+        const identity = Object.entries(clients).find(([, item]) => item.session.access_token === token)?.[0];
+        if (identity && !cookies.has(identity)) {
+            const login = await fetch(`${base}/api/supabase/auth/v1/token?grant_type=password`, { method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Libreria-Request': '1' },
+                body: JSON.stringify({ email: `${identity}@demo.local`, password: demoPassword }) });
+            if (!login.ok) return login;
+            cookies.set(identity, login.headers.get('set-cookie').split(';')[0]); await login.body.cancel();
+        }
+        return fetch(`${base}/api/pedidos`, { method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Libreria-Request': '1', Cookie: cookies.get(identity) || '' }, body: JSON.stringify(body) });
+    };
     await t.test('login, validación de sesión, credenciales incorrectas y refresh real', async () => {
         const denied = await sdk().auth.signInWithPassword({ email: 'cliente@demo.local', password: 'incorrecta' });
         assert.ok(denied.error);
@@ -55,9 +68,9 @@ test('flujos reales con Auth/PostgREST/Storage/bright-action y Express en Supaba
     await t.test('Edge Function crea usuario, RPC edita perfil/rol y Edge Function elimina usuario sin historial', async () => {
         const email = `test-${Date.now()}@demo.local`;
         const result = await edge(clients.admin.session.access_token, { accion: 'crear', correo: email,
-            password: 'DemoLocal-306!', nombres: 'Usuario ficticio', apellidos: 'Prueba', rol: 'empleado', activo: true });
+            password: demoPassword, nombres: 'Usuario ficticio', apellidos: 'Prueba', rol: 'empleado', activo: true });
         assert.equal(result.status, 201); const { id } = await result.json(); assert.ok(id);
-        const created = sdk(); await checked(created.auth.signInWithPassword({ email, password: 'DemoLocal-306!' }));
+        const created = sdk(); await checked(created.auth.signInWithPassword({ email, password: demoPassword }));
         await checked(admin.rpc('actualizar_usuario_admin', { p_usuario_id: id, p_nombres: 'Editado', p_apellidos: 'Prueba', p_activo: true, p_rol: 'cliente' }));
         const role = await checked(created.from('usuario_roles').select('roles(codigo)').eq('usuario_id', id).single());
         assert.equal(role.roles.codigo, 'cliente');

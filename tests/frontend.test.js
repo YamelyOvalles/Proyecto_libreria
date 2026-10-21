@@ -5,14 +5,16 @@ const vm = require('node:vm');
 function clientContext(config, auth) {
     const storage = new Map();
     const window = { LIBRERIA_SUPABASE_CONFIG: config, sessionStorage: storage, location: { hash: '' },
-        supabase: { createClient: (_url, _key, options) => { window.options = options; return { auth }; } } };
-    vm.runInNewContext(fs.readFileSync('js/supabase-client.js', 'utf8'), { window, atob, console, URLSearchParams });
+        supabase: { createClient: (_url, _key, options) => { window.options = options; return { auth: { signOut: async () => ({}), ...auth } }; } } };
+    vm.runInNewContext(fs.readFileSync('js/supabase-client.js', 'utf8'), { window, atob, console, URLSearchParams, Headers, URL,
+        fetch: async () => new Response('null') });
     return window;
 }
-test('cliente acepta Supabase local y mantiene sesión en sessionStorage', () => {
+test('cliente acepta Supabase local y conserva compatibilidad SDK solo en memoria', () => {
     const window = clientContext({ url: 'http://127.0.0.1:54321', anonKey: 'sb_publishable_test' }, {});
     assert.equal(window.libreriaSupabaseConfigurado, true);
-    assert.equal(window.options.auth.storage, window.sessionStorage);
+    assert.notEqual(window.options.auth.storage, window.sessionStorage);
+    assert.equal(window.options.auth.detectSessionInUrl, false);
     assert.equal(window.options.auth.persistSession, true);
 });
 test('cliente rechaza claves administrativas y origen ajeno', () => {

@@ -25,7 +25,7 @@ function createOrderController(gateway) {
             throw new HttpError(400, 'Notas inválidas.');
         }
         // Identidad, precios, stock, documentos y transacción pertenecen exclusivamente a la RPC.
-        const result = await gateway.createOrder(req.session.token, {
+        const result = await gateway.createOrder(req.identity.token, {
             p_metodo_entrega: data.p_metodo_entrega, p_metodo_pago: data.p_metodo_pago,
             p_sucursal_id: data.p_metodo_entrega === 'retiro' ? data.p_sucursal_id : null,
             p_direccion: data.p_direccion || null, p_notas: data.p_notas || null

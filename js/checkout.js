@@ -97,7 +97,7 @@ window.crearCheckout = function ({ obtenerCarrito, vaciarCarrito }) {
             if (!sesion) throw new Error("Debes iniciar sesión para realizar un pedido.");
             const respuesta = await fetch("/api/pedidos", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${sesion.access_token}` },
+                headers: { "Content-Type": "application/json", "X-Libreria-Request": "1" },
                 body: JSON.stringify({
                 p_metodo_entrega: entrega.value,
                 p_sucursal_id: domicilio ? null : Number(sucursal.value),

@@ -52,12 +52,6 @@
         window.libreriaUsuario = sesion.user;
         window.libreriaRol = window.libreriaSesion.rol;
         window.libreriaAuthResuelta = true;
-        sessionStorage.setItem("libreria.usuario", JSON.stringify({
-            id: sesion.user.id,
-            correo: sesion.user.email,
-            rol: window.libreriaRol,
-            nombre
-        }));
         document.documentElement.style.visibility = "";
         document.dispatchEvent(new CustomEvent("libreria:auth-lista", {
             detail: window.libreriaSesion

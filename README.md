@@ -57,7 +57,7 @@ La función `bright-action` es necesaria para crear y eliminar usuarios y para e
 
 ## Cuentas para probar
 
-Todas las cuentas demo locales usan la contraseña **DemoLocal-306!**:
+La contraseña demo se genera al ejecutar `local:config` y queda como `DEMO_PASSWORD` en `scripts/.env.demo`, ignorado por Git. Consúltala localmente sin compartirla. En instalaciones existentes define allí una contraseña nueva de al menos 12 caracteres y ejecuta `npm.cmd run demo:seed` para rotarla.
 
 - admin@demo.local: administrador, con acceso a todos los módulos.
 - empleado@demo.local: pedidos, inventario y documentos.
@@ -126,7 +126,32 @@ server/app.js construye la aplicación y server/index.js la inicia. server/confi
 
 El navegador confirma compras mediante **POST /api/pedidos**. Express valida la sesión, el perfil activo y los campos recibidos, y llama a la RPC PostgreSQL con el JWT del usuario. La RPC calcula precios y confirma stock, pedido y cotización en una transacción. Así se evita duplicar reglas comerciales y se mantienen los permisos de Supabase.
 
-Auth conserva login y sesiones; RLS protege lecturas y carritos; las RPC autorizan los cambios administrativos; bright-action utiliza la API Admin para gestionar cuentas. Ocultar botones no concede ni sustituye permisos del backend.
+Supabase Auth verifica la identidad; Express administra la sesión de aplicación con `express-session`. El navegador utiliza `/api/supabase` para Auth, REST, RPC, portadas y bright-action. Express verifica el perfil activo, el rol y el origen, y envía a Supabase el JWT guardado en el servidor. RLS protege las filas y las RPC mantienen las transacciones existentes. bright-action conserva la API Admin exclusivamente en Supabase.
+
+La cookie `lq.sid` es HttpOnly y SameSite=Lax; usa Secure con HTTPS y obligatoriamente en producción. El identificador se regenera al autenticar. La sesión caduca a los 30 minutos sin actividad y tiene un máximo absoluto de ocho horas; los tokens se renuevan solo en el servidor. Logout destruye la sesión propia incluso si Supabase no está disponible. El SDK recibe valores de compatibilidad sin capacidad de acceso a Supabase y los conserva únicamente en memoria. No se guardan contraseñas ni JWT reales en Storage del navegador. Las portadas públicas pueden seguir descargándose directamente del proveedor.
+
+Las solicitudes que modifican datos deben llevar `X-Libreria-Request: 1`; se rechazan orígenes ajenos y no se habilita CORS. Helmet aplica CSP y otros encabezados. El acceso a `/admin` y `/documento`, con o sin extensión, también se verifica en Express. La autorización por fila de los documentos sigue correspondiendo a RLS.
+
+### Almacén de sesiones y migración incremental
+
+En desarrollo, sin `SESSION_DATABASE_URL`, se permite MemoryStore: reiniciar Express cierra las sesiones y el secreto temporal cambia. Para conservarlas entre reinicios, configura `SESSION_SECRET` aleatorio (mínimo 32 caracteres) y `SESSION_DATABASE_URL` privados en `server/.env.local`. Utiliza la conexión PostgreSQL de tu pila local, no una clave de la API. Después ejecuta:
+
+```powershell
+npm.cmd run sessions:migrate -- --local
+```
+
+La migración `database/migrations/20261021_application_sessions.sql` crea solamente la tabla de sesiones y su índice, activa RLS y revoca el acceso a los roles públicos. No reinstala la base ni modifica las tablas existentes. Es repetible. Requiere un propietario de PostgreSQL; el usuario del almacén necesita SELECT, INSERT, UPDATE y DELETE en esa tabla. Restringe las credenciales de conexión a ese uso cuando prepares producción.
+
+En producción, incluidas las funciones de Vercel, **ambas variables son obligatorias**; el servidor se niega a utilizar MemoryStore. Configura la conexión privada con TLS verificado, aplica la migración con `npm.cmd run sessions:migrate` sobre el destino seleccionado y ejecuta detrás de un proxy HTTPS confiable. Se confía en un salto de proxy. El limitador de intentos es por proceso; un despliegue con varias instancias requiere un almacén compartido para un límite global.
+
+Para desarrollo con la configuración local y el comando solicitado:
+
+```powershell
+$env:LIBRERIA_ENV_FILE='.env.local'
+npm.cmd run dev
+```
+
+El informe de esta revisión, la comparación con la Fase 3, los archivos modificados y los límites de las pruebas están en [evidencias/mejoras-arquitectura-sesiones.md](evidencias/mejoras-arquitectura-sesiones.md). Para comprobar el almacén PostgreSQL local entre instancias usa `npm.cmd run test:sessions:local`; esta prueba aplica únicamente la migración aditiva de sesiones a la pila local.
 
 Express no trae un contenedor de inyección de dependencias. La aplicación pasa configuración y gateway explícitamente a sus componentes, lo que permite probarlos sin agregar uno artificial.
 

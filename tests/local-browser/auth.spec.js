@@ -2,12 +2,15 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const dotenv = require('dotenv');
 const { createClient } = require('@supabase/supabase-js');
+dotenv.config({ path: 'scripts/.env.demo', quiet: true });
+const demoPassword = process.env.DEMO_PASSWORD;
+const newPassword = require('node:crypto').randomBytes(24).toString('base64url');
 const local = dotenv.parse(fs.readFileSync('server/.env.local'));
 if (!/^http:\/\/(localhost|127\.0\.0\.1):/.test(local.SUPABASE_URL)) throw new Error('Estas pruebas solo aceptan Supabase local.');
 async function login(page, email) {
     await page.goto('/login.html');
     await page.locator('#email').fill(email);
-    await page.locator('#password').fill('DemoLocal-306!');
+    await page.locator('#password').fill(demoPassword);
     await page.locator('#login-submit-btn').click();
 }
 test('cliente inicia sesión, conserva sesión al recargar y cierra sesión', async ({ page }) => {
@@ -65,7 +68,7 @@ test('checkout de navegador abre cotización, genera PDF y conserva el enlace tr
     expect(pdf.subarray(0,4).toString()).toBe('%PDF'); expect(pdf.length).toBeGreaterThan(1000);
     await page.evaluate(() => window.libreriaSupabase.auth.signOut({ scope: 'local' }));
     await page.goto(documentUrl); await expect(page).toHaveURL(/login\.html\?returnTo=/);
-    await page.locator('#email').fill('otro@demo.local'); await page.locator('#password').fill('DemoLocal-306!');
+    await page.locator('#email').fill('otro@demo.local'); await page.locator('#password').fill(demoPassword);
     await page.locator('#login-submit-btn').click();
     await expect(page.locator('#document-number')).toHaveText(number);
 });
@@ -73,7 +76,7 @@ test('checkout de navegador abre cotización, genera PDF y conserva el enlace tr
 test('registro y recuperación real por correo local permiten cambiar contraseña', async ({ page, request }) => {
     const email = `registro-${Date.now()}@demo.local`;
     await page.goto('/login.html?registro=1');
-    await page.locator('#email').fill(email); await page.locator('#password').fill('DemoLocal-306!');
+    await page.locator('#email').fill(email); await page.locator('#password').fill(demoPassword);
     await page.locator('#login-submit-btn').click(); await expect(page).toHaveURL(/informacion\.html$/);
     await expect(page.locator('.account-trigger')).toBeVisible();
     await page.locator('.account-trigger').click(); await page.locator('[data-logout]').click();
@@ -96,10 +99,10 @@ test('registro y recuperación real por correo local permiten cambiar contraseñ
     await page.goto('about:blank');
     await page.goto(destination.href);
     await expect(page.locator('#login-submit-btn')).toHaveText('Actualizar contraseña');
-    await page.locator('#password').fill('DemoNueva-306!'); await page.locator('#login-submit-btn').click();
+    await page.locator('#password').fill(newPassword); await page.locator('#login-submit-btn').click();
     await expect(page.locator('#login-message')).toContainText('Contraseña actualizada');
     const sdk = createClient(local.SUPABASE_URL, local.SUPABASE_ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
-    expect((await sdk.auth.signInWithPassword({ email, password: 'DemoLocal-306!' })).error).toBeTruthy();
-    expect((await sdk.auth.signInWithPassword({ email, password: 'DemoNueva-306!' })).error).toBeNull();
+    expect((await sdk.auth.signInWithPassword({ email, password: demoPassword })).error).toBeTruthy();
+    expect((await sdk.auth.signInWithPassword({ email, password: newPassword })).error).toBeNull();
     await sdk.auth.signOut({ scope: 'local' });
 });

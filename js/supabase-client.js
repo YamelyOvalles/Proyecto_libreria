@@ -27,20 +27,62 @@
         esClavePublica(configuracion.anonKey);
 
     window.libreriaSupabaseConfigurado = Boolean(configurado && window.supabase?.createClient);
+    const memoria = new Map();
+    async function servidorFetch(input, opciones = {}) {
+        const url = new URL(typeof input === 'string' ? input : input.url);
+        const headers = new Headers(opciones.headers || (typeof input !== 'string' ? input.headers : undefined));
+        headers.set('X-Libreria-Request', '1');
+        return fetch('/api/supabase' + url.pathname + url.search, { ...opciones, headers, credentials: 'same-origin' });
+    }
     window.libreriaSupabase = window.libreriaSupabaseConfigurado
         ? window.supabase.createClient(configuracion.url, configuracion.anonKey, {
+            global: { fetch: servidorFetch },
             auth: {
                 persistSession: true,
-                storage: window.sessionStorage,
+                storage: { getItem: key => memoria.get(key) || null, setItem: (key, value) => memoria.set(key, value), removeItem: key => memoria.delete(key) },
                 storageKey: "libreria.auth",
                 autoRefreshToken: true,
-                detectSessionInUrl: true
+                detectSessionInUrl: false
             }
         })
         : null;
+    if (window.libreriaSupabase) {
+        const cerrar = window.libreriaSupabase.auth.signOut.bind(window.libreriaSupabase.auth);
+        window.libreriaSupabase.auth.signOut = async () => {
+            const respuesta = await fetch('/api/supabase/auth/v1/logout', { method: 'POST', credentials: 'same-origin',
+                headers: { 'X-Libreria-Request': '1' } });
+            if (!respuesta.ok) return { error: new Error('No se pudo cerrar la sesión.') };
+            return cerrar({ scope: 'local' });
+        };
+    }
+
+    let restauracion;
+    async function restaurarSesion() {
+        if (!restauracion) restauracion = (async () => {
+            // Limpia únicamente las antiguas credenciales de esta aplicación.
+            window.sessionStorage?.removeItem?.('libreria.auth');
+            window.sessionStorage?.removeItem?.('libreria.usuario');
+            const fragmento = new URLSearchParams(window.location.hash.slice(1));
+            let respuesta;
+            if (fragmento.has('access_token') && fragmento.has('refresh_token')) {
+                respuesta = await fetch('/api/supabase/exchange', { method: 'POST', credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json', 'X-Libreria-Request': '1' },
+                    body: JSON.stringify({ access_token: fragmento.get('access_token'), refresh_token: fragmento.get('refresh_token') }) });
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            } else respuesta = await fetch('/api/supabase/session', { credentials: 'same-origin' });
+            if (!respuesta.ok) throw new Error('No se pudo restaurar la sesión.');
+            const sesion = await respuesta.json();
+            if (sesion) {
+                const { error } = await window.libreriaSupabase.auth.setSession(sesion);
+                if (error) throw error;
+            }
+        })();
+        return restauracion;
+    }
 
     window.obtenerSesionLibreria = async function () {
         if (!window.libreriaSupabase) return null;
+        await restaurarSesion();
         const { data: datosSesion, error: errorSesion } = await window.libreriaSupabase.auth.getSession();
         if (errorSesion) throw errorSesion;
         if (!datosSesion.session) return null;

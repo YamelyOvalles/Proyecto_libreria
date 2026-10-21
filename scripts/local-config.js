@@ -12,7 +12,7 @@ if (!validPublicConfig(config) || !/^http:\/\/127\.0\.0\.1:/.test(config.url) ||
 }
 // Protege server/.env existente: escribe archivos alternativos, ignorados.
 const publicEnv = `SUPABASE_URL=${config.url}\nSUPABASE_ANON_KEY=${config.anonKey}\nPORT=3000\n`;
-const adminEnv = publicEnv + `SUPABASE_SERVICE_ROLE_KEY=${status.SERVICE_ROLE_KEY}\n`;
+const adminEnv = publicEnv + `DEMO_PASSWORD=${require('node:crypto').randomBytes(24).toString('base64url')}\n` + `SUPABASE_SERVICE_ROLE_KEY=${status.SERVICE_ROLE_KEY}\n`;
 for (const [file, content] of [['server/.env.local', publicEnv], ['scripts/.env.demo', adminEnv]]) {
     if (fs.existsSync(file)) throw new Error(`${file} ya existe; consérvalo o elimínalo explícitamente antes de regenerar.`);
 }

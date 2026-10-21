@@ -17,15 +17,22 @@
     "test:edge": "deno check --config supabase/functions/deno.json supabase/functions/bright-action/index.ts",
     "verify:install": "node scripts/verify-clean-install.js",
     "test:browser:local": "playwright test --config playwright.local.config.js",
-    "db:audit": "node scripts/audit-database.js"
+    "db:audit": "node scripts/audit-database.js",
+    "sessions:migrate": "node scripts/migrate-sessions.js",
+    "test:sessions:local": "node --test tests/session-store.integration.test.js"
   },
   "engines": {
     "node": ">=22"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",
+    "connect-pg-simple": "^10.0.0",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.7.1",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.8",
