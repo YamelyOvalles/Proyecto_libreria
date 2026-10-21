@@ -2,7 +2,7 @@
 
 ## Alcance y punto de partida
 
-Se revisaron los archivos versionados de la aplicación, servidor, SQL, función administrativa, pruebas, configuración y documentación, y se comparó `fase-3-backend` con la rama de partida `main`. Git estaba limpio. El trabajo se realizó en `mejoras-arquitectura-sesiones`.
+Se revisaron los archivos versionados de la aplicación, servidor, SQL, función administrativa, pruebas, configuración y documentación, y se comparó el estado original de `fase-3-backend` (`005f8a3`) con la rama de partida `main`. Git estaba limpio. Las mejoras corrigen observaciones de la Fase 3. Se prepararon inicialmente en una rama auxiliar y, por indicación del usuario, quedaron en `fase-3-backend` mediante un avance directo hasta el commit verificado `918f5fc`. Ese avance conserva también la base de Fase 4 utilizada durante la implementación y las pruebas. La rama auxiliar fue eliminada; las referencias de `main` y `fase-4-despliegue` no se modificaron.
 
 La Fase 4 ya había incorporado rutas, controlador y gateway de pedidos, validación del checkout, manejo central de errores y pruebas de permisos y transacciones. Por tanto, la observación de «Express solo sirve archivos» estaba parcialmente resuelta. Seguían pendientes las sesiones propias y la intermediación de las demás operaciones. No se reconstruyó la aplicación ni se modificaron el instalador comercial, las RPC, las políticas RLS existentes, la función bright-action o el diseño visual.
 
@@ -79,4 +79,4 @@ Pendientes: despliegue Vercel/host remoto, cookies Secure en un HTTPS de producc
 5. Ejecuta `npm.cmd run start:local`, o establece `$env:LIBRERIA_ENV_FILE='.env.local'` y ejecuta `npm.cmd run dev`. Abre `http://localhost:3000`.
 6. Para sesiones persistentes, configura `SESSION_SECRET` y `SESSION_DATABASE_URL` privados y ejecuta `npm.cmd run sessions:migrate -- --local` antes del arranque. No ejecutes el instalador comercial sobre una base existente. En producción utiliza las variables del host, conexión TLS y la migración dirigida al destino seleccionado, sin `--local`.
 
-No se realizó merge a main ni publicación remota. Los cambios se entregan en la rama de trabajo con un commit descriptivo.
+No se realizó merge a main ni publicación remota. Los cambios se entregan en `fase-3-backend` con commits descriptivos.
