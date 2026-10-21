@@ -23,8 +23,7 @@ window.crearCheckout = function ({ obtenerCarrito, vaciarCarrito }) {
 
     async function cargarSucursales() {
         if (!window.libreriaSupabase) return;
-        const { data, error } = await window.libreriaSupabase
-            .from("sucursales").select("id,nombre,ciudad").eq("activo", true).order("nombre");
+        const { data, error } = await window.libreriaApi("/api/sucursales");
         sucursal.replaceChildren();
         if (error) {
             const opcion = new Option("No se pudieron cargar las sucursales", "");
@@ -66,11 +65,7 @@ window.crearCheckout = function ({ obtenerCarrito, vaciarCarrito }) {
 
     async function buscarCotizacion(pedidoId) {
         for (let intento = 0; intento < 3; intento += 1) {
-            const { data, error } = await window.libreriaSupabase
-                .from("cotizaciones")
-                .select("id")
-                .eq("pedido_id", pedidoId)
-                .maybeSingle();
+            const { data, error } = await window.libreriaApi("/api/mis-pedidos/" + pedidoId + "/cotizacion");
             if (error) throw error;
             if (data?.id) return data;
             await new Promise(resolver => setTimeout(resolver, 250));

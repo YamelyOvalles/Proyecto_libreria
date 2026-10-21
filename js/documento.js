@@ -155,8 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    const tabla = tipo === "cotizacion" ? "cotizaciones" : "facturas";
-    const { data, error } = await window.libreriaSupabase.from(tabla).select("*").eq("id", id).single();
+    const { data, error } = await window.libreriaApi("/api/documentos/" + tipo + "/" + id);
     if (error || !data) {
         mostrarError(error?.message || "No tienes permiso para consultar este documento.");
         return;

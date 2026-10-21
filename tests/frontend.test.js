@@ -2,31 +2,33 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-function clientContext(config, auth) {
+function clientContext(config, respond = async () => new Response('null')) {
     const storage = new Map();
     const window = { LIBRERIA_SUPABASE_CONFIG: config, sessionStorage: storage, location: { hash: '' },
-        supabase: { createClient: (_url, _key, options) => { window.options = options; return { auth: { signOut: async () => ({}), ...auth } }; } } };
+        supabase: { createClient: (_url, _key, options) => { window.options = options; return {}; } } };
     vm.runInNewContext(fs.readFileSync('js/supabase-client.js', 'utf8'), { window, atob, console, URLSearchParams, Headers, URL,
-        fetch: async () => new Response('null') });
+        fetch: respond });
     return window;
 }
-test('cliente acepta Supabase local y conserva compatibilidad SDK solo en memoria', () => {
-    const window = clientContext({ url: 'http://127.0.0.1:54321', anonKey: 'sb_publishable_test' }, {});
+test('cliente usa sesión propia y el SDK no administra credenciales', async () => {
+    const window = clientContext({ url: 'http://127.0.0.1:54321', anonKey: 'sb_publishable_test' });
     assert.equal(window.libreriaSupabaseConfigurado, true);
-    assert.notEqual(window.options.auth.storage, window.sessionStorage);
-    assert.equal(window.options.auth.detectSessionInUrl, false);
-    assert.equal(window.options.auth.persistSession, true);
+    assert.equal(window.options.auth, undefined);
+    assert.equal(await window.options.accessToken(), 'server-session');
+    assert.equal(await window.obtenerSesionLibreria(), null);
 });
 test('cliente rechaza claves administrativas y origen ajeno', () => {
     assert.equal(clientContext({ url: 'https://test.supabase.co', anonKey: 'sb_secret_test' }, {}).libreriaSupabaseConfigurado, false);
     assert.equal(clientContext({ url: 'http://evil.test', anonKey: 'sb_publishable_test' }, {}).libreriaSupabaseConfigurado, false);
 });
-test('sesión almacenada se confirma con getUser y se rechaza identidad distinta', async () => {
-    const window = clientContext({ url: 'http://localhost:54321', anonKey: 'sb_publishable_test' }, {
-        getSession: async () => ({ data: { session: { user: { id: 'a' }, access_token: 'jwt' } } }),
-        getUser: async () => ({ data: { user: { id: 'b' } } })
+test('frontend obtiene identidad y rol del endpoint Express, sin recibir JWT', async () => {
+    const calls=[];
+    const window = clientContext({ url: 'http://localhost:54321', anonKey: 'sb_publishable_test' }, async path => {
+        calls.push(path); return Response.json({user:{id:'a'},role:'empleado',profile:{activo:true}});
     });
-    assert.equal(await window.obtenerSesionLibreria(), null);
+    assert.equal((await window.obtenerSesionLibreria()).user.id,'a');
+    assert.equal(await window.obtenerRolLibreria('a'),'empleado');
+    assert.deepEqual(calls,['/api/auth/session']);
 });
 async function guard(pathname, { profile, role = 'cliente', user = { id: 'demo' } } = {}) {
     const redirects = [];
@@ -37,7 +39,7 @@ async function guard(pathname, { profile, role = 'cliente', user = { id: 'demo' 
         obtenerSesionLibreria: async () => user ? { user } : null,
         obtenerRolLibreria: async () => role,
         obtenerPerfilLibreria: async () => profile,
-        libreriaSupabase: { auth: { signOut: async () => { signedOut = true; }, onAuthStateChange: () => {} } }
+        libreriaAuth: { signOut: async () => { signedOut = true; }, onAuthStateChange: () => {} }
     };
     const document = { documentElement: { style: {} }, dispatchEvent: () => {} };
     vm.runInNewContext(fs.readFileSync('js/auth.js', 'utf8'), {

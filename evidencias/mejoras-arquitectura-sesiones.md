@@ -1,5 +1,7 @@
 # Revisión de arquitectura y sesiones — 21 de octubre de 2026
 
+> Informe histórico de la entrega 918f5fc/9c15d7b. El estado de las correcciones posteriores, sus pruebas y pendientes está en [correcciones-finales-fases-3-4.md](correcciones-finales-fases-3-4.md).
+
 ## Alcance y punto de partida
 
 Se revisaron los archivos versionados de la aplicación, servidor, SQL, función administrativa, pruebas, configuración y documentación, y se comparó el estado original de `fase-3-backend` (`005f8a3`) con la rama de partida `main`. Git estaba limpio. Las mejoras corrigen observaciones de la Fase 3. Se prepararon inicialmente en una rama auxiliar y, por indicación del usuario, quedaron en `fase-3-backend` mediante un avance directo hasta el commit verificado `918f5fc`. Ese avance conserva también la base de Fase 4 utilizada durante la implementación y las pruebas. La rama auxiliar fue eliminada; las referencias de `main` y `fase-4-despliegue` no se modificaron.

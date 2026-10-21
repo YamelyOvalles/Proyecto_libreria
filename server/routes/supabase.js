@@ -12,7 +12,7 @@ const rpcs = new Set(['listar_movimientos_inventario', 'listar_usuarios_admin', 
     'guardar_configuracion_negocio', 'eliminar_categoria_admin', 'guardar_categoria_admin', 'ajustar_inventario_admin',
     'generar_factura_pedido', 'actualizar_estado_pedido', 'actualizar_pago_pedido', 'actualizar_usuario_admin', 'enviar_mensaje_contacto']);
 const adminRpcs = new Set(['listar_usuarios_admin', 'guardar_producto_admin', 'guardar_configuracion_negocio',
-    'eliminar_categoria_admin', 'guardar_categoria_admin', 'ajustar_inventario_admin', 'actualizar_usuario_admin']);
+    'eliminar_categoria_admin', 'guardar_categoria_admin', 'actualizar_usuario_admin']);
 // Valores de compatibilidad para el SDK. Nunca son JWT de Supabase ni otorgan acceso a la base.
 function browserSession(auth) {
     if (!auth) return null;
@@ -67,11 +67,12 @@ function supabaseRoutes(config, gateway, fetchImpl = fetch) {
                     (authEndpoint !== 'recover' && (typeof data.password !== 'string' || data.password.length < 8 || data.password.length > 1024))) throw new HttpError(400, 'Correo o contraseña inválidos.');
             }
             if (authEndpoint === 'logout') {
-                // La indisponibilidad del proveedor no impide destruir la sesión propia.
-                if (req.session.auth) {
-                    try { await upstream('/auth/v1/logout?scope=local', req.session.auth.access_token, 'POST'); } catch { /* Se invalida igualmente en Express. */ }
-                }
+                const token = req.session.auth?.access_token;
                 await change(req, 'destroy');
+                // La indisponibilidad del proveedor no impide destruir la sesión propia.
+                if (token) {
+                    try { await upstream('/auth/v1/logout?scope=local', token, 'POST'); } catch { /* Se invalida igualmente en Express. */ }
+                }
                 res.clearCookie('lq.sid', { httpOnly: true, secure: Boolean(config.production || req.secure), sameSite: 'lax' });
                 return res.json({});
             }

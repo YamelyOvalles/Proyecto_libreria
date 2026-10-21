@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     let libros = [];
     let carrito = [];
-    let carritoId = null;
     let checkout = null;
     let focoAnterior = null;
     let usuarioActual = null;
@@ -50,30 +49,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function cargarConfiguracionImpuestos() {
-        const { data, error } = await window.libreriaSupabase
-            .from("configuracion_negocio")
-            .select("cotizacion_mostrar_itbis,cotizacion_itbis_pct")
-            .eq("id", 1)
-            .single();
+        const { data, error } = await window.libreriaApi("/api/catalogo/impuestos");
         if (error) throw error;
         aplicarItbis = Boolean(data.cotizacion_mostrar_itbis);
         itbisPct = Number(data.cotizacion_itbis_pct) || 0;
     }
 
     async function cargarCatalogo() {
-        let resultado = await window.libreriaSupabase
-            .from("libros")
-            .select("id,isbn,titulo,descripcion,precio,descuento_pct,formato,idioma,imagen_portada,inventarios(cantidad_disponible),libro_autor(autores(nombre))")
-            .eq("activo", true)
-            .order("titulo");
-
-        if (resultado.error) {
-            resultado = await window.libreriaSupabase
-                .from("libros")
-                .select("id,isbn,titulo,descripcion,precio,formato,idioma,imagen_portada,inventarios(cantidad_disponible),libro_autor(autores(nombre))")
-                .eq("activo", true)
-                .order("titulo");
-        }
+        const resultado = await window.libreriaApi("/api/catalogo");
 
         if (resultado.error) throw resultado.error;
         libros = (resultado.data || []).map(libro => {
@@ -90,21 +73,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    async function obtenerCarrito(usuarioId) {
-        let { data, error } = await window.libreriaSupabase
-            .from("carritos").select("id").eq("perfil_id", usuarioId).maybeSingle();
+    async function obtenerCarrito() {
+        const { data, error } = await window.libreriaApi("/api/carrito");
         if (error) throw error;
-        if (!data) {
-            const resultado = await window.libreriaSupabase
-                .from("carritos").insert({ perfil_id: usuarioId }).select("id").single();
-            if (resultado.error) throw resultado.error;
-            data = resultado.data;
-        }
-        carritoId = data.id;
-
-        const detalles = await window.libreriaSupabase
-            .from("carrito_detalles").select("libro_id,cantidad").eq("carrito_id", carritoId);
-        if (detalles.error) throw detalles.error;
+        const detalles = { data: data.items };
         carrito = detalles.data.map(item => {
             const libro = libros.find(actual => actual.id === item.libro_id);
             return libro ? { ...libro, cantidad: item.cantidad } : null;
@@ -175,15 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function guardarCantidad(libroId, cantidad) {
-        if (cantidad <= 0) {
-            const { error } = await window.libreriaSupabase.from("carrito_detalles")
-                .delete().eq("carrito_id", carritoId).eq("libro_id", libroId);
-            if (error) throw error;
-            return;
-        }
-        const { error } = await window.libreriaSupabase.from("carrito_detalles").upsert({
-            carrito_id: carritoId, libro_id: libroId, cantidad
-        }, { onConflict: "carrito_id,libro_id" });
+        const { error } = await window.libreriaApi("/api/carrito/items/" + libroId, { method: "PUT", body: { cantidad: Math.max(0, cantidad) } });
         if (error) throw error;
     }
 
@@ -293,7 +257,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
         await cargarConfiguracionImpuestos();
-        await obtenerCarrito(usuarioActual.id);
+        await obtenerCarrito();
         renderizarCarrito();
         checkout = window.crearCheckout({
             obtenerCarrito: () => carrito,

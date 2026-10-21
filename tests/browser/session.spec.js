@@ -17,12 +17,12 @@ test('sesión de Express persiste entre páginas, no guarda tokens en Storage y 
     expect(state.storage).toBeNull(); expect(state.identity).toBeNull(); expect(state.local).toBeNull();
     expect(state.cookies).not.toContain('lq.sid');
     expect((await context.cookies()).find(cookie => cookie.name === 'lq.sid').httpOnly).toBe(true);
-    const session = await page.request.get('/api/supabase/session');
+    const session = await page.request.get('/api/auth/session');
     expect(await session.text()).not.toContain('internal-provider-test');
     const forbidden = await page.request.get('/admin.html'); expect(forbidden.status()).toBe(403);
     await page.locator('.account-trigger').click();
     await page.locator('[data-logout]').click();
     await expect(page.getByRole('link', { name: 'Iniciar sesión', exact: true })).toBeVisible();
-    expect(await (await page.request.get('/api/supabase/session')).json()).toBeNull();
+    expect(await (await page.request.get('/api/auth/session')).json()).toBeNull();
     expect(errors).toEqual([]);
 });

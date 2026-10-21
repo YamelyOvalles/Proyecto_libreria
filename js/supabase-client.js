@@ -27,90 +27,69 @@
         esClavePublica(configuracion.anonKey);
 
     window.libreriaSupabaseConfigurado = Boolean(configurado && window.supabase?.createClient);
-    const memoria = new Map();
-    async function servidorFetch(input, opciones = {}) {
-        const url = new URL(typeof input === 'string' ? input : input.url);
-        const headers = new Headers(opciones.headers || (typeof input !== 'string' ? input.headers : undefined));
-        headers.set('X-Libreria-Request', '1');
-        return fetch('/api/supabase' + url.pathname + url.search, { ...opciones, headers, credentials: 'same-origin' });
+    window.libreriaApi = async function(path, options = {}) {
+        try {
+            const response = await fetch(path, { method: options.method || 'GET', credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-Libreria-Request': '1' },
+                body: options.body === undefined ? undefined : JSON.stringify(options.body) });
+            const data = await response.json();
+            return response.ok ? { data, error: null } : { data: null, error: { message: data.error || 'Solicitud rechazada.', status: response.status } };
+        } catch { return { data: null, error: { message: 'No se pudo conectar con el servidor Express.' } }; }
+    };
+    // El SDK se conserva para lecturas y Storage mediante Express; no administra Auth.
+    window.libreriaSupabase = window.libreriaSupabaseConfigurado ? window.supabase.createClient(configuracion.url, configuracion.anonKey, {
+        accessToken: async () => 'server-session',
+        global: { fetch: (input, options = {}) => {
+            const url = new URL(typeof input === 'string' ? input : input.url);
+            const headers = new Headers(options.headers);
+            headers.set('X-Libreria-Request', '1');
+            return fetch('/api/supabase' + url.pathname + url.search, { ...options, headers, credentials: 'same-origin' });
+        } }
+    }) : null;
+    let current = null, restoration;
+    const listeners = new Set();
+    function emit(event) { for (const listener of listeners) listener(event, current); }
+    async function call(path, method, body) {
+        const result = await window.libreriaApi('/api/auth/' + path, { method, body });
+        if (result.error) return result;
+        return result;
     }
-    window.libreriaSupabase = window.libreriaSupabaseConfigurado
-        ? window.supabase.createClient(configuracion.url, configuracion.anonKey, {
-            global: { fetch: servidorFetch },
-            auth: {
-                persistSession: true,
-                storage: { getItem: key => memoria.get(key) || null, setItem: (key, value) => memoria.set(key, value), removeItem: key => memoria.delete(key) },
-                storageKey: "libreria.auth",
-                autoRefreshToken: true,
-                detectSessionInUrl: false
-            }
-        })
-        : null;
-    if (window.libreriaSupabase) {
-        const cerrar = window.libreriaSupabase.auth.signOut.bind(window.libreriaSupabase.auth);
-        window.libreriaSupabase.auth.signOut = async () => {
-            const respuesta = await fetch('/api/supabase/auth/v1/logout', { method: 'POST', credentials: 'same-origin',
-                headers: { 'X-Libreria-Request': '1' } });
-            if (!respuesta.ok) return { error: new Error('No se pudo cerrar la sesión.') };
-            return cerrar({ scope: 'local' });
-        };
-    }
-
-    let restauracion;
-    async function restaurarSesion() {
-        if (!restauracion) restauracion = (async () => {
-            // Limpia únicamente las antiguas credenciales de esta aplicación.
+    async function restore() {
+        if (!restoration) restoration = (async () => {
             window.sessionStorage?.removeItem?.('libreria.auth');
             window.sessionStorage?.removeItem?.('libreria.usuario');
-            const fragmento = new URLSearchParams(window.location.hash.slice(1));
-            let respuesta;
-            if (fragmento.has('access_token') && fragmento.has('refresh_token')) {
-                respuesta = await fetch('/api/supabase/exchange', { method: 'POST', credentials: 'same-origin',
-                    headers: { 'Content-Type': 'application/json', 'X-Libreria-Request': '1' },
-                    body: JSON.stringify({ access_token: fragmento.get('access_token'), refresh_token: fragmento.get('refresh_token') }) });
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            let result;
+            if (fragment.has('access_token') && fragment.has('refresh_token')) {
+                const body = { access_token: fragment.get('access_token'), refresh_token: fragment.get('refresh_token'), type: fragment.get('type') };
                 window.history.replaceState(null, '', window.location.pathname + window.location.search);
-            } else respuesta = await fetch('/api/supabase/session', { credentials: 'same-origin' });
-            if (!respuesta.ok) throw new Error('No se pudo restaurar la sesión.');
-            const sesion = await respuesta.json();
-            if (sesion) {
-                const { error } = await window.libreriaSupabase.auth.setSession(sesion);
-                if (error) throw error;
-            }
+                result = await call('exchange', 'POST', body);
+            } else result = await call('session', 'GET');
+            if (result.error) throw new Error(result.error.message);
+            current = result.data;
         })();
-        return restauracion;
+        return restoration;
     }
-
-    window.obtenerSesionLibreria = async function () {
+    window.libreriaAuth = {
+        async getSession() { try { await restore(); return { data: { session: current }, error: null }; } catch (error) { return { data: { session: null }, error }; } },
+        async getUser() { const result = await call('session', 'GET'); current = result.data; return { data: { user: current?.user || null }, error: result.error }; },
+        async signInWithPassword(body) { const result = await call('login', 'POST', body); if (!result.error) { current = result.data; emit('SIGNED_IN'); } return { data: { user: result.data?.user, session: result.data }, error: result.error }; },
+        async signUp(body) { const result = await call('register', 'POST', body); if (result.data?.session) { current = result.data.session; emit('SIGNED_IN'); } return result; },
+        async signOut() { const result = await call('logout', 'POST'); if (!result.error) { current = null; emit('SIGNED_OUT'); } return result; },
+        resetPasswordForEmail: email => call('recover', 'POST', { email }),
+        updateUser: body => call('password', 'PUT', body),
+        async signInWithOAuth({ provider }) { const result = await call('oauth', 'POST', { provider }); if (result.data?.url) window.location.assign(result.data.url); return result; },
+        onAuthStateChange(callback) { listeners.add(callback); return { data: { subscription: { unsubscribe: () => listeners.delete(callback) } } }; }
+    };
+    window.obtenerSesionLibreria = async function() {
         if (!window.libreriaSupabase) return null;
-        await restaurarSesion();
-        const { data: datosSesion, error: errorSesion } = await window.libreriaSupabase.auth.getSession();
-        if (errorSesion) throw errorSesion;
-        if (!datosSesion.session) return null;
-
-        // Valida la sesion con Supabase.
-        const { data: datosUsuario, error: errorUsuario } = await window.libreriaSupabase.auth.getUser();
-        if (errorUsuario) throw errorUsuario;
-        if (!datosUsuario.user || datosUsuario.user.id !== datosSesion.session.user.id) return null;
-        return { ...datosSesion.session, user: datosUsuario.user };
+        const result = await window.libreriaAuth.getSession();
+        if (result.error) throw result.error;
+        return result.data.session;
     };
 
-    window.obtenerRolLibreria = async function (usuarioId) {
-        if (!window.libreriaSupabase || !usuarioId) return null;
-        const { data, error } = await window.libreriaSupabase
-            .from("usuario_roles").select("roles(codigo)")
-            .eq("usuario_id", usuarioId).single();
-        if (error) throw error;
-        return data?.roles?.codigo || null;
-    };
-
-    window.obtenerPerfilLibreria = async function (usuarioId) {
-        if (!window.libreriaSupabase || !usuarioId) return null;
-        const { data, error } = await window.libreriaSupabase
-            .from("perfiles").select("nombres,apellidos,activo")
-            .eq("id", usuarioId).maybeSingle();
-        if (error) throw error;
-        return data;
-    };
+    window.obtenerRolLibreria = async function(id) { await restore(); return current?.user?.id === id ? current.role : null; };
+    window.obtenerPerfilLibreria = async function(id) { await restore(); return current?.user?.id === id ? current.profile : null; };
 
     window.mensajeErrorSupabase = function (error, alternativo) {
         console.error(error);

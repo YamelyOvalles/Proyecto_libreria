@@ -219,12 +219,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function cargarPedidos() {
         const [pedidos, cotizaciones, facturas] = await Promise.all([
-            window.libreriaSupabase
-                .from("pedidos")
-                .select("id,numero,cliente_nombre,cliente_correo,metodo_entrega,metodo_pago,estado_pago,estado,subtotal,descuento,itbis,costo_envio,total,notas,creado_en,pedido_detalles(libro_id,titulo,cantidad,precio_unitario,descuento_pct,descuento,subtotal,total_linea),pedido_direcciones_entrega(destinatario,telefono,linea_1,linea_2,sector,ciudad,provincia,codigo_postal,referencia)")
-                .order("creado_en", { ascending: false }),
-            window.libreriaSupabase.from("cotizaciones").select("id,numero,pedido_id,fecha_emision,valida_hasta,estado"),
-            window.libreriaSupabase.from("facturas").select("id,numero,pedido_id,ncf,fecha_emision,estado")
+            window.libreriaApi("/api/pedidos"),
+            window.libreriaApi("/api/cotizaciones"),
+            window.libreriaApi("/api/facturas")
         ]);
         if (pedidos.error) throw pedidos.error;
         if (cotizaciones.error) throw cotizaciones.error;
@@ -237,21 +234,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function cargarConfiguracionNegocio() {
-        const { data, error } = await window.libreriaSupabase
-            .from("configuracion_negocio")
-            .select("*")
-            .eq("id", 1)
-            .single();
+        const { data, error } = await window.libreriaApi("/api/configuracion");
         if (error) throw error;
         estado.configuracionNegocio = data;
         llenarConfiguracionNegocio(data);
     }
 
     async function cargarProductos() {
-        const { data, error } = await window.libreriaSupabase
-            .from("libros")
-            .select("id,isbn,titulo,descripcion,precio,descuento_pct,formato,idioma,editorial,categoria_id,stock_minimo,imagen_portada,activo,inventarios(cantidad_existencia,cantidad_reservada,cantidad_disponible),libro_autor(autores(nombre))")
-            .order("titulo");
+        const { data, error } = await window.libreriaApi("/api/productos");
         if (error) throw error;
         estado.productos = data || [];
         renderizarProductos();
@@ -261,10 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function cargarCategorias() {
-        const { data, error } = await window.libreriaSupabase
-            .from("categorias")
-            .select("id,nombre,activo,creado_en")
-            .order("nombre");
+        const { data, error } = await window.libreriaApi("/api/categorias");
         if (error) throw error;
         estado.categorias = data || [];
         llenarCategorias();
@@ -273,9 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function cargarMovimientos() {
-        const { data, error } = await window.libreriaSupabase.rpc("listar_movimientos_inventario", {
-            p_limite: 40
-        });
+        const { data, error } = await window.libreriaApi("/api/inventario", { method: "GET" });
         if (error) throw error;
         estado.movimientos = data || [];
         renderizarMovimientos();
@@ -283,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function cargarUsuarios() {
         if (window.libreriaRol !== "administrador") return;
-        const { data, error } = await window.libreriaSupabase.rpc("listar_usuarios_admin");
+        const { data, error } = await window.libreriaApi("/api/usuarios", { method: "GET" });
         if (error) throw error;
         estado.usuarios = data || [];
         renderizarUsuarios();
@@ -292,10 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function cargarMensajes() {
         if (window.libreriaRol !== "administrador") return;
-        const { data, error } = await window.libreriaSupabase
-            .from("contact_messages")
-            .select("id,user_id,nombre,correo,telefono,asunto,mensaje,estado,created_at")
-            .order("created_at", { ascending: false });
+        const { data, error } = await window.libreriaApi("/api/mensajes");
         if (error) throw error;
         estado.mensajes = data || [];
         renderizarMensajes();
@@ -484,9 +466,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function eliminarProducto(producto) {
         if (!confirm(`¿Retirar “${producto.titulo}”? Si tiene historial se desactivará; si no, se eliminará definitivamente.`)) return;
-        const { data, error } = await window.libreriaSupabase.functions.invoke("bright-action", {
-            body: { accion: "eliminar_producto", producto_id: producto.id }
-        });
+        const { data, error } = await window.libreriaApi("/api/productos/" + producto.id, { method: "DELETE" });
         if (error) {
             return mostrarAviso(await mensajeErrorFuncion(error, "No se pudo eliminar el producto."));
         }
@@ -527,7 +507,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const archivo = document.getElementById("product-image-file").files[0];
             if (archivo) portadaSubida = await subirPortada(archivo);
-            const { error } = await window.libreriaSupabase.rpc("guardar_producto_admin", {
+            const { error } = await window.libreriaApi((id ? "/api/productos/" + id : "/api/productos"), { method: (id ? "PUT" : "POST"), body: {
                 p_producto_id: id ? Number(id) : null,
                 p_isbn: document.getElementById("product-isbn").value,
                 p_titulo: document.getElementById("product-title").value,
@@ -543,7 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 p_stock_inicial: Number(document.getElementById("product-stock").value || 0),
                 p_stock_minimo: Number(document.getElementById("product-min-stock").value),
                 p_activo: document.getElementById("product-active").checked
-            });
+            } });
             if (error) throw error;
             productoGuardado = true;
             const rutaAnterior = rutaPortadaGuardada(portadaAnterior);
@@ -650,7 +630,7 @@ document.addEventListener("DOMContentLoaded", () => {
             factura_condiciones: valor("setting-invoice-terms"),
             factura_notas: valor("setting-invoice-notes")
         };
-        const { data, error } = await window.libreriaSupabase.rpc("guardar_configuracion_negocio", { p_datos: datos });
+        const { data, error } = await window.libreriaApi("/api/configuracion", { method: "PUT", body: { p_datos: datos } });
         boton.disabled = false;
         if (error) return mostrarAviso(mensajeError(error, "No se pudo guardar la configuración."));
         estado.configuracionNegocio = Array.isArray(data) ? data[0] : data;
@@ -694,9 +674,7 @@ document.addEventListener("DOMContentLoaded", () => {
             editar.addEventListener("click", () => editarCategoria(categoria));
             eliminar.addEventListener("click", async () => {
                 if (!confirm(`¿Eliminar o desactivar la categoría “${categoria.nombre}”?`)) return;
-                const { data, error } = await window.libreriaSupabase.rpc("eliminar_categoria_admin", {
-                    p_categoria_id: categoria.id
-                });
+                const { data, error } = await window.libreriaApi("/api/categorias/" + categoria.id, { method: "DELETE" });
                 if (error) return mostrarAviso(mensajeError(error, "No se pudo modificar la categoría."));
                 await Promise.all([cargarCategorias(), cargarProductos()]);
                 mostrarAviso(`Categoría ${data === "eliminada" ? "eliminada" : "desactivada"}.`, "success");
@@ -719,11 +697,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const boton = evento.currentTarget.querySelector('[type="submit"]');
         const id = document.getElementById("category-id").value;
         boton.disabled = true;
-        const { error } = await window.libreriaSupabase.rpc("guardar_categoria_admin", {
+        const { error } = await window.libreriaApi((id ? "/api/categorias/" + id : "/api/categorias"), { method: (id ? "PUT" : "POST"), body: {
             p_categoria_id: id ? Number(id) : null,
             p_nombre: document.getElementById("category-name").value,
             p_activo: document.getElementById("category-active").checked
-        });
+        } });
         boton.disabled = false;
         if (error) return mostrarAviso(mensajeError(error, "No se pudo guardar la categoría."));
         limpiarFormularioCategoria();
@@ -795,12 +773,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!formulario.reportValidity()) return;
         const boton = formulario.querySelector('[type="submit"]');
         boton.disabled = true;
-        const { error } = await window.libreriaSupabase.rpc("ajustar_inventario_admin", {
+        const { error } = await window.libreriaApi("/api/inventario/ajustes", { method: "POST", body: {
             p_producto_id: Number(document.getElementById("inventory-product").value),
             p_tipo: document.getElementById("inventory-type").value,
             p_cantidad: Number(document.getElementById("inventory-quantity").value),
             p_motivo: document.getElementById("inventory-reason").value
-        });
+        } });
         boton.disabled = false;
         if (error) return mostrarAviso(mensajeError(error, "No se pudo registrar el movimiento."));
         formulario.reset();
@@ -985,13 +963,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!pedido || !evento.currentTarget.reportValidity()) return;
         const boton = document.getElementById("invoice-submit");
         boton.disabled = true;
-        const { data, error } = await window.libreriaSupabase.rpc("generar_factura_pedido", {
+        const { data, error } = await window.libreriaApi("/api/pedidos/" + pedido.id + "/factura", { method: "POST", body: {
             p_pedido_id: pedido.id,
             p_ncf: document.getElementById("invoice-ncf").value || null,
             p_condicion_pago: document.getElementById("invoice-condition").value,
             p_fecha_vencimiento: document.getElementById("invoice-due-date").value || null,
             p_notas: document.getElementById("invoice-notes").value || null
-        });
+        } });
         boton.disabled = false;
         if (error) return mostrarAviso(mensajeError(error, "No se pudo generar la factura."));
         document.getElementById("invoice-dialog").close();
@@ -1019,14 +997,14 @@ document.addEventListener("DOMContentLoaded", () => {
         boton.disabled = true;
         try {
             if (nuevoEstado !== pedido.estado) {
-                const { error } = await window.libreriaSupabase.rpc("actualizar_estado_pedido", { p_pedido_id: pedido.id, p_estado: nuevoEstado });
+                const { error } = await window.libreriaApi("/api/pedidos/" + pedido.id + "/estado", { method: "PATCH", body: { p_pedido_id: pedido.id, p_estado: nuevoEstado } });
                 if (error) throw error;
             }
             if (nuevoPago !== pedido.estado_pago) {
-                const { error } = await window.libreriaSupabase.rpc("actualizar_pago_pedido", {
+                const { error } = await window.libreriaApi("/api/pedidos/" + pedido.id + "/pago", { method: "PATCH", body: {
                     p_pedido_id: pedido.id,
                     p_estado_pago: nuevoPago
-                });
+                } });
                 if (error) throw error;
             }
             document.getElementById("order-dialog").close();
@@ -1115,10 +1093,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!mensaje) return;
         const boton = document.getElementById("message-save-btn");
         boton.disabled = true;
-        const { error } = await window.libreriaSupabase
-            .from("contact_messages")
-            .update({ estado: document.getElementById("message-detail-status").value })
-            .eq("id", mensaje.id);
+        const { error } = await window.libreriaApi("/api/mensajes/" + mensaje.id, { method: "PATCH", body: { estado: document.getElementById("message-detail-status").value } });
         boton.disabled = false;
         if (error) return mostrarAviso(mensajeError(error, "No se pudo actualizar el mensaje."));
         document.getElementById("message-dialog").close();
@@ -1186,13 +1161,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const accion = activo ? "activar" : "desactivar";
         if (!confirm(`¿Deseas ${accion} la cuenta de ${usuario.nombres}?`)) return;
         boton.disabled = true;
-        const { error } = await window.libreriaSupabase.rpc("actualizar_usuario_admin", {
+        const { error } = await window.libreriaApi("/api/usuarios/" + (typeof usuario !== "undefined" ? usuario.id : id), { method: "PUT", body: {
             p_usuario_id: usuario.id,
             p_nombres: usuario.nombres,
             p_apellidos: usuario.apellidos,
             p_activo: activo,
             p_rol: usuario.rol
-        });
+        } });
         boton.disabled = false;
         if (error) return mostrarAviso(mensajeError(error, `No se pudo ${accion} el usuario.`));
         await cargarUsuarios();
@@ -1203,9 +1178,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // La función segura valida el historial antes de borrar la cuenta.
         if (!confirm(`¿Eliminar definitivamente la cuenta de ${usuario.nombres}? Esta acción no se puede deshacer.`)) return;
         boton.disabled = true;
-        const { error } = await window.libreriaSupabase.functions.invoke("bright-action", {
-            body: { accion: "eliminar", usuario_id: usuario.id }
-        });
+        const { error } = await window.libreriaApi("/api/usuarios/" + usuario.id, { method: "DELETE" });
         boton.disabled = false;
         if (error) {
             return mostrarAviso(await mensajeErrorFuncion(
@@ -1250,27 +1223,25 @@ document.addEventListener("DOMContentLoaded", () => {
         boton.disabled = true;
         let error;
         if (id) {
-            ({ error } = await window.libreriaSupabase.rpc("actualizar_usuario_admin", {
+            ({ error } = await window.libreriaApi("/api/usuarios/" + (typeof usuario !== "undefined" ? usuario.id : id), { method: "PUT", body: {
                 p_usuario_id: id,
                 p_nombres: datos.nombres,
                 p_apellidos: datos.apellidos,
                 p_activo: datos.activo,
                 p_rol: datos.rol
-            }));
+            } }));
         } else {
-            ({ error } = await window.libreriaSupabase.functions.invoke("bright-action", {
-                body: {
+            ({ error } = await window.libreriaApi("/api/usuarios", { method: "POST", body: {
                     ...datos,
                     correo: document.getElementById("user-email").value,
                     password: document.getElementById("user-password").value
-                }
-            }));
+                } }));
         }
         boton.disabled = false;
         if (error) {
             const mensajeAlternativo = id
                 ? "No se pudo actualizar el usuario."
-                : "La función para crear usuarios no está disponible en Supabase.";
+                : "No se pudo crear la cuenta del usuario.";
             return mostrarAviso(await mensajeErrorFuncion(error, mensajeAlternativo));
         }
         document.getElementById("user-dialog").close();

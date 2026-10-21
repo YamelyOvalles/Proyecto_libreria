@@ -87,7 +87,7 @@ botonRecuperar.addEventListener("click", async () => {
     }
     if (!window.libreriaSupabase) return mostrarMensaje("Configura Supabase antes de recuperar la contraseña.");
     bloquear(true);
-    const { error } = await window.libreriaSupabase.auth.resetPasswordForEmail(email, {
+    const { error } = await window.libreriaAuth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}${window.location.pathname}`
     });
     bloquear(false);
@@ -96,7 +96,7 @@ botonRecuperar.addEventListener("click", async () => {
 
 botonGoogle.addEventListener("click", async () => {
     if (!window.libreriaSupabase) return mostrarMensaje("Configura Supabase antes de continuar.");
-    const { error } = await window.libreriaSupabase.auth.signInWithOAuth({
+    const { error } = await window.libreriaAuth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: new URL(destinoDespuesAcceso, window.location.href).href }
     });
@@ -116,18 +116,18 @@ formulario.addEventListener("submit", async evento => {
     bloquear(true);
     try {
         if (modo === "recuperacion") {
-            const { error } = await window.libreriaSupabase.auth.updateUser({ password });
+            const { error } = await window.libreriaAuth.updateUser({ password });
             if (error) throw error;
             mostrarMensaje("Contraseña actualizada. Ya puedes entrar con tu nueva contraseña.", "exito");
             modo = "login";
             correo.disabled = false;
             botonEnviar.textContent = "Entrar a Librería Quisqueya";
-            await window.libreriaSupabase.auth.signOut();
+            await window.libreriaAuth.signOut();
         } else if (modo === "registro") {
             if (rolSeleccionado === "administrador") {
                 throw new Error("Las cuentas administrativas solo pueden ser asignadas desde la base de datos.");
             }
-            const { data, error } = await window.libreriaSupabase.auth.signUp({ email, password });
+            const { data, error } = await window.libreriaAuth.signUp({ email, password });
             if (error) throw error;
             if (!data.session) {
                 mostrarMensaje("Cuenta creada. Confirma el correo antes de iniciar sesión.", "exito");
@@ -138,16 +138,16 @@ formulario.addEventListener("submit", async evento => {
             }
             window.location.replace(destinoDespuesAcceso);
         } else {
-            const { data, error } = await window.libreriaSupabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await window.libreriaAuth.signInWithPassword({ email, password });
             if (error) throw error;
             const perfil = await window.obtenerPerfilLibreria(data.user.id);
             if (!perfil?.activo) {
-                await window.libreriaSupabase.auth.signOut({ scope: "local" });
+                await window.libreriaAuth.signOut({ scope: "local" });
                 throw new Error("La cuenta no está activa.");
             }
             const rolReal = await window.obtenerRolLibreria(data.user.id);
             if (rolSeleccionado === "administrador" && !["administrador", "empleado"].includes(rolReal)) {
-                await window.libreriaSupabase.auth.signOut();
+                await window.libreriaAuth.signOut();
                 throw new Error("Esta cuenta no pertenece al personal autorizado.");
             }
             window.location.replace(documentoSolicitado || (["administrador", "empleado"].includes(rolReal) ? "admin.html" : destinoDespuesAcceso));
@@ -168,7 +168,7 @@ function activarRecuperacion() {
     mostrarMensaje("El enlace de recuperación fue validado.", "exito");
 }
 
-window.libreriaSupabase?.auth.onAuthStateChange(evento => {
+window.libreriaAuth.onAuthStateChange(evento => {
     if (evento === "PASSWORD_RECOVERY") activarRecuperacion();
 });
 
@@ -186,7 +186,7 @@ window.libreriaSupabase?.auth.onAuthStateChange(evento => {
         if (sesion?.user && modo !== "recuperacion") {
             const perfil = await window.obtenerPerfilLibreria(sesion.user.id);
             if (!perfil?.activo) {
-                await window.libreriaSupabase.auth.signOut({ scope: "local" });
+                await window.libreriaAuth.signOut({ scope: "local" });
                 mostrarMensaje("La cuenta no está activa.");
                 return;
             }

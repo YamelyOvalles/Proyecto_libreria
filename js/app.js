@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", async function () {
             button.disabled = true;
             try {
-                await window.libreriaSupabase?.auth.signOut({ scope: "local" });
+                await window.libreriaAuth.signOut({ scope: "local" });
             } finally {
                 sessionStorage.removeItem("libreria.auth");
                 sessionStorage.removeItem("libreria.usuario");

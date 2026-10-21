@@ -16,6 +16,8 @@ const run = (role, action) => asUser(db, ids[role], action);
 test('migración de sesiones es repetible, conserva libros y bloquea acceso por API pública', async () => {
     const migration = fs.readFileSync('database/migrations/20261021_application_sessions.sql', 'utf8');
     await db.exec(migration); await db.exec(migration);
+    const revocation = fs.readFileSync('database/migrations/20261021_session_revocation.sql','utf8');
+    await db.exec(revocation); await db.exec(revocation);
     await q("insert into application_sessions(sid,sess,expire) values ('test','{}',now()+interval '1 hour')");
     for (const role of ['cliente', 'administrador']) {
         await assert.rejects(run(role, () => q('select * from application_sessions')), /permission denied/);

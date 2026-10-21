@@ -36,7 +36,10 @@ test('administrador crea, edita y elimina producto desde la interfaz existente',
     await page.locator('#product-title').fill(title);
     await page.locator('#product-price').fill('100');
     await page.locator('#product-stock').fill('0');
+    await page.locator('#product-image-file').setInputFiles({name:'portada-prueba.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jWZkAAAAASUVORK5CYII=','base64')});
+    const cover=page.waitForResponse(response=>response.url().includes('/api/supabase/storage/v1/object/portadas/')&&response.request().method()==='POST');
     await page.locator('#product-form [type="submit"]').click();
+    expect((await cover).status()).toBe(200);
     await expect(page.locator('#product-dialog')).not.toBeVisible();
     await page.locator('#product-search').fill(title);
     const row = page.locator('#products-table-body tr').filter({ hasText: title });
@@ -66,7 +69,7 @@ test('checkout de navegador abre cotización, genera PDF y conserva el enlace tr
     const documentUrl = page.url();
     const pdf = await page.pdf({ path: testInfo.outputPath('cotizacion.pdf'), format: 'A4', printBackground: true });
     expect(pdf.subarray(0,4).toString()).toBe('%PDF'); expect(pdf.length).toBeGreaterThan(1000);
-    await page.evaluate(() => window.libreriaSupabase.auth.signOut({ scope: 'local' }));
+    await page.evaluate(() => window.libreriaAuth.signOut({ scope: 'local' }));
     await page.goto(documentUrl); await expect(page).toHaveURL(/login\.html\?returnTo=/);
     await page.locator('#email').fill('otro@demo.local'); await page.locator('#password').fill(demoPassword);
     await page.locator('#login-submit-btn').click();
@@ -105,4 +108,24 @@ test('registro y recuperación real por correo local permiten cambiar contraseñ
     expect((await sdk.auth.signInWithPassword({ email, password: demoPassword })).error).toBeTruthy();
     expect((await sdk.auth.signInWithPassword({ email, password: newPassword })).error).toBeNull();
     await sdk.auth.signOut({ scope: 'local' });
+});
+
+test('empleado registra inventario desde la interfaz mediante Express; cliente recibe rechazo',async({page,request})=>{
+    const admin=await request.post('/api/auth/login',{headers:{'X-Libreria-Request':'1'},data:{email:'admin@demo.local',password:demoPassword}});
+    expect(admin.status()).toBe(200);
+    const title='Inventario navegador '+Date.now();
+    const create=await request.post('/api/productos',{headers:{'X-Libreria-Request':'1'},data:{p_isbn:String(Date.now()),p_titulo:title,p_autor:'Autor ficticio',p_categoria:'Prueba navegador',p_editorial:'Editorial demo',p_descripcion:'Datos locales de prueba',p_precio:10,p_descuento_pct:0,p_formato:'fisico',p_idioma:'Español',p_imagen_portada:null,p_stock_inicial:0,p_stock_minimo:0,p_activo:true}});
+    expect(create.status()).toBe(201);const id=await create.json();
+    await login(page,'empleado@demo.local');await expect(page).toHaveURL(/admin\.html$/);
+    await page.locator('[data-admin-view="inventario"]').click();
+    await page.locator('#inventory-product').selectOption(String(id));
+    await page.locator('#inventory-type').selectOption('entrada');
+    await page.locator('#inventory-quantity').fill('2');await page.locator('#inventory-reason').fill('Prueba real desde Express');
+    const movement=page.waitForResponse(response=>response.url().endsWith('/api/inventario/ajustes')&&response.request().method()==='POST');
+    await page.locator('#inventory-form [type="submit"]').click();expect((await movement).status()).toBe(201);
+    const books=await (await request.get('/api/productos')).json();expect(Number(books.find(book=>book.id===id).inventarios.cantidad_existencia)).toBe(2);
+    await Promise.all([page.waitForURL(/login\.html$/),page.evaluate(()=>window.libreriaAuth.signOut())]);
+    await login(page,'cliente@demo.local');await expect(page).toHaveURL(/informacion\.html$/);
+    const denied=await page.request.post('/api/inventario/ajustes',{headers:{'X-Libreria-Request':'1'},data:{p_producto_id:id,p_tipo:'entrada',p_cantidad:1,p_motivo:'Bloqueado'}});expect(denied.status()).toBe(403);
+    expect((await request.delete('/api/productos/'+id,{headers:{'X-Libreria-Request':'1'}})).status()).toBe(200);
 });

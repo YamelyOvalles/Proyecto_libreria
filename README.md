@@ -1,184 +1,149 @@
-# Librería Quisqueya — Fase 4
+# Librería Quisqueya — correcciones de las Fases 3 y 4
 
-Proyecto de Desarrollo de Aplicaciones Web ISW-306. La interfaz utiliza HTML, CSS y JavaScript; el servidor utiliza Express 5. Supabase proporciona autenticación, PostgreSQL, Storage y la función administrativa `bright-action`.
+Aplicación académica de ISW-306. Express gestiona autenticación, sesiones y operaciones de negocio; Supabase conserva Auth, PostgreSQL, RLS y Storage. La interfaz HTML/CSS existente se conserva.
 
-## Requisitos
+## Versión de esta entrega
 
-Instala Git, Node.js 22 o superior y Docker Desktop con contenedores Linux. Abre Docker Desktop antes de continuar. Necesitas internet para descargar las dependencias y las imágenes en la primera instalación.
+La rama de esta entrega es **correcciones-fases-3-4**, creada desde fase-3-backend (9c15d7b), la versión más reciente al iniciar las correcciones. main y fase-4-despliegue estaban en 7edaa5b y no se modificaron. Por indicación del usuario esta entrega se mantiene local, sin push ni merge.
 
-La aplicación se verificó en Windows con Node 24.19.0, npm 11.17.0, Docker 29.8.2 y WSL 2. Los paquetes instalados fueron Express 5.2.1, Supabase JS 2.117.2 y Supabase CLI 2.120.0; la base local ejecutó PostgreSQL 17.11. `npm ci` instala las versiones del archivo package-lock.json.
+Trabaja desde la carpeta de esta entrega. Cuando el propietario autorice publicarla, una copia nueva podrá obtenerse con:
 
-En Windows usa PowerShell y los comandos `npm.cmd` y `npx.cmd` que aparecen abajo. En Linux o macOS usa `npm` y `npx`.
-
-## Primera instalación
-
-La opción local instala un backend propio para la evaluación. No requiere acceso al proyecto remoto del equipo ni modifica su base de datos.
-
-Comprueba primero que Docker esté funcionando:
-
-```powershell
-docker info
-```
-
-Después ejecuta:
-
-```powershell
-git clone --branch fase-4-despliegue https://github.com/YamelyOvalles/Proyecto_libreria.git
+~~~powershell
+git clone --branch correcciones-fases-3-4 https://github.com/YamelyOvalles/Proyecto_libreria.git
 cd Proyecto_libreria
-npm.cmd ci
-npx.cmd supabase start
-npm.cmd run local:config
-npm.cmd run demo:seed
-```
+~~~
 
-La primera descarga puede tardar varios minutos. Supabase carga automáticamente **database/database.sql**, el único instalador de la base. El profesor no debe ejecutar otros archivos SQL ni crear un administrador manualmente.
+Ese comando de clonación solo funciona después de publicar la rama. Los informes anteriores en evidencias describen sus respectivas versiones; el estado actual está en [el informe final](evidencias/correcciones-finales-fases-3-4.md).
 
-`local:config` crea server/.env.local y scripts/.env.demo con las claves de esta instalación local. Ambos archivos están ignorados por Git. Conserva los archivos que ya existan: el script se niega a sobrescribirlos y no cambia server/.env.
+## Inicio rápido con Docker
 
-## Iniciar la aplicación
+Requisitos: Node.js 22 o superior, npm, Git y Docker Desktop iniciado con contenedores Linux. En Windows utiliza npm.cmd; en Linux/macOS utiliza npm.
 
-Abre dos terminales en la carpeta Proyecto_libreria y mantenlas abiertas.
+Desde la carpeta del proyecto:
 
-En la primera inicia la función administrativa:
+~~~powershell
+npm.cmd install
+npm.cmd run dev
+~~~
 
-```powershell
-npx.cmd supabase functions serve bright-action --no-verify-jwt
-```
+En una copia nueva sin configuración, dev prepara Supabase local, genera archivos privados, aplica únicamente las migraciones aditivas de sesiones y crea las cuentas demo. La primera descarga de imágenes puede tardar. Los mensajes de Supabase CLI que contienen claves se capturan y no se imprimen.
 
-En la segunda inicia Express:
+Si ya tienes configuración local, dev la conserva y comprueba Auth y la tabla de sesiones antes de iniciar Express. Si el esquema de sesiones necesita actualizarse o quieres preparar el entorno explícitamente:
 
-```powershell
-npm.cmd run start:local
-```
+~~~powershell
+npm.cmd run setup -- --local
+npm.cmd run dev
+~~~
 
-Abre **http://localhost:3000**. Usa esta dirección para que los enlaces de recuperación coincidan con la configuración de autenticación.
+Abre **http://localhost:3000**. Solo necesitas mantener el comando dev en una terminal. La aplicación ya no requiere iniciar bright-action por separado: Express crea y elimina cuentas mediante Auth Admin y procesa los productos con las RPC existentes.
 
-La función `bright-action` es necesaria para crear y eliminar usuarios y para eliminar productos desde el panel. Aunque el comando desactiva la comprobación automática del gateway, la función valida internamente la sesión, el perfil activo y el rol administrador antes de ejecutar cualquier operación.
+setup conserva las variables existentes y agrega solo las ausentes; no sobrescribe server/.env. Las cuentas demo de la pila local son admin@demo.local, empleado@demo.local, cliente@demo.local, otro@demo.local e inactivo@demo.local. Su contraseña aleatoria está únicamente como DEMO_PASSWORD en scripts/.env.demo, ignorado por Git. Consúltala localmente sin copiarla a informes ni mensajes. No son cuentas del proyecto remoto.
 
-## Cuentas para probar
+Para reiniciar Express usa Ctrl+C y npm.cmd run dev. Docker puede permanecer encendido. Para detener deliberadamente la pila local usa npx.cmd supabase stop; los datos locales se conservan. No es necesario reiniciar ni reinstalar la base comercial.
 
-La contraseña demo se genera al ejecutar `local:config` y queda como `DEMO_PASSWORD` en `scripts/.env.demo`, ignorado por Git. Consúltala localmente sin compartirla. En instalaciones existentes define allí una contraseña nueva de al menos 12 caracteres y ejecuta `npm.cmd run demo:seed` para rotarla.
+## Opción con Supabase remoto de demostración
 
-- admin@demo.local: administrador, con acceso a todos los módulos.
-- empleado@demo.local: pedidos, inventario y documentos.
-- cliente@demo.local: catálogo, carrito y compras.
-- otro@demo.local: segundo cliente para comprobar aislamiento.
-- inactivo@demo.local: cuenta que debe recibir rechazo de acceso.
+Un proyecto demo remoto debe pertenecer al equipo o estar autorizado. No se ha creado, reconfigurado ni validado un proyecto remoto durante esta entrega.
 
-El instalador incluye cuatro libros, autores, categorías, inventario y una sucursal. `demo:seed` crea las cuentas y agrega tres pedidos ficticios, cotizaciones, una factura y un mensaje. Se puede repetir sin duplicar estos ejemplos. Las credenciales son exclusivamente locales.
+~~~powershell
+npm.cmd run setup -- --remote
+~~~
 
-Prueba login, carrito y compra como cliente; procesa el pedido como empleado y revisa sus documentos. Como administrador puedes crear un producto, subir una portada y editarlo. Los productos con historial se desactivan al eliminarlos para conservar ventas y movimientos.
+Completa el archivo privado server/.env.remote generado desde server/.env.example. Necesitas URL y clave pública del proyecto, conexión PostgreSQL para sesiones y la clave privada de Auth Admin para crear/eliminar cuentas. El administrador del proyecto debe disponer previamente del esquema comercial, RLS, Storage y redirecciones de correo.
 
-## Base de datos, archivos y correos
+Aplica la migración de sesiones al destino remoto seleccionado solo con autorización del propietario. Para ello establece sus variables como variables del proceso o usa server/.env; el comando sin --local lee ese archivo. No ejecutes database/database.sql sobre una base existente.
 
-Todo el esquema de la aplicación está en **database/database.sql**: 24 tablas, funciones, índices, triggers, permisos, políticas RLS, bucket de portadas y datos iniciales. Supabase aporta los servicios y esquemas de Auth y Storage. Las cuentas demo se crean con el script porque pertenecen a Auth.
+~~~powershell
+npm.cmd run sessions:migrate
+npm.cmd run dev:remote
+~~~
 
-El SQL se concilió con las exportaciones recibidas del remoto. Se corrigieron permisos de cuentas inactivas, restricciones antiguas incompatibles, bloqueo del checkout, coherencia de ITBIS y borrado de productos sin historial. Las exportaciones y el SQL de regresión se conservan en tests/fixtures únicamente para pruebas; no son pasos de instalación. No ejecutes el instalador completo sobre una base existente.
+dev:remote lee server/.env.remote y no inicia Docker ni la CLI. La conexión al proyecto demo y su configuración siguen pendientes de verificación con credenciales privadas. Puedes elegir explícitamente .env, .env.local o .env.remote mediante LIBRERIA_ENV_FILE.
 
-Las portadas iniciales están en assets/portadas. El SQL configura el bucket `portadas` para imágenes JPEG, PNG y WebP de hasta 5 MiB; solo un administrador activo puede escribir. La configuración local permite registrarse sin confirmar correo y utiliza Mailpit para recibir correos de recuperación:
+## Variables privadas y despliegue
 
-- Base de datos y administración local: http://127.0.0.1:54323
-- Buzón de correos local: http://127.0.0.1:54324
+| Variable | Uso |
+| --- | --- |
+| SUPABASE_URL | URL del proyecto; local o HTTPS de Supabase |
+| SUPABASE_ANON_KEY | Clave pública anon/publishable; preserva RLS |
+| SUPABASE_AUTH_ADMIN_KEY | Clave secret/service_role usada exclusivamente para Auth Admin en el servidor |
+| SESSION_SECRET | Secreto aleatorio de al menos 32 caracteres, estable entre reinicios e instancias |
+| SESSION_DATABASE_URL | Conexión privada a PostgreSQL para el almacén de sesiones |
+| NODE_ENV | production en el host de producción; development para ejecución local |
+| PORT | Puerto de Express; 3000 de forma predeterminada |
+| LIBRERIA_ENV_FILE | Selección explícita de archivo de entorno para scripts y servidor |
+| DEMO_PASSWORD | Solo scripts/.env.demo: contraseña de cuentas ficticias locales |
 
-Google OAuth está deshabilitado. La analítica opcional está deshabilitada para evitar depender del puerto TCP de Docker; esto no impide los flujos de la aplicación.
+SUPABASE_AUTH_ADMIN_KEY nunca se envía al navegador ni se utiliza para consultas SQL. Express exige rol administrador antes de llamar a Auth Admin. Las consultas de libros, perfiles, roles y demás datos utilizan exclusivamente la clave pública y el JWT del usuario. No se desactiva RLS. La API pública de configuración devuelve solo URL y clave pública.
 
-## Detener y volver a iniciar
+En producción son obligatorios el secreto y PostgreSQL; se rechaza MemoryStore. La conexión remota de sesiones exige sslmode=verify-full. El usuario del almacén debe ser propietario exclusivamente de la tabla de sesiones o tener una política RLS específica; otorgar CRUD sin política no basta. El propietario de la base prepara ese acceso y aplica las migraciones. Mantén protegidos secretos, conexión y copias de seguridad.
 
-Detén Express y la función con Ctrl+C en sus terminales. Después ejecuta:
+Express exige HTTPS en producción y confía en un salto de proxy; el proxy del host debe ser confiable y preservar el protocolo original. Las cookies son HttpOnly, SameSite=Lax y Secure en producción. Vercel conserva api/index.js y vercel.json; exige las mismas variables y conectividad con el almacén PostgreSQL. El HTTPS y el despliegue reales siguen pendientes de comprobación externa.
 
-```powershell
-npx.cmd supabase stop
-```
+## Sesiones y seguridad
 
-En la siguiente sesión ejecuta `npx.cmd supabase start` y vuelve a iniciar las dos terminales. Los datos se conservan. No repitas `local:config` si sus archivos ya existen.
+La sesión de aplicación se guarda en Express/PostgreSQL. El navegador recibe identidad, perfil y rol; no recibe JWT ni refresh tokens para el flujo normal de Auth. Los enlaces de recuperación se intercambian en Express y se elimina su fragmento de URL. El SDK se conserva para portadas a través de Express, sin gestionar Auth.
 
-Para borrar y reinstalar deliberadamente **solo la base local**, detén Express y la función, ejecuta `npx.cmd supabase db reset --local` y luego `npm.cmd run demo:seed`. Este reset elimina los datos locales; no forma parte del arranque normal.
+La sesión tiene 30 minutos de inactividad y máximo de ocho horas. El ID se regenera al autenticar; Express renueva el token y comprueba usuario, perfil activo y rol. Logout revoca primero la sesión propia y limpia la cookie. Las revocaciones permanecen ocho horas; una escritura o touch antiguo no puede restaurarlas, tampoco entre instancias. Las fechas del almacén se manejan en UTC. Las pruebas fuerzan vencimientos y concurrencia, sin esperar ocho horas de reloj.
 
-## Pruebas
+Las modificaciones exigen X-Libreria-Request: 1; se rechazan orígenes ajenos y no se habilita CORS. Hay validación de entradas, límites de tamaño, Helmet/CSP y limitación de intentos por proceso. Un despliegue con varias instancias debe agregar un limitador compartido para un límite global; el almacén de sesiones ya es compartido.
 
-Las pruebas ejecutadas y sus límites están en [evidencias/fase-4-pruebas.md](evidencias/fase-4-pruebas.md). Pasaron 32 pruebas aisladas, 12 de integración y 5 de navegador con servicios locales reales.
+Las contraseñas administrativas publicadas anteriormente deben cambiarse en Supabase Auth y donde se hayan reutilizado. No se declara completada ninguna rotación remota. El procedimiento de Git e historial está en [evidencias/git-seguridad-y-revision.md](evidencias/git-seguridad-y-revision.md).
 
-```powershell
+## Rutas principales de Express
+
+| Método y ruta | Permiso y responsabilidad |
+| --- | --- |
+| POST /api/auth/login, /register, /recover, /exchange | Autenticación/recuperación mediante controlador y servicio |
+| GET /api/auth/session | Verifica sesión, actividad y rol |
+| POST /api/auth/logout | Revoca sesión propia y cierra sesión de Auth |
+| PUT /api/auth/password | Cambia contraseña del usuario autenticado |
+| GET /api/catalogo | Catálogo público |
+| GET /api/catalogo/impuestos, /api/sucursales | Datos de compra para usuario autenticado |
+| GET /api/productos, /api/categorias | Personal |
+| POST, PUT, DELETE /api/productos[/id], /api/categorias[/id] | Administrador; RPC transaccionales |
+| GET, POST, PUT, DELETE /api/usuarios[/id] | Administrador; historial protegido y sin autoeliminación |
+| GET /api/inventario; POST /api/inventario/ajustes | Empleado o administrador |
+| GET /api/carrito; PUT /api/carrito/items/:id | Carrito propio; identidad tomada de la sesión |
+| POST /api/pedidos | Checkout con precios/stock/documentos calculados por PostgreSQL |
+| GET /api/pedidos; PATCH /api/pedidos/:id/estado o /pago | Personal |
+| POST /api/pedidos/:id/factura | Personal; conserva restricciones y transacciones |
+| GET /api/documentos/:tipo/:id | Propietario o personal, según RLS |
+| GET/PUT /api/configuracion | Lectura de personal; escritura de administrador |
+| POST /api/contacto; GET/PATCH /api/mensajes[/id] | Contacto público; gestión de administrador |
+
+El frontend principal consume estas rutas. /api/supabase se conserva para compatibilidad y transporte de Storage; las portadas públicas pueden descargarse directamente del proveedor. bright-action sigue en el repositorio para instalaciones anteriores y tiene pruebas separadas; no es una dependencia del arranque actual.
+
+server/routes define rutas; server/controllers valida y coordina solicitudes; server/services ejecuta Auth, consultas, RPC y persistencia; server/middleware aplica sesiones, CSRF, validación y errores. PostgreSQL sigue siendo la autoridad transaccional de precios, inventario, pedidos y documentos.
+
+## Migraciones, datos y pruebas
+
+database/database.sql conserva el instalador comercial de Fase 4. Las migraciones en database/migrations agregan exclusivamente el almacén de sesiones y su revocación; son repetibles y no reinstalan las tablas comerciales.
+
+~~~powershell
 npm.cmd run check
 npm.cmd test
-npm.cmd run db:audit
-npm.cmd run verify:install
-```
-
-Para probar Auth, roles, CRUD, Storage, pedidos y Edge, mantén Supabase y bright-action activos:
-
-```powershell
 npm.cmd run test:integration
-```
-
-Para las pruebas de navegador detén Express: la prueba abre su propio servidor en el puerto 3000. Mantén Supabase y bright-action activos.
-
-```powershell
-npx.cmd playwright install chromium
+npm.cmd run test:sessions:local
+npm.cmd run test:browser
 npm.cmd run test:browser:local
-```
+~~~
 
-Estas pruebas también recorren checkout, cotización, PDF y recuperación por correo local. Agregan datos ficticios a la base local. Los resultados de navegador se guardan en test-results, ignorado por Git. Para revisar tipos de la función por separado, instala Deno y ejecuta `npm.cmd run test:edge`; se verificó con Deno 2.9.7.
+La suite aislada usa proveedores simulados y PostgreSQL en memoria. Las pruebas de integración y navegador local requieren setup y usan datos ficticios de la pila local; crean usuarios, productos, movimientos, pedidos y documentos. Conservan el historial generado y no aceptan proyectos remotos. Playwright genera resultados ignorados por Git. Si no está instalado Chromium, usa npx.cmd playwright install chromium. En Windows puedes seleccionar Chrome existente con PLAYWRIGHT_EXECUTABLE_PATH.
 
-## Organización de Express
+Para la función heredada, opcionalmente inicia npx.cmd supabase functions serve bright-action --no-verify-jwt y ejecuta npm.cmd run test:legacy-edge. npm.cmd run test:edge comprueba sus tipos si tienes Deno. Esto no es necesario para usar la aplicación actual.
 
-server/app.js construye la aplicación y server/index.js la inicia. server/config.js valida la configuración; server/routes contiene las rutas; server/controllers coordina las solicitudes; server/middleware valida sesiones y maneja errores; server/services accede a Supabase.
-
-El navegador confirma compras mediante **POST /api/pedidos**. Express valida la sesión, el perfil activo y los campos recibidos, y llama a la RPC PostgreSQL con el JWT del usuario. La RPC calcula precios y confirma stock, pedido y cotización en una transacción. Así se evita duplicar reglas comerciales y se mantienen los permisos de Supabase.
-
-Supabase Auth verifica la identidad; Express administra la sesión de aplicación con `express-session`. El navegador utiliza `/api/supabase` para Auth, REST, RPC, portadas y bright-action. Express verifica el perfil activo, el rol y el origen, y envía a Supabase el JWT guardado en el servidor. RLS protege las filas y las RPC mantienen las transacciones existentes. bright-action conserva la API Admin exclusivamente en Supabase.
-
-La cookie `lq.sid` es HttpOnly y SameSite=Lax; usa Secure con HTTPS y obligatoriamente en producción. El identificador se regenera al autenticar. La sesión caduca a los 30 minutos sin actividad y tiene un máximo absoluto de ocho horas; los tokens se renuevan solo en el servidor. Logout destruye la sesión propia incluso si Supabase no está disponible. El SDK recibe valores de compatibilidad sin capacidad de acceso a Supabase y los conserva únicamente en memoria. No se guardan contraseñas ni JWT reales en Storage del navegador. Las portadas públicas pueden seguir descargándose directamente del proveedor.
-
-Las solicitudes que modifican datos deben llevar `X-Libreria-Request: 1`; se rechazan orígenes ajenos y no se habilita CORS. Helmet aplica CSP y otros encabezados. El acceso a `/admin` y `/documento`, con o sin extensión, también se verifica en Express. La autorización por fila de los documentos sigue correspondiendo a RLS.
-
-### Almacén de sesiones y migración incremental
-
-En desarrollo, sin `SESSION_DATABASE_URL`, se permite MemoryStore: reiniciar Express cierra las sesiones y el secreto temporal cambia. Para conservarlas entre reinicios, configura `SESSION_SECRET` aleatorio (mínimo 32 caracteres) y `SESSION_DATABASE_URL` privados en `server/.env.local`. Utiliza la conexión PostgreSQL de tu pila local, no una clave de la API. Después ejecuta:
-
-```powershell
-npm.cmd run sessions:migrate -- --local
-```
-
-La migración `database/migrations/20261021_application_sessions.sql` crea solamente la tabla de sesiones y su índice, activa RLS y revoca el acceso a los roles públicos. No reinstala la base ni modifica las tablas existentes. Es repetible. Requiere un propietario de PostgreSQL; el usuario del almacén necesita SELECT, INSERT, UPDATE y DELETE en esa tabla. Restringe las credenciales de conexión a ese uso cuando prepares producción.
-
-En producción, incluidas las funciones de Vercel, **ambas variables son obligatorias**; el servidor se niega a utilizar MemoryStore. Configura la conexión privada con TLS verificado, aplica la migración con `npm.cmd run sessions:migrate` sobre el destino seleccionado y ejecuta detrás de un proxy HTTPS confiable. Se confía en un salto de proxy. El limitador de intentos es por proceso; un despliegue con varias instancias requiere un almacén compartido para un límite global.
-
-Para desarrollo con la configuración local y el comando solicitado:
-
-```powershell
-$env:LIBRERIA_ENV_FILE='.env.local'
-npm.cmd run dev
-```
-
-El informe de esta revisión, la comparación con la Fase 3, los archivos modificados y los límites de las pruebas están en [evidencias/mejoras-arquitectura-sesiones.md](evidencias/mejoras-arquitectura-sesiones.md). Para comprobar el almacén PostgreSQL local entre instancias usa `npm.cmd run test:sessions:local`; esta prueba aplica únicamente la migración aditiva de sesiones a la pila local.
-
-Express no trae un contenedor de inyección de dependencias. La aplicación pasa configuración y gateway explícitamente a sus componentes, lo que permite probarlos sin agregar uno artificial.
-
-## Uso remoto o despliegue
-
-Para la evaluación utiliza la opción local. `npm start` usa server/.env o las variables del host y puede conectarse a un Supabase remoto. server/.env.example contiene la plantilla: SUPABASE_URL, SUPABASE_ANON_KEY pública y PORT. Un proyecto remoto nuevo debe instalar database/database.sql y configurar Auth, redirecciones y correo por separado.
-
-Para desplegar bright-action en un proyecto autorizado:
-
-```powershell
-npx.cmd supabase login
-npx.cmd supabase functions deploy bright-action --project-ref TU_PROJECT_REF --no-verify-jwt
-```
-
-Supabase proporciona las variables administrativas dentro de la función. Nunca copies service_role o claves secretas a Express, HTML, JavaScript público o Git. Los ejemplos .env contienen solo marcadores. Evita compartir la salida de `supabase status`, porque puede mostrar claves.
-
-Para un host Node configura las variables públicas, ejecuta `npm ci --omit=dev` y `npm start`. También se conserva la entrada Express para Vercel en api/index.js. El despliegue de producción y la configuración privada del remoto no están verificados. No se ha fusionado un PR ni creado v4.0.
+El workflow de GitHub ejecuta las suites de Express, PostgreSQL y navegador sobre una pila local efímera. La ejecución remota del workflow solo puede comprobarse después de publicar los cambios y contar con la participación real de otro integrante.
 
 ## Si algo falla
 
-- **Docker no arranca en Windows:** ejecuta `wsl --version`. Si falta WSL, abre PowerShell como administrador y ejecuta `wsl --install --no-distribution`; completa el proceso, reinicia si Windows lo solicita y abre Docker Desktop.
-- **Puerto ocupado:** detén la otra aplicación que use 3000 o los puertos 54320–54324. Antes de test:browser:local detén tu Express.
-- **local:config dice que el archivo existe:** conserva la configuración y continúa con demo:seed o start:local.
-- **Error al crear usuarios o eliminar productos:** comprueba que la terminal de bright-action siga activa.
-- **401 o 403:** vuelve a iniciar sesión y comprueba que el perfil esté activo y tenga el rol necesario.
-- **No encuentras el correo de recuperación:** abre el buzón local indicado arriba y usa localhost:3000 para la web.
-- **Playwright no encuentra el navegador:** ejecuta `npx.cmd playwright install chromium`.
+- Docker no responde: abre Docker Desktop y espera el motor Linux; vuelve a ejecutar setup.
+- Faltan variables o tabla de sesiones: prepara el destino correcto con setup local o la migración autorizada remota.
+- El puerto 3000 está ocupado: usa PORT con otro puerto; los correos locales están configurados para localhost:3000.
+- Crear/eliminar cuentas devuelve error de configuración: revisa SUPABASE_AUTH_ADMIN_KEY privada en Express.
+- 401/403: comprueba sesión, actividad y rol; un cliente no puede modificar inventario ni acceder al panel.
+- Correo local: revisa Mailpit en http://127.0.0.1:54324.
+- La configuración existente apunta a otro destino: setup se detiene para conservarla; selecciónala explícitamente.
 
 ## Integrantes del equipo
 

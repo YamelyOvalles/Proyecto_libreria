@@ -11,7 +11,9 @@ async function main() {
     const client = new Client({ connectionString });
     try {
         await client.connect();
-        await client.query(fs.readFileSync(path.join(__dirname, '..', 'database/migrations/20261021_application_sessions.sql'), 'utf8'));
+        const directory = path.join(__dirname, '..', 'database/migrations');
+        for (const name of fs.readdirSync(directory).filter(name => /^\d+_.*\.sql$/.test(name)).sort())
+            await client.query(fs.readFileSync(path.join(directory, name), 'utf8'));
         console.log('Migración aditiva de sesiones aplicada.');
     } finally { await client.end(); }
 }

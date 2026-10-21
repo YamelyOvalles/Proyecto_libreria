@@ -31,7 +31,7 @@
             window.obtenerPerfilLibreria(sesion.user.id).catch(() => null)
         ]);
         if (!perfil?.activo) {
-            await window.libreriaSupabase.auth.signOut({ scope: "local" });
+            await window.libreriaAuth.signOut({ scope: "local" });
             window.location.replace("login.html?auth=inactivo");
             return;
         }
@@ -63,7 +63,7 @@
     }
 }());
 
-window.libreriaSupabase?.auth.onAuthStateChange(evento => {
+window.libreriaAuth.onAuthStateChange(evento => {
     if (evento !== "SIGNED_OUT") return;
     sessionStorage.removeItem("libreria.usuario");
     window.libreriaSesion = null;

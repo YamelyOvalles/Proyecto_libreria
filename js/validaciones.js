@@ -102,13 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             if (!window.libreriaSupabase) throw new Error("No se pudo conectar con Supabase.");
 
-            const { error } = await window.libreriaSupabase.rpc("enviar_mensaje_contacto", {
+            const { error } = await window.libreriaApi("/api/contacto", { method: "POST", body: {
                 p_nombre: campos.nombre.value.trim(),
                 p_correo: campos.correo.value.trim().toLowerCase(),
                 p_telefono: campos.telefono.value.trim() || null,
                 p_asunto: campos.asunto.options[campos.asunto.selectedIndex].text,
                 p_mensaje: campos.mensaje.value.trim()
-            });
+            } });
             if (error) throw error;
 
             formulario.reset();
