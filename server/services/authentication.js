@@ -4,7 +4,17 @@ function createAuthenticationService(applicationAuth, gateway) {
     const { upstream } = applicationAuth;
     async function request(path, body, token, method = 'POST') {
         const response = await upstream('/auth/v1/' + path, token, method, JSON.stringify(body), { 'Content-Type': 'application/json' });
-        if (!response.ok) throw new HttpError(response.status >= 500 ? 502 : response.status, 'Supabase rechazó la autenticación. Revisa los datos o intenta nuevamente.');
+        if (!response.ok) {
+            // No reenviar mensajes del proveedor: pueden incluir datos internos.
+            const failure = await response.json().catch(() => ({}));
+            const code = failure?.error_code || failure?.code;
+            let message = 'No se pudo completar la autenticación. Intenta nuevamente.';
+            if (response.status >= 500) message = 'El servicio de autenticación no está disponible. Intenta nuevamente en unos minutos.';
+            else if (response.status === 429) message = 'Demasiados intentos. Espera unos minutos antes de intentarlo nuevamente.';
+            else if (code === 'invalid_credentials') message = 'El correo o la contraseña no son correctos para este entorno. Revisa los datos e intenta nuevamente.';
+            else if (code === 'email_not_confirmed') message = 'Confirma tu correo electrónico antes de iniciar sesión.';
+            throw new HttpError(response.status >= 500 ? 502 : response.status, message);
+        }
         return response.status === 204 ? null : response.json();
     }
     async function establish(req, data, recovery = false) {

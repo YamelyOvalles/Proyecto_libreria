@@ -4,16 +4,16 @@ Aplicación académica de ISW-306. Express gestiona autenticación, sesiones y o
 
 ## Versión de esta entrega
 
-La rama de esta entrega es **correcciones-fases-3-4**, creada desde fase-3-backend (9c15d7b), la versión más reciente al iniciar las correcciones. main y fase-4-despliegue estaban en 7edaa5b y no se modificaron. Por indicación del usuario esta entrega se mantiene local, sin push ni merge.
+La rama de esta entrega es **correcciones-fases-3-4**, creada desde fase-3-backend (9c15d7b), la versión más reciente al iniciar las correcciones. main y fase-4-despliegue estaban en 7edaa5b y no se modificaron. La publicación de esta rama fue autorizada por el propietario; no incluye una fusión con otras ramas.
 
-Trabaja desde la carpeta de esta entrega. Cuando el propietario autorice publicarla, una copia nueva podrá obtenerse con:
+Una copia de la rama de entrega puede obtenerse con:
 
 ~~~powershell
 git clone --branch correcciones-fases-3-4 https://github.com/YamelyOvalles/Proyecto_libreria.git
 cd Proyecto_libreria
 ~~~
 
-Ese comando de clonación solo funciona después de publicar la rama. Los informes anteriores en evidencias describen sus respectivas versiones; el estado actual está en [el informe final](evidencias/correcciones-finales-fases-3-4.md).
+Los informes anteriores en evidencias describen sus respectivas versiones; el estado actual está en [el informe final](evidencias/correcciones-finales-fases-3-4.md).
 
 ## Inicio rápido con Docker
 

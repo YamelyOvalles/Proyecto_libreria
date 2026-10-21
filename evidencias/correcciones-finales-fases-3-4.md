@@ -2,9 +2,13 @@
 
 ## Alcance y estado real
 
-Se trabajó en **correcciones-fases-3-4**, creada desde fase-3-backend (9c15d7b), la rama más reciente al iniciar. main y fase-4-despliegue permanecieron en 7edaa5b; fase-3-backend conserva su referencia original. No se sobrescribieron cambios locales ajenos: el árbol estaba limpio al iniciar. Por la última instrucción del usuario, **esta entrega no se sube a GitHub ni se fusiona**.
+Se trabajó en **correcciones-fases-3-4**, creada desde fase-3-backend (9c15d7b), la rama más reciente al iniciar. main y fase-4-despliegue permanecieron en 7edaa5b; fase-3-backend conserva su referencia original. No se sobrescribieron cambios locales ajenos: el árbol estaba limpio al iniciar. El propietario autorizó posteriormente la limpieza y publicación de esta rama, sin fusionar otras ramas ni reescribir el historial.
 
 Se implementaron y probaron localmente las correcciones verificables. La ejecución remota, las credenciales del proveedor y la revisión efectiva de otro integrante no pueden darse por completadas desde esta copia. El informe histórico anterior se identifica como tal.
+
+### Comprobación posterior del acceso local
+
+Se verificó un inicio de sesión real como administrador con admin@demo.local y la contraseña privada configurada en scripts/.env.demo, seguido del cierre de esa sesión de diagnóstico. La cuenta pruebaadmin@gmail.com no existe en la pila local consultada; las cuentas del proyecto remoto son independientes. Los errores de autenticación distinguen credenciales incorrectas, correo sin confirmar, límite de intentos y fallos del proveedor sin exponer su respuesta interna. La suite ampliada pasó 46 pruebas; los resultados anteriores corresponden a la entrega inicial descrita más abajo.
 
 | Fase | Problema | Corrección realizada | Prueba ejecutada | Estado |
 | --- | --- | --- | --- | --- |

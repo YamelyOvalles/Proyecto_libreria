@@ -1,6 +1,25 @@
 const { test, before, after }=require('node:test');
 const assert=require('node:assert/strict');
 const {createApp}=require('../server/app');
+const {createAuthenticationService}=require('../server/services/authentication');
+test('errores de autenticación explican el rechazo sin exponer respuestas privadas del proveedor',async()=>{
+    const cases=[
+        [400,{error_code:'invalid_credentials'},400,/correo o la contraseña/],
+        [403,{code:'email_not_confirmed'},403,/Confirma tu correo/],
+        [429,{code:'over_request_rate_limit'},429,/Demasiados intentos/],
+        [500,{code:'invalid_credentials'},502,/no está disponible/],
+        [400,{code:'unknown'},400,/No se pudo completar/],
+        [502,null,502,/no está disponible/]
+    ];
+    for(const [status,payload,expected,message]of cases){
+        const service=createAuthenticationService({upstream:async()=>payload===null?
+            new Response('private-provider-detail',{status}):Response.json({...payload,message:'private-provider-detail'},{status})},{});
+        await assert.rejects(service.request('token?grant_type=password',{}),error=>{
+            assert.equal(error.status,expected);assert.match(error.message,message);
+            assert.doesNotMatch(error.message,/private-provider-detail/);return true;
+        });
+    }
+});
 const config={url:'http://127.0.0.1:54321',anonKey:'sb_publishable_test'};
 const ids={cliente:'00000000-0000-4000-8000-000000000001',empleado:'00000000-0000-4000-8000-000000000002',administrador:'00000000-0000-4000-8000-000000000003'};
 let server,base,calls=[],refreshStarted,releaseRefresh,expiry=false;
